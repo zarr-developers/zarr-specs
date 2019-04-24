@@ -89,3 +89,55 @@ hierarchy are held in a *store*. To enable a variety of different
 store types to be used, the core protocol defines a simple *store
 interface* which is a common set of operations that a store must
 provide.
+
+Node names
+----------
+
+TODO define constraints on node names
+
+Data types
+----------
+
+TODO define core data types
+
+Regular chunk grids
+-------------------
+
+TODO define regular chunk grids, including how to form a key for each chunk in a grid
+
+Memory layouts
+--------------
+
+TODO define "C" and "F" memory layouts
+
+Codec interface
+---------------
+
+TODO define the codec interface
+
+Array metadata
+--------------
+
+TODO define the structure and content of array metadata documents
+
+Group metadata
+--------------
+
+TODO define the structure and content of group metadata documents
+
+User attributes
+---------------
+
+TODO define attributes documents
+
+Store interface
+---------------
+
+TODO define the store interface
+
+Storage protocol
+----------------
+
+TODO define how high level operations like creating a group or array 
+translate into low level key/value operations on the store interface
+
