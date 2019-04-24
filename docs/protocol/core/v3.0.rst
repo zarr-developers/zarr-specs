@@ -1,0 +1,3 @@
+Zarr core protocol version 3.0
+==============================
+
