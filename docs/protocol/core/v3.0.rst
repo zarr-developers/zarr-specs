@@ -35,11 +35,25 @@ An array contains zero or more *elements*. Each element can be
 identified by a tuple of coordinates, one for each dimension of the
 array. If all dimensions of an array have finite length, then the
 number of elements in the array is given by the product of the
-dimension lengths.
+dimension lengths. An array element may be empty, or it may have a
+value.
 
-TODO data type
+An array is associated with a *data type*. A data type defines the set
+of possible values that the array may contain, and a binary
+representation (i.e., sequence of bytes) for each possible value. For
+example, the little-endian 32-bit signed integer data type defines
+binary representations for all integers in the range −2,147,483,648 to
+2,147,483,647. The core protocol only considers a limited set of data
+types, but protocol extensions may define other data types.
 
-TODO chunks, chunk shape, chunk grid
+An array is divided into a set of *chunks*, where each chunk is a
+hyperrectangle defined by a tuple of intervals, one for each dimension
+of the array. The shape of a chunk is the tuple of interval lengths,
+and the size of a chunk (i.e., number of elements contained within the
+chunk) is the product of its interval lengths.
+
+The core protocol only considers the case where all chunks have the
+same shape and the chunks form a regular grid. However, protocol
+extensions may define other types of grid, such as rectilinear grids.
 
 TODO additional constraint on names
-
