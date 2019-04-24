@@ -9,9 +9,8 @@ either a *group* or an *array*. Group nodes may have children
 but array nodes may not.
 
 Each node in a hierarchy has a *name* which is a string of ASCII
-characters with some additional constraints (see below). Two sibling
-nodes cannot have the same name. The root node does not have a
-name.
+characters with some additional constraints. Two sibling nodes cannot 
+have the same name. The root node does not have a name.
 
 Each node in a hierarchy has a *path* which uniquely identifies that
 node and defines its location within the hierarchy. The path is formed 
