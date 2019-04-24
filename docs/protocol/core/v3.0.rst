@@ -13,13 +13,13 @@ characters with some additional constraints (see below). Two sibling
 nodes cannot have the same name. The root node does not have a
 name.
 
-Each node in a hierarchy has a *path* which uniquely identifies all
-nodes in the hierarchy. The path is formed by joining together the "/"
-character, followed by the names of all ancestor nodes separated by
-the "/" character, followed by the name of the node itself. For
-example, the path "/foo/bar" identifies a node named "bar", whose
-parent is named "foo", whose parent is the root of the hierarchy. The
-string "/" identifies the root node.
+Each node in a hierarchy has a *path* which uniquely identifies that
+node and defines its location within the hierarchy. The path is formed 
+by joining together the "/" character, followed by the names of all 
+ancestor nodes separated by the "/" character, followed by the name of 
+the node itself. For example, the path "/foo/bar" identifies a node 
+named "bar", whose parent is named "foo", whose parent is the root of 
+the hierarchy. The string "/" identifies the root node.
 
 An array has a fixed number of *dimensions*. Each dimension has an
 integer length. The core protocol only considers the case where the
