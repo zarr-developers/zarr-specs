@@ -53,8 +53,40 @@ of the array. The shape of a chunk is the tuple of interval lengths,
 and the size of a chunk (i.e., number of elements contained within the
 chunk) is the product of its interval lengths.
 
-The core protocol only considers the case where all chunks have the
-same shape and the chunks form a regular grid. However, protocol
-extensions may define other types of grid, such as rectilinear grids.
+The chunks of an array are organised into a *grid*. The core protocol
+only considers the case where all chunks have the same shape and the
+chunks form a regular grid. However, protocol extensions may define
+other grid types such as rectilinear grids.
 
-TODO additional constraint on names
+An array is associated with a *memory layout* which defines how to
+construct a binary representation of a single chunk by organising the
+binary values within the chunk into a single contiguous sequence of
+bytes. The core protocol defines two types of memory layout based on
+"C" (row-major) and "F" (column-major) ordering of values, but
+protocol extensions may define other memory layouts.
+
+An array is associated with an *encoding pipeline*, which is a
+sequence of zero or more *codecs* that transforms the binary
+representation of a chunk in some way. For example, an encoding
+pipeline might include a checksum codec to ensure data integrity, and
+a compression codec to reduce data size. All codecs implement a common
+*codec interface* which provides a pair of operations, one to perform
+the transformation (encode), the other to reverse the transformation
+(decode).
+
+Each node in a hierarchy is represented by a *metadata document*,
+which is a machine-readable document containing essential processing
+information about the node. For example, an array metadata document
+will specify the number of dimensions, length of each dimension, data
+type, chunk shape, memory layout and encoding pipeline for that array.
+
+Each node in a hierarchy may have an *attributes document*, which is a
+machine-readable document containing information that may be useful to
+users of the data but is not essential to the basic processing of the
+node.
+
+The metadata, attributes and encoded chunk data for all nodes in a
+hierarchy are held in a *store*. To enable a variety of different
+store types to be used, the core protocol defines a simple *store
+interface* which is a common set of operations that a store must
+provide.
