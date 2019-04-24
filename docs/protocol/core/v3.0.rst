@@ -1,3 +1,45 @@
 Zarr core protocol version 3.0
 ==============================
 
+Conceptual model
+================
+
+A Zarr *hierarchy* is a tree structure, where each node in the tree is
+either a *group* or an *array*. Group nodes may have children
+but array nodes may not.
+
+Each node in a hierarchy has a *name* which is a string of ASCII
+characters with some additional constraints (see below). Two sibling
+nodes cannot have the same name. The root node does not have a
+name.
+
+Each node in a hierarchy has a *path* which uniquely identifies all
+nodes in the hierarchy. The path is formed by joining together the "/"
+character, followed by the names of all ancestor nodes separated by
+the "/" character, followed by the name of the node itself. For
+example, the path "/foo/bar" identifies a node named "bar", whose
+parent is named "foo", whose parent is the root of the hierarchy. The
+string "/" identifies the root node.
+
+An array has a fixed number of *dimensions*. Each dimension has an
+integer length. In the simplest case, the lengths of all dimensions
+are finite. However, a dimension can also be of infinite length, or
+variable length.
+
+The *shape* of an array is the tuple of dimension lengths. For
+example, if an array has 2 dimensions, where the length of the first
+dimension is 100 and the length of the second dimension is 20, then
+the shape of the array is (100, 20).
+
+An array contains zero or more *elements*. Each element can be
+identified by a tuple of coordinates, one for each dimension of the
+array. If all dimensions of an array have finite length, then the
+number of elements in the array is given by the product of the
+dimension lengths.
+
+TODO data type
+
+TODO chunks, chunk shape, chunk grid
+
+TODO additional constraint on names
+
