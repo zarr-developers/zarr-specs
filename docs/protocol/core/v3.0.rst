@@ -1,6 +1,7 @@
 Zarr core protocol version 3.0
 ==============================
 
+
 Conceptual model
 ----------------
 
@@ -90,10 +91,12 @@ store types to be used, the core protocol defines a simple *store
 interface* which is a common set of operations that a store must
 provide.
 
+
 Node names
 ----------
 
 TODO define constraints on node names
+
 
 Data types
 ----------
@@ -105,6 +108,7 @@ Regular chunk grids
 
 TODO define regular chunk grids, including how to form a key for each chunk in a grid
 
+
 Memory layouts
 --------------
 
@@ -115,25 +119,30 @@ Codec interface
 
 TODO define the codec interface
 
+
 Array metadata
 --------------
 
 TODO define the structure and content of array metadata documents
+
 
 Group metadata
 --------------
 
 TODO define the structure and content of group metadata documents
 
+
 User attributes
 ---------------
 
 TODO define attributes documents
 
+
 Store interface
 ---------------
 
 TODO define the store interface
+
 
 Storage protocol
 ----------------
