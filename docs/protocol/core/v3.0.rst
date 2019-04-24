@@ -2,7 +2,7 @@ Zarr core protocol version 3.0
 ==============================
 
 Conceptual model
-================
+----------------
 
 A Zarr *hierarchy* is a tree structure, where each node in the tree is
 either a *group* or an *array*. Group nodes may have children
