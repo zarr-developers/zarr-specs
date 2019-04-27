@@ -21,7 +21,7 @@ the node itself. For example, the path "/foo/bar" identifies a node
 named "bar", whose parent is named "foo", whose parent is the root of 
 the hierarchy. The string "/" identifies the root node.
 
-An array has a fixed number of *dimensions*. Each dimension has an
+An array has a fixed number of zero or more *dimensions*. Each dimension has an
 integer length. The core protocol only considers the case where the
 lengths of all dimensions are finite. However, protocol extensions may
 be defined which allow a dimension to have infinite or variable
