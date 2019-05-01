@@ -1,3 +1,152 @@
 Zarr core protocol version 3.0
 ==============================
 
+
+Conceptual model
+----------------
+
+A Zarr *hierarchy* is a tree structure, where each node in the tree is
+either a *group* or an *array*. Group nodes may have children
+but array nodes may not.
+
+Each node in a hierarchy has a *name* which is a string of ASCII
+characters with some additional constraints. Two sibling nodes cannot 
+have the same name. The root node does not have a name.
+
+Each node in a hierarchy has a *path* which uniquely identifies that
+node and defines its location within the hierarchy. The path is formed 
+by joining together the "/" character, followed by the names of all 
+ancestor nodes separated by the "/" character, followed by the name of 
+the node itself. For example, the path "/foo/bar" identifies a node 
+named "bar", whose parent is named "foo", whose parent is the root of 
+the hierarchy. The string "/" identifies the root node.
+
+An array has a fixed number of zero or more *dimensions*. Each dimension has an
+integer length. The core protocol only considers the case where the
+lengths of all dimensions are finite. However, protocol extensions may
+be defined which allow a dimension to have infinite or variable
+length.
+
+The *shape* of an array is the tuple of dimension lengths. For
+example, if an array has 2 dimensions, where the length of the first
+dimension is 100 and the length of the second dimension is 20, then
+the shape of the array is (100, 20).
+
+An array contains zero or more *elements*. Each element can be
+identified by a tuple of coordinates, one for each dimension of the
+array. If all dimensions of an array have finite length, then the
+number of elements in the array is given by the product of the
+dimension lengths. An array element may be empty, or it may have a
+value.
+
+An array is associated with a *data type*. A data type defines the set
+of possible values that the array may contain, and a binary
+representation (i.e., sequence of bytes) for each possible value. For
+example, the little-endian 32-bit signed integer data type defines
+binary representations for all integers in the range −2,147,483,648 to
+2,147,483,647. The core protocol only considers a limited set of data
+types, but protocol extensions may define other data types.
+
+An array is divided into a set of *chunks*, where each chunk is a
+hyperrectangle defined by a tuple of intervals, one for each dimension
+of the array. The shape of a chunk is the tuple of interval lengths,
+and the size of a chunk (i.e., number of elements contained within the
+chunk) is the product of its interval lengths.
+
+The chunks of an array are organised into a *grid*. The core protocol
+only considers the case where all chunks have the same shape and the
+chunks form a regular grid. However, protocol extensions may define
+other grid types such as rectilinear grids.
+
+An array is associated with a *memory layout* which defines how to
+construct a binary representation of a single chunk by organising the
+binary values within the chunk into a single contiguous sequence of
+bytes. The core protocol defines two types of memory layout based on
+"C" (row-major) and "F" (column-major) ordering of values, but
+protocol extensions may define other memory layouts.
+
+An array is associated with an *encoding pipeline*, which is a
+sequence of zero or more *codecs* that transforms the binary
+representation of a chunk in some way. For example, an encoding
+pipeline might include a checksum codec to ensure data integrity, and
+a compression codec to reduce data size. All codecs implement a common
+*codec interface* which provides a pair of operations, one to perform
+the transformation (encode), the other to reverse the transformation
+(decode).
+
+Each node in a hierarchy is represented by a *metadata document*,
+which is a machine-readable document containing essential processing
+information about the node. For example, an array metadata document
+will specify the number of dimensions, length of each dimension, data
+type, chunk shape, memory layout and encoding pipeline for that array.
+
+Each node in a hierarchy may have an *attributes document*, which is a
+machine-readable document containing information that may be useful to
+users of the data but is not essential to the basic processing of the
+node.
+
+The metadata, attributes and encoded chunk data for all nodes in a
+hierarchy are held in a *store*. To enable a variety of different
+store types to be used, the core protocol defines a simple *store
+interface* which is a common set of operations that a store must
+provide.
+
+
+Node names
+----------
+
+TODO define constraints on node names
+
+
+Data types
+----------
+
+TODO define core data types
+
+Regular chunk grids
+-------------------
+
+TODO define regular chunk grids, including how to form a key for each chunk in a grid
+
+
+Memory layouts
+--------------
+
+TODO define "C" and "F" memory layouts
+
+Codec interface
+---------------
+
+TODO define the codec interface
+
+
+Array metadata
+--------------
+
+TODO define the structure and content of array metadata documents
+
+
+Group metadata
+--------------
+
+TODO define the structure and content of group metadata documents
+
+
+User attributes
+---------------
+
+TODO define attributes documents
+
+
+Store interface
+---------------
+
+TODO define the store interface
+
+
+Storage protocol
+----------------
+
+TODO define how high level operations like creating a group or array 
+translate into low level key/value operations on the store interface
+
