@@ -220,6 +220,9 @@ Core data types
       - 16
       - big-endian
 
+Floating point types correspond to basic binary interchange formats as
+defined by IEEE 754-2008.
+
 
 Regular chunk grids
 -------------------
