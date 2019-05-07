@@ -1,0 +1,5 @@
+# emacs temp files
+*~
+
+# sphinx build files
+docs/_build
