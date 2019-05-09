@@ -7,4 +7,5 @@ Under construction.
    :maxdepth: 1
    :caption: Contents:
 
-   extensions/todo
+   extensions/example/v1.0
+
