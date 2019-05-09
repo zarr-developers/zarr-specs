@@ -133,7 +133,7 @@ Core data types
      - Size (no. bytes)
      - Byte order
    * - `bool`
-     - Boolean
+     - Boolean, with False encoded as `\x00` and True encoded as `\x01`
      - 1
      - None
    * - `i1`
