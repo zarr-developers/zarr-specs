@@ -155,11 +155,20 @@ within the chunk at grid index (i // dx, j // dy, k // dz, ...), where
 (i % dx, j % dy, k % dz, ...) within that chunk. For example, @@TODO
 example.
 
-The key for chunk with grid index (i, j, k, ...) is formed by
-concatenating the ASCII string representation of each index, joined
-together via the period (".") character. For example, in a 3
-dimensional array, the key for the chunk at grid index (1, 23, 45) is
-the string "1.23.45".
+The key for chunk with grid index (i, j, k, ...) is formed by joining
+together the path of the array in which the chunk occurs, then a
+forward slash character ("/"), then a prefix, then the ASCII string
+representations of each index, then a suffix. The prefix, chunk
+indices and suffix are joined using a separator. The default value for
+the prefix is the empty string (""), the default value for the
+separator is the period character (".") and the default value for the
+suffix is the empty string (""), but these values may be configured,
+see the section on `Array metadata`_ below.
+
+For example, in a 3 dimensional array at path "/foo/bar" configured
+with default values for the chunk key prefix, suffix and separator,
+the key for the chunk at grid index (1, 23, 45) is the string
+"/foo/bar/1.23.45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
