@@ -126,99 +126,100 @@ Core data types
 ~~~~~~~~~~~~~~~
 
 .. list-table:: Data types
-    :header-rows: 1
-    * - Identifier
-      - Numerical type
-      - Size (no. bytes)
-      - Byte order
-    * - `bool`
-      - Boolean
-      - 1
-      - None
-    * - `i1`
-      - signed integer
-      - 1
-      - None
-    * - `<i2`
-      - signed integer
-      - 2
-      - little-endian
-    * - `<i4`
-      - signed integer
-      - 4
-      - little-endian
-    * - `<i8`
-      - signed integer
-      - 8
-      - little-endian
-    * - `>i2`
-      - signed integer
-      - 2
-      - big-endian
-    * - `>i4`
-      - signed integer
-      - 4
-      - big-endian
-    * - `>i8`
-      - signed integer
-      - 8
-      - big-endian
-    * - `u1`
-      - signed integer
-      - 1
-      - None
-    * - `<u2`
-      - unsigned integer
-      - 2
-      - little-endian
-    * - `<u4`
-      - unsigned integer
-      - 4
-      - little-endian
-    * - `<u8`
-      - unsigned integer
-      - 8
-      - little-endian
-    * - `<f2`
-      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
-      - 2
-      - little-endian
-    * - `<f4`
-      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
-      - 4
-      - little-endian
-    * - `<f8`
-      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
-      - 8
-      - little-endian
-    * - `>f2`
-      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
-      - 2
-      - big-endian
-    * - `>f4`
-      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
-      - 4
-      - big-endian
-    * - `>f8`
-      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
-      - 8
-      - big-endian
-    * - `<c8`
-      - complex number, represented by two 32-bit floats (real and imaginary components)
-      - 8
-      - little-endian
-    * - `<c16`
-      - complex number, represented by two 64-bit floats (real and imaginary components)
-      - 16
-      - little-endian
-    * - `>c8`
-      - complex number, represented by two 32-bit floats (real and imaginary components)
-      - 8
-      - big-endian
-    * - `>c16`
-      - complex number, represented by two 64-bit floats (real and imaginary components)
-      - 16
-      - big-endian
+   :header-rows: 1
+
+   * - Identifier
+     - Numerical type
+     - Size (no. bytes)
+     - Byte order
+   * - `bool`
+     - Boolean
+     - 1
+     - None
+   * - `i1`
+     - signed integer
+     - 1
+     - None
+   * - `<i2`
+     - signed integer
+     - 2
+     - little-endian
+   * - `<i4`
+     - signed integer
+     - 4
+     - little-endian
+   * - `<i8`
+     - signed integer
+     - 8
+     - little-endian
+   * - `>i2`
+     - signed integer
+     - 2
+     - big-endian
+   * - `>i4`
+     - signed integer
+     - 4
+     - big-endian
+   * - `>i8`
+     - signed integer
+     - 8
+     - big-endian
+   * - `u1`
+     - signed integer
+     - 1
+     - None
+   * - `<u2`
+     - unsigned integer
+     - 2
+     - little-endian
+   * - `<u4`
+     - unsigned integer
+     - 4
+     - little-endian
+   * - `<u8`
+     - unsigned integer
+     - 8
+     - little-endian
+   * - `<f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - little-endian
+   * - `<f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - little-endian
+   * - `<f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - little-endian
+   * - `>f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - big-endian
+   * - `>f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - big-endian
+   * - `>f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - big-endian
+   * - `<c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - little-endian
+   * - `<c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - little-endian
+   * - `>c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - big-endian
+   * - `>c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - big-endian
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
