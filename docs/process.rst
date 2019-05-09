@@ -83,7 +83,7 @@ The Zarr core protocol spec is versioned using a [major].[minor]
 versioning scheme. The spec documents live in the zarr-specs GitHub
 repository at the location ``docs/protocol/core/v[major].[minor].rst``.
 
-A new major version of the core protocol spec can include change which
+A new major version of the core protocol spec can include changes which
 are not backwards-compatible, in the sense that implementations of
 previous major protocol versions would not correctly interpret data
 written using the new protocol version, and therefore should not
