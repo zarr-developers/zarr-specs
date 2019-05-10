@@ -1,7 +1,7 @@
 Zarr core protocol version 3.0
 ==============================
 
-**Work in progress**
+**Work in Progress**
 
 This version:
     https://zarr-specs.readthedocs.io/en/core-protocol-v3.0-dev/protocol/core/v3.0.html
