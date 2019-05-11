@@ -4,10 +4,10 @@ Zarr core protocol version 3.0
 **Work in Progress**
 
 This version:
-    https://zarr-specs.readthedocs.io/en/core-protocol-v3.0-dev/protocol/core/v3.0.html
-    TODO replace "core-protocol-v3.0-dev" with a git tag when a snapshot version is tagged
-Latest published version:
-    https://zarr-specs.readthedocs.io/en/latest/protocol/core/v3.0.html (not yet published)
+    http://purl.org/zarr/spec/protocol/core/3.0/dev
+    TODO replace "dev" with a git tag when a draft is tagged, and create a PURL redirecting to RTFD
+Latest version:
+    http://purl.org/zarr/spec/protocol/core/3.0/latest
 Issue tracking:
     [GitHub issues](https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0)
 Suggest an edit for this spec:
