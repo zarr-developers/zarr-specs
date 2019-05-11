@@ -7,7 +7,7 @@ This version:
     http://purl.org/zarr/spec/protocol/core/3.0/dev
     TODO replace "dev" with a git tag when a draft is tagged, and create a PURL redirecting to RTFD
 Latest version:
-    http://purl.org/zarr/spec/protocol/core/3.0/latest
+    http://purl.org/zarr/spec/protocol/core/3.0
 Issue tracking:
     [GitHub issues](https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0)
 Suggest an edit for this spec:
