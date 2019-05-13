@@ -123,7 +123,60 @@ TODO define the codec interface
 Array metadata
 --------------
 
-TODO define the structure and content of array metadata documents
+An array metadata document is a JSON document containing configuration
+metadata for an array. The document must contain a single object, here
+called the metadata object. The metadata object must contain the
+following keys:
+
+`zarr_format`
+
+    Version number of the Zarr core protocol that defines the metadata
+    format. For arrays conforming to this specification, the value
+    must be the string "3.0".
+
+`zarr_format_spec`
+
+    URI of the Zarr core protocol that defines the metadata
+    format. For arrays conforming to this specification, the value
+    must be the string "http://purl.org/zarr/spec/protocol/core/3.0".
+
+`shape`
+
+    An array of integers providing the length of each dimension of the
+    array.
+
+`data_type`
+
+    The data type of the array. If the data type is defined in this
+    specification, then the value must be the data type identifier
+    provided as a string. If the data type is defined via a protocol
+    extension, then the value must be an object with the keys `value`,
+    `extension_spec` and `fallback`, described further below in the
+    `Protocol extensions`_ section.
+
+`chunk_grid`
+
+    The chunk grid of the array. If the chunk grid is a regular chunk
+    grid as defined in this specification, then the value must be an
+    object with the keys `grid_type` and `chunk_shape`, where the
+    value of the `grid_type` key is the string "regular" and the value
+    of the `chunk_shape` key is an array of integers providing the
+    lengths of the chunk along each dimension of the array. If the
+    chunk grid is defined in a protocol extension, then the value must
+    be an object with the keys `grid_type` and `extension_spec`,
+    described further below in the `Protocol extensions`_ section.
+
+`chunk_memory_layout`
+
+    TODO
+
+`chunk_encoding_pipeline`
+
+    TODO
+
+`fill_value`
+
+    TODO
 
 
 Group metadata
@@ -150,3 +203,7 @@ Storage protocol
 TODO define how high level operations like creating a group or array 
 translate into low level key/value operations on the store interface
 
+Protocol extensions
+-------------------
+
+TODO define different types of protocol extension.
