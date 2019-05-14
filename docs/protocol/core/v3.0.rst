@@ -125,56 +125,110 @@ Array metadata
 
 An array metadata document is a JSON document containing configuration
 metadata for an array. The document must contain a single object, here
-called the metadata object. The metadata object must contain the
-following keys:
+called the array metadata object. The array metadata object must
+contain the following keys:
 
-`zarr_format`
+`zarr_format` (required)
 
-    Version number of the Zarr core protocol that defines the metadata
-    format. For arrays conforming to this specification, the value
-    must be the string "3.0".
+    URI of the Zarr core protocol specification that defines the
+    metadata format. For arrays written by software conforming to this
+    specification, the value must be the string
+    "http://purl.org/zarr/spec/protocol/core/3.0".
 
-`zarr_format_spec`
+    Implementations of this protocol may assume that the final path
+    segment of this URI ("3.0") represents the core protocol version
+    number, where "3" is the major version number and "0" is the minor
+    version number. Implementations of this protocol may also assume
+    that future versions of this protocol that retain the same major
+    versioning number ("3") will be backwards-compatible, in the sense
+    that any new features added to the protocol can be safely
+    ignored. In other words, implementations of this protocol may read
+    any array metadata object where the major version number is "3"
+    and interpret the metadata as defined in this specification,
+    ignoring any metadata keys not defined here.
 
-    URI of the Zarr core protocol that defines the metadata
-    format. For arrays conforming to this specification, the value
-    must be the string "http://purl.org/zarr/spec/protocol/core/3.0".
+    Note that this value is given as a URI rather than just as a
+    simple version number string to help with discovery of this
+    specification.
 
-`shape`
+`shape` (required)
 
     An array of integers providing the length of each dimension of the
-    array.
+    array. For example, a value ``[10, 20]`` indicates a
+    two-dimensional array, where the first dimension has length 10 and
+    the second dimension has length 20.
 
-`data_type`
+`data_type` (required)
 
     The data type of the array. If the data type is defined in this
     specification, then the value must be the data type identifier
-    provided as a string. If the data type is defined via a protocol
-    extension, then the value must be an object with the keys `value`,
-    `extension_spec` and `fallback`, described further below in the
-    `Protocol extensions`_ section.
+    provided as a string. For example, ``"<f8"`` for little-endian
+    64-bit floating point number.
 
-`chunk_grid`
+    The `data_type` key is an extension point, and the value may be
+    defined by a protocol extension. If the data type is defined by a
+    protocol extension, then the value must be an object with the keys
+    `extension_spec`, `type` and `fallback`. The `extension_spec` key
+    is required and its value must be a URI that identifies the
+    protocol extension and dereferences to a human-readable
+    representation of the specification.  The `type` key is required
+    and its value is defined by the protocol extension. The `fallback`
+    key is optional and, if provided, its value must be one of the
+    data type identifiers defined in this specification. If an
+    implementation does not recognise the extension, but the
+    `fallback` key is present, then the implementation may proceed
+    using the value of the `fallback` key as the data type. The object
+    may also contain other keys as defined by the protocol extension.
+
+`chunk_grid` (required)
 
     The chunk grid of the array. If the chunk grid is a regular chunk
     grid as defined in this specification, then the value must be an
-    object with the keys `grid_type` and `chunk_shape`, where the
-    value of the `grid_type` key is the string "regular" and the value
-    of the `chunk_shape` key is an array of integers providing the
-    lengths of the chunk along each dimension of the array. If the
-    chunk grid is defined in a protocol extension, then the value must
-    be an object with the keys `grid_type` and `extension_spec`,
-    described further below in the `Protocol extensions`_ section.
+    object with the keys `type` and `chunk_shape`. The value of the
+    `type` key must be the string ``"regular"``, and the value of the
+    `chunk_shape` key must be an array of integers providing the
+    lengths of the chunk along each dimension of the array. For
+    example, ``{"type": "regular", "chunk_shape": [2, 5]}`` for a
+    regular grid where the chunks have length 2 along the first
+    dimension and length 5 along the second dimension.
 
-`chunk_memory_layout`
+    The `chunk_grid` key is an extension point, and the value may
+    defined by a protocol extension. If the chunk grid type is defined
+    by a protocol extension, then the value must be an object with the
+    keys `extension_spec` and `type`. The `extension_spec` key is
+    required and the value must be a URI that identifies the protocol
+    extension and dereferences to a human-readable representation of
+    the specification.  The `type` key is required and the value is
+    defined by the protocol extension. The object may also contain
+    other keys as defined by the protocol extension.
+
+`chunk_memory_layout` (required)
+
+    The internal memory layout of the chunks. Use the value ``"C"`` to
+    indicate C contiguous memory layout or ``"F"`` to indicate F
+    contiguous memory layout as defined in this specification @@TODO
+    link to sections.
+
+    The `chunk_memory_layout` key is an extension point, and the value
+    may defined by a protocol extension. If the chunk memory layout
+    type is defined by a protocol extension, then the value must be an
+    object with the keys `extension_spec` and `type`. The
+    `extension_spec` key is required and the value must be a URI that
+    identifies the protocol extension and dereferences to a
+    human-readable representation of the specification.  The `type`
+    key is required and the value is defined by the protocol
+    extension. The object may also contain other keys as defined by
+    the protocol extension.
+
+`chunk_encoding_pipeline` (required)
 
     TODO
 
-`chunk_encoding_pipeline`
+`fill_value` (required)
 
     TODO
 
-`fill_value`
+`extensions` (optional)
 
     TODO
 
