@@ -138,15 +138,260 @@ User attributes
 TODO define attributes documents
 
 
-Store interface
----------------
+Stores
+------
 
-TODO define the store interface
+A Zarr store is a system that can be used to store and retrieve data
+from a Zarr hierarchy. For a store to be compatible with this
+protocol, it must support a set of operations defined in the `Store
+interface`_ subsection. The store interface can be implemented using a
+variety of underlying storage technologies, described in the
+subsection on `Store implementations`_.
+
+Store interface
+~~~~~~~~~~~~~~~
+
+The store interface is intended to be simple to implement using a
+variety of different underlying storage technologies. It is defined in
+a general way here, but it should be straightforward to translate into
+a software interface in any given programming languages. The goal is
+that an implementation of this specification could be modular and
+allow for different store implementations to be used.
+
+The store interface defines a set of operations involving `keys` and
+`values`. In the context of this interface, a `key` is any ASCII
+string containing only characters in the ranges `a-z`, `A-Z`, `0-9`,
+or in the set `/.-_`; and a `value` is any sequence of bytes. It is
+assumed that the store holds (`key`, `value`) pairs, with only one
+such pair for any given `key`. I.e., a store is a mapping from keys to
+values.
+
+The following operations are required:
+
+``set_value`` - Store a (`key`, `value`) pair.
+
+    | Parameters: `key`, `value`
+    | Output: none
+
+``get_value`` - Retrieve the `value` associated with a given `key`.
+
+    | Parameters: `key`
+    | Output: `value`
+
+``list_keys`` - Retrieve all `keys` in the store.
+
+    | Parameters: none
+    | Output: set of `keys`
+
+``contains_key`` - Determine if the store contains a given `key`.
+
+    | Parameters: `key`
+    | Output: True or False
+
+The following operations are optional, but if provided may be used by
+an implementation of this protocol to optimise some operations:
+
+``list_keys_with_prefix`` - Retrieve all keys with a given prefix.
+
+    | Parameters: `key` prefix
+    | Output: set of `keys`
+
+    If not supported, this operation can be achieved by using
+    `list_keys` then filtering the resulting set of keys to those with
+    the given prefix.
+    
+``list_prefixes`` - Retrieve all key prefixes which themselves have a
+given prefix, assuming the delimiter "/".
+
+    | Parameters: `key` prefix
+    | Output: set of `key` prefixes
+
+    For example, if a store contains the keys "a/b", "a/c", "d", "e",
+    "e/f", then ``list_prefixes("")`` would return "a/" and "e/".
+
+    For example, if a store contains the keys "foo/bar/baz" and
+    "foo/spam/eggs" then ``list_prefixes("")`` would return "foo/",
+    and ``list_prefixes("foo/")`` would return "foo/bar/" and
+    "foo/spam/".
+
+    The ``list_prefixes`` operation, if available, allows keys to be
+    queried in a similar manner to how directories on a file system
+    can be listed, although note that there is no requirement for a
+    store implementation to use a file system or to be aware of any
+    structure within the keys or attach any special meaning to the "/"
+    character within keys.
+
+    If the ``list_prefixes`` operation is not supported by a store then
+    the same operation can be achieved by obtaining the result of the
+    ``list_keys`` operation and post-processing the keys by @@TODO
+    describe algorithm succintly@@.
+
+
+Store implementations
+~~~~~~~~~~~~~~~~~~~~~
+
+TODO 
 
 
 Storage protocol
 ----------------
 
-TODO define how high level operations like creating a group or array 
-translate into low level key/value operations on the store interface
+This section describes how to translate high level operations to
+create, delete or modify Zarr hierarchies, groups or arrays, into low
+level operations on the key/value store interface defined above.
 
+Key prefixes
+~~~~~~~~~~~~
+
+This section makes a distinction between `hierarchy paths`, which are
+logical paths which define the location of group or array nodes within
+a Zarr hierarchy, and `storage keys`, which are keys used to store and
+retrieve metadata and data via the store interface.
+
+The Zarr storage protocol uses a mapping between hierarchy paths and
+storage key prefixes, described as follows.
+
+A hierarchy path is translated into a key prefix by removing the
+leading "/", then splitting the hierarchy path into path components by
+the "/" delimiter. Each path component is then translated into a key
+component by appending ".g" if the path component corresponds to a
+group or appending ".a" if the path component corresponds to an
+array. These key components are then rejoined using the "/"
+delimiter. To make it easier for various storage systems to provide
+optimisations, separate key prefixes are used for metadata and chunk
+data. For metadata the prefix "meta/" is prepended, and for chunk data
+the prefix "data/" is prepended. Finally, a trailing "/" is appended
+if not already present.
+
+For a group at an arbitrary hierarchy path `P`, let `M` be the
+corresponding metadata key prefix. The key for the group metadata
+document is formed by appending "group.json" to `M`.
+
+For an array at an arbitrary hierarchy path `P`, let `M` be the
+corresponding metadata key prefix and `D` be the corresponding data
+prefix. The key for the array metadata document is formed by appending
+"array.json" to `M`. @@TODO chunk keys@@.
+
+@@TODO keys for user attributes.@@
+
+For example, for a group at the root hierarchy path "/", the metadata
+key prefix is "meta/", and the group metadata document is stored under
+the key "meta/group.json". The data key prefix is "data/".
+
+For example, for a group at hierarchy path "/foo/bar", the metadata
+key prefix is "meta/foo.g/bar.g/", and the group metadata document is
+stored under the key "meta/foo.g/bar.g/group.json". The data key
+prefix is "data/foo.g/bar.g/".
+
+For example, for an array at hierarchy path "/spam/eggs", the metadata
+key prefix is "meta/spam.g/eggs.a/", and the array metadata document
+is stored under the key "meta/spam.g/eggs.a/array.json". The data key
+prefix is "data/spam.g/foo.a/" and chunk keys will be formed by
+appending the chunk key suffix to this prefix. @@TODO cross-check
+language against chunk grid terminology re chunk keys.@@
+
+
+Protocol operations
+~~~~~~~~~~~~~~~~~~~
+
+@@TODO generalise so this section can be normative, plus examples.@@
+
+Let `P` be an arbitrary hierarchy path. Let `meta_key_prefix(P)` be a
+function that returns the metadata key prefix for `P`, and let
+`data_key_prefix(P)` be a function that returns the data key prefix
+for `P`. Let "+" be the string concatenation operator.
+
+**Create a group at hierarchy path `P`.**
+
+    Let `value` be the serialisation of a valid group metadata
+    document. Let `key` be ``meta_key_prefix(P) +
+    "group.json"``. Invoke ``set_value(key, value)``.
+
+    For example, if `P` is the root hierarchy path "/", invoke
+    ``set_value("meta/group.json", value)``.
+
+    For example, if `P` is the hierarchy path "/foo/bar", invoke
+    ``set_value("meta/foo.g/bar.g/group.json", value)``.
+
+    When a group is created at path `P` where `P` is not the root
+    hierarchy path, then it is **not** necessary to check if groups
+    already exist at all ancestor paths of `P`. For example, if `P` is
+    "/foo/bar", it is not necessary to check if groups exist at paths
+    "/" and "/foo", nor is it necessary to create groups at these
+    ancestor paths if they do not exist. Explicitly creating a group
+    at a non-root path `P` implicitly creates groups at all ancestor
+    paths if they have not been explicitly created.
+
+**Create an array at hierarchy path "/spam/eggs".**
+
+    Let `value` be the serialisation of a valid array metadata
+    document. Invoke ``set_value("meta/spam.g/eggs.a/array.json",
+    value)``.
+
+**List children of the group at hierarchy root path "/".**
+
+    Let `prefixes` be the result of invoking
+    ``list_prefixes("meta/")``. @@TODO finish this.
+
+**List all nodes in a hierarchy.**
+
+    @@TODO better explanation@@. List all keys in the store with
+    prefix "meta/". Collect all array nodes by filtering for keys
+    ending in "array.json" and reconstructing their hierarchy
+    path. Collect all explicit group nodes by filtering for keys
+    ending in "group.json" and reconstructing their hierarchy
+    paths. Collect all implicit group nodes.
+
+**Delete an array at path "/spam/eggs".**
+
+    @@TODO better explanation@@. Delete all keys with the prefix
+    "meta/spam.g/eggs.a/". Delete all keys with the prefix
+    "data/spam.g/eggs.a/".
+
+**Delete a group at path "/foo/bar".**
+
+    @@TODO better explanation@@. Delete all keys with the prefix
+    "meta/foo.g/bar.g/". Delete all keys with the prefix
+    "data/foo.g/bar.g".
+
+**Replace an existing array at path "/spam/eggs" with a new array.**
+
+    @@TODO
+
+**Replace an existing array at path "/spam/eggs" with a new grouop.**
+
+    @@TODO
+
+**Replace an existing group at path "/foo/bar" with a new array.**
+
+    @@TODO
+    
+**Store element values in an array.**
+
+    @@TODO
+    
+**Retrieve element values in an array.**
+
+    @@TODO
+    
+**Reshape an array.**
+
+    @@TODO
+    
+**Store user attributes in a group or array.**
+
+    @@TODO
+    
+**Retrieve user attribute in a group or array.**
+  
+    @@TODO
+    
+**Determine if an array exists at a given hierarchy path.**
+
+    @@TODO
+    
+**Determine if a group exists at a given hierarchy path.**
+
+    @@TODO
+    
+  
