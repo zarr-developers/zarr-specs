@@ -1,3 +1,6 @@
+.. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
+
+
 Zarr core protocol version 3.0
 ==============================
 
