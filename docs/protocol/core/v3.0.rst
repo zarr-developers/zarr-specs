@@ -138,24 +138,34 @@ To allow for flexibility to define and implement new codecs, this
 specification does not define any codecs, nor restrict the set of
 codecs that may be used. Each codec must be defined via a separate
 specification. In order to refer to codecs in array metadata
-documents, each codec must also have a unique identifier, which is an
-ASCII string. A codec specification must declare the codec identifier,
-and describe (or cite documents that describe) the encoding and
-decoding algorithms and the format of the encoded data. The Zarr core
-development team maintains a repository of codec specifications, which
-are hosted alongside this specification. For further details of the
-process for contributing a codec specification, see the Zarr community
-process specification @@TODO link.
+documents, each codec must have a unique identifier, which is a URI
+that dereferences to a human-readable specification of the codec. A
+codec specification must declare the codec identifier, and describe
+(or cite documents that describe) the encoding and decoding algorithms
+and the format of the encoded data.
 
 A codec may have configuration parameters which modify the behaviour
 of the codec in some way. For example, a compression codec may have a
 compression level parameter, which is an integer that affects the
 resulting compression ratio of the data. Configuration parameters must
-also be declared in the codec specification, including a definition of
-how configuration parameters are represented as JSON.
+be declared in the codec specification, including a definition of how
+configuration parameters are represented as JSON.
 
-Further details of how an encoding pipeline is configured for an array
-are given in the section below on `Array metadata`_.
+The Zarr core development team maintains a repository of codec
+specifications, which are hosted alongside this specification in the
+`zarr-specs GitHub repository
+<https://github.org/zarr-developers/zarr-specs>`_, and which are
+published on the `zarr-specs documentation Web site
+<http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+recommended that codec specifications are contributed to the
+zarr-specs GitHub repository. However, codec specifications may be
+maintained by any group or organisation and published in any location
+on the Web. For further details of the process for contributing a
+codec specification to the zarr-specs GitHub repository, see the Zarr
+community process specification @@TODO link.
+
+Further details of how a chunk encoding pipeline is configured for an
+array are given in the section below on `Array metadata`_.
 
 
 Array metadata
