@@ -298,7 +298,44 @@ other names
 Group metadata
 --------------
 
-TODO define the structure and content of group metadata documents
+A Zarr group metadata document is a [RFC8259]_ JSON document
+containing configuration metadata for a Zarr group. In this section,
+the terms "value", "number", "string" and "object" are used as defined
+in [RFC8259]_. The term "array" is also used as defined in [RFC8259]_
+and means a JSON array, except where qualified as "Zarr
+array". Following [RFC8259]_, this section also describes an object as
+a set of name/value pairs. @@TODO figure out how to refactor this
+content with the array metadata section to avoid duplication.@@
+
+A Zarr group metadata document must contain a single object, here
+called the metadata object. The following names must be present in the
+metadata object and must be used as defined below.
+
+`zarr_format`
+
+    URI of the Zarr core protocol specification that defines the
+    metadata format. For Zarr groups conforming to this specification,
+    the value must be the string
+    "http://purl.org/zarr/spec/protocol/core/3.0".
+
+    @@TODO figure out how to refactor this content with array metadata
+    to avoid duplication.@@
+
+`extensions`
+
+    Provides protocol extensions which define additional features used
+    by the Zarr group or other modifications to the metadata format.
+
+    @@TODO figure out how to refactor this content with array metadata
+    to avoid duplication.@@
+
+other names
+
+    All other names are reserved for future versions of this
+    specification.
+
+    @@TODO figure out how to refactor this content with array metadata
+    to avoid duplication.@@
 
 
 User attributes
