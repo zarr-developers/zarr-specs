@@ -120,20 +120,21 @@ Codec interface
 TODO define the codec interface
 
 
-Array metadata
---------------
+Core metadata
+-------------
 
-A Zarr array metadata document is a [RFC8259]_ JSON document
-containing configuration metadata for a Zarr array. In this section,
-the terms "value", "number", "string" and "object" are used as defined
-in [RFC8259]_. The term "array" is also used as defined in [RFC8259]_
-and means a JSON array, except where qualified as "Zarr
+This section defines core metadata documents for Zarr arrays and
+groups.  A Zarr metadata document is a [RFC8259]_ JSON document
+containing configuration metadata for a Zarr array or group. In this
+section, the terms "value", "number", "string" and "object" are used
+as defined in [RFC8259]_. The term "array" is also used as defined in
+[RFC8259]_ and means a JSON array, except where qualified as "Zarr
 array". Following [RFC8259]_, this section also describes an object as
 a set of name/value pairs.
 
-A Zarr array metadata document must contain a single object, here
-called the metadata object. The following names must be present in the
-metadata object and must be used as defined below.
+A Zarr array or group metadata document must contain a single object,
+here called the metadata object. The following names must be present
+in the metadata object and must be used as defined below.
 
 `zarr_format`
 
@@ -158,6 +159,35 @@ metadata object and must be used as defined below.
     simple version number string to help with discovery of this
     specification.
 
+`extensions`
+
+    Provides protocol extensions which define additional features used
+    by the Zarr array or group or other modifications to the metadata
+    format. The value must be an array containing zero or more
+    objects, each of which identifies an extension used and provides
+    any additional extension configuration metadata. Each extension
+    configuration object must contain the name `extension` whose value
+    is a URI that identifies a Zarr protocol extension and
+    dereferences to a human readable representation of the extension
+    specification. Each object must also contain the name
+    `must_understand` whose value is either the literal ``true`` or
+    ``false``. Each object may contain other name/value pairs as
+    defined by the protocol extension.
+
+    If an implementation of this specification encounters an extension
+    that it does not recognise, but the value of `must_understand` is
+    ``false``, then the extension may be ignored and processing may
+    continue. If the extension is not recognised and the value of
+    `must_understand` is ``true`` then processing must terminate and
+    an appropriate error raised.
+
+
+Array metadata documents
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to `zarr_format` and `extensions`, a Zarr array metadata
+document must also contain the following names, used as defined below.
+    
 `shape`
 
     An array of integers providing the length of each dimension of the
@@ -261,81 +291,27 @@ metadata object and must be used as defined below.
     the fill value is undefined and the implementation may use any
     arbitrary value that is consistent with the data type as the fill
     value.
-    
-`extensions`
 
-    Provides protocol extensions which define additional features used
-    by the Zarr array or other modifications to the metadata
-    format. The value must be an array containing zero or more
-    objects, each of which identifies an extension used and provides
-    any additional extension configuration metadata. Each extension
-    configuration object must contain the name `extension` whose value
-    is a URI that identifies a Zarr protocol extension and
-    dereferences to a human readable representation of the extension
-    specification. Each object must also contain the name
-    `must_understand` whose value is either the literal ``true`` or
-    ``false``. Each object may contain other name/value pairs as
-    defined by the protocol extension.
-
-    If an implementation of this specification encounters an extension
-    that it does not recognise, but the value of `must_understand` is
-    ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognised and the value of
-    `must_understand` is ``true`` then processing must terminate and
-    an appropriate error raised.
-
-other names
-
-    All other names are reserved for future versions of this
-    specification. Implementations and protocol extensions must not
-    define or use any other names within the metadata object. Any
-    additional metadata must be provided elsewhere, e.g., within any
-    of the extension point values, or within the `extensions`, or in a
-    separate metadata object stored under a different key in the
-    store. See also the section on `Protocol extensions`_ below.
+All other names are reserved for future versions of this
+specification. Implementations and protocol extensions must not define
+or use any other names within the metadata object. Any additional
+metadata must be provided elsewhere, e.g., within any of the extension
+point values, or within the `extensions`, or in a separate metadata
+object stored under a different key in the store. See also the section
+on `Protocol extensions`_ below.
 
 
-Group metadata
---------------
+Group metadata documents
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-A Zarr group metadata document is a [RFC8259]_ JSON document
-containing configuration metadata for a Zarr group. In this section,
-the terms "value", "number", "string" and "object" are used as defined
-in [RFC8259]_. The term "array" is also used as defined in [RFC8259]_
-and means a JSON array, except where qualified as "Zarr
-array". Following [RFC8259]_, this section also describes an object as
-a set of name/value pairs. @@TODO figure out how to refactor this
-content with the array metadata section to avoid duplication.@@
-
-A Zarr group metadata document must contain a single object, here
-called the metadata object. The following names must be present in the
-metadata object and must be used as defined below.
-
-`zarr_format`
-
-    URI of the Zarr core protocol specification that defines the
-    metadata format. For Zarr groups conforming to this specification,
-    the value must be the string
-    "http://purl.org/zarr/spec/protocol/core/3.0".
-
-    @@TODO figure out how to refactor this content with array metadata
-    to avoid duplication.@@
-
-`extensions`
-
-    Provides protocol extensions which define additional features used
-    by the Zarr group or other modifications to the metadata format.
-
-    @@TODO figure out how to refactor this content with array metadata
-    to avoid duplication.@@
-
-other names
-
-    All other names are reserved for future versions of this
-    specification.
-
-    @@TODO figure out how to refactor this content with array metadata
-    to avoid duplication.@@
+A Zarr group metadata object must contain the `zarr_format` and
+`extensions` names as defined above. All other names are reserved for
+future versions of this specification. Implementations and protocol
+extensions must not define or use any other names within the metadata
+object. Any additional metadata must be provided elsewhere, e.g.,
+within any of the extension point values, or within the `extensions`,
+or in a separate metadata object stored under a different key in the
+store. See also the section on `Protocol extensions`_ below.
 
 
 User attributes
