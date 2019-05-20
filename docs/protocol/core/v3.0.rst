@@ -181,6 +181,12 @@ in the metadata object and must be used as defined below.
     `must_understand` is ``true`` then processing must terminate and
     an appropriate error raised.
 
+`attributes`
+
+    Provides user- or application-defined metadata. The value must be
+    an object, but there are no constraints on what name/value pairs
+    the object contains.
+
 
 Array metadata documents
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -304,20 +310,15 @@ on `Protocol extensions`_ below.
 Group metadata documents
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A Zarr group metadata object must contain the `zarr_format` and
-`extensions` names as defined above. All other names are reserved for
-future versions of this specification. Implementations and protocol
-extensions must not define or use any other names within the metadata
-object. Any additional metadata must be provided elsewhere, e.g.,
-within any of the extension point values, or within the `extensions`,
-or in a separate metadata object stored under a different key in the
-store. See also the section on `Protocol extensions`_ below.
-
-
-User attributes
----------------
-
-TODO define attributes documents
+A Zarr group metadata object must contain the `zarr_format`,
+`extensions` and `attributes` names as defined above. All other names
+are reserved for future versions of this
+specification. Implementations and protocol extensions must not define
+or use any other names within the metadata object. Any additional
+metadata must be provided elsewhere, e.g., within any of the extension
+point values, or within the `extensions`, or in a separate metadata
+object stored under a different key in the store. See also the section
+on `Protocol extensions`_ below.
 
 
 Store interface
