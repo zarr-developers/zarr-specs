@@ -245,25 +245,23 @@ storage keys, described as follows.
 
 For a group at an arbitrary non-root hierarchy path `P`, the metadata
 key for the group metadata document is formed by concatenating
-"meta/root", `P`, and ".grp.json".
+"meta", `P`, and "/group.json".
 
 For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/root/foo/bar.grp.json".
+corresponding metadata key is "meta/foo/bar/group.json".
 
 For an array at an arbitrary hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta/root",
-`P`, and ".arr.json". The data key for array chunks is formed by
+the array metadata document is formed by concatenating "meta", `P`,
+and "/array.json". The data key for array chunks is formed by
 concatenating "data", `P`, "/", and the chunk key suffix.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/root/foo/baz.arr.json". If the
-array has two dimensions, the data key for the chunk with grid
-coordinates (0, 0) is "data/foo/baz/0.0".
+corresponding metadata key is "meta/foo/baz/array.json". If the array
+has two dimensions, the data key for the chunk with grid coordinates
+(0, 0) is "data/foo/baz/0.0".
 
-If the root node is a group, the metadata key is "meta/root.grp.json".
-
-If the root node is an array, the metadata key is
-"meta/root.arr.json".
+If the root node is a group, the metadata key is "meta/group.json". If
+the root node is an array, the metadata key is "meta/array.json".
 
 
 Protocol operations
@@ -302,35 +300,11 @@ Let "+" be the string concatenation operator.
 
 **List children of the group at hierarchy path `P`.**
 
-    Let `prefix` = "meta/root" + `P` + "/".
-
-    Let `keys` = ``listdir(prefix)``.
-
-    Hierarchy paths for child arrays are obtained by filtering `keys`
-    to retain only those ending in ".arr.json", then stripping the
-    leading "meta/root" and trailing ".arr.json" from each.
-    
-    Hierarchy paths for child groups are obtained by filtering `keys`
-    to retain only those ending in ".grp.json", then stripping the
-    leading "meta/root" and trailing ".grp.json" from each.
-
-    Note that it is not necessary to retrieve the metadata documents
-    for any of these child arrays or groups. The existence of the
-    nodes can be inferred from the presence of the keys.
+    @@TODO
     
 **List all nodes in a hierarchy.**
 
-    Let `keys` = ``listpre("meta/root/")``.
-
-    Hierarchy paths for array nodes are obtained by filtering `keys`
-    to retain only those ending in ".arr.json", then stripping the
-    leading "meta/root" and trailing ".arr.json" from each.
-    
-    Hierarchy paths for group nodes are obtained by filtering `keys`
-    to retain only those ending in ".grp.json", then stripping the
-    leading "meta/root" and trailing ".grp.json" from each.
-
-    @@TODO explain something about implicit groups.@@
+    @@TODO
 
 **Delete a node at path `P`.**
 
