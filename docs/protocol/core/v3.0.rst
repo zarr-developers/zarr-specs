@@ -145,9 +145,9 @@ F contiguous memory layout
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the first dimension of the array
-is the fastest changing dimension, also known as "column-major" or
-"Fortran" order. This layout is only applicable to arrays with fixed
-size data types.
+is the fastest changing dimension, also known as "column-major"
+order. This layout is only applicable to arrays with fixed size data
+types.
 
 For example, for a two-dimensional array with chunk shape (dx, dy),
 the binary values for a given chunk are taken from chunk elements in
