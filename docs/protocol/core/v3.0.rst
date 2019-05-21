@@ -1,5 +1,72 @@
+.. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
+
+
 Zarr core protocol version 3.0
 ==============================
+
+**Work in Progress**
+
+This version:
+    http://purl.org/zarr/spec/protocol/core/3.0/dev
+    TODO replace "dev" with a git tag when a draft is tagged, and create a PURL redirecting to RTFD
+Latest version:
+    http://purl.org/zarr/spec/protocol/core/3.0
+Issue tracking:
+    [GitHub issues](https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0)
+Suggest an edit for this spec:
+    [GitHub editor](https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst)
+
+Copyright 2019 [Zarr core development
+team](https://github.com/orgs/zarr-developers/teams/core-devs) (@@TODO
+list institutions?). This work is licensed under a [Creative Commons
+Attribution 3.0 Unported
+License](https://creativecommons.org/licenses/by/3.0/).
+
+----
+
+
+Abstract
+--------
+
+This specification defines a core protocol for storage and retrieval
+of N-dimensional typed arrays.
+
+
+Status of this document
+-----------------------
+
+This document is a **Work in Progress**. It may be updated, replaced
+or obsoleted by other documents at any time. It is inappapropriate to
+cite this document as other than work in progress.
+
+Comments, questions or contributions to this document are very
+welcome. Comments and questions should be raised via [GitHub
+issues](https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0). When
+raising an issue, please add the label
+"core-protocol-v3.0". Contributions and suggested edits can be made
+via GitHub via the [online
+editor](https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst)
+or by making a pull request against the "core-protocol-v3.0-dev"
+branch.
+
+This document was produced by the [Zarr core development
+team](https://github.com/orgs/zarr-developers/teams/core-devs).
+
+
+Document conventions
+--------------------
+
+Conformance requirements are expressed with a combination of
+descriptive assertions and [RFC2119]_ terminology. The key words
+"MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the normative
+parts of this document are to be interpreted as described in
+[RFC2119]_. However, for readability, these words do not appear in all
+uppercase letters in this specification.
+
+All of the text of this specification is normative except sections
+explicitly marked as non-normative, examples, and notes. Examples in
+this specification are introduced with the words "for example".
 
 
 Conceptual model
@@ -10,8 +77,9 @@ either a *group* or an *array*. Group nodes may have children
 but array nodes may not.
 
 Each node in a hierarchy has a *name* which is a string of ASCII
-characters with some additional constraints. Two sibling nodes cannot 
-have the same name. The root node does not have a name.
+characters with some additional constraints defined in the section on
+`Node names`_ below. Two sibling nodes cannot have the same name. The
+root node does not have a name.
 
 Each node in a hierarchy has a *path* which uniquely identifies that
 node and defines its location within the hierarchy. The path is formed 
@@ -95,29 +163,330 @@ provide.
 Node names
 ----------
 
-TODO define constraints on node names
+Except for the root node, each node in a hierarchy must have a name,
+which is a string of ASCII characters. To ensure consistent behaviour
+across different storage systems, the following constraints apply to
+node names:
+
+* must not be the empty string ("")
+
+* must consist only of characters in the sets `a-z`, `A-Z`, `0-9`,
+  `-_.`
+
+* must not be a string composed only of period characters, e.g. "." or
+  ".."
+
+* must be at most 255 characters long
+
+Note that node names are used to form storage keys, and that some
+storage systems will perform a case-insensitive comparison of storage
+keys during retrieval. Therefore, within a hierarchy, all nodes within
+a set of sibling nodes must have a name that is unique under
+case-insensitive comparison. E.g., the names "foo" and "FOO" are not
+allowed for sibling nodes.
 
 
 Data types
 ----------
 
-TODO define core data types
+A data type describes the set of possible binary values that an array
+element may take, along with some information about how the values
+should be interpreted.
 
-Regular chunk grids
--------------------
+This protocol defines a limited set of data types to represent Boolean
+values, integers, floating point numbers and complex numbers. Protocol
+extensions may define additional data types. All of the data types
+defined here have a fixed size, in the sense that all values require
+the same number of bytes. However, protocol extensions may define
+variable sized data types.
 
-TODO define regular chunk grids, including how to form a key for each chunk in a grid
+Note that the Zarr protocol is intended to enable communication of
+data between a variety of computing environments. The native byte
+order may differ between machines used to write and read the data.
 
+Each data type is associated with an identifier, which can be used in
+metadata documents to refer to the data type. For the data types
+defined in this protocol, the identifier is a simple ASCII
+string. However, protocol extensions may use any JSON value to
+identify a data type.
+
+Core data types
+~~~~~~~~~~~~~~~
+
+.. list-table:: Data types
+   :header-rows: 1
+
+   * - Identifier
+     - Numerical type
+     - Size (no. bytes)
+     - Byte order
+   * - `bool`
+     - Boolean, with False encoded as `\x00` and True encoded as `\x01`
+     - 1
+     - None
+   * - `i1`
+     - signed integer
+     - 1
+     - None
+   * - `<i2`
+     - signed integer
+     - 2
+     - little-endian
+   * - `<i4`
+     - signed integer
+     - 4
+     - little-endian
+   * - `<i8`
+     - signed integer
+     - 8
+     - little-endian
+   * - `>i2`
+     - signed integer
+     - 2
+     - big-endian
+   * - `>i4`
+     - signed integer
+     - 4
+     - big-endian
+   * - `>i8`
+     - signed integer
+     - 8
+     - big-endian
+   * - `u1`
+     - signed integer
+     - 1
+     - None
+   * - `<u2`
+     - unsigned integer
+     - 2
+     - little-endian
+   * - `<u4`
+     - unsigned integer
+     - 4
+     - little-endian
+   * - `<u8`
+     - unsigned integer
+     - 8
+     - little-endian
+   * - `<f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - little-endian
+   * - `<f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - little-endian
+   * - `<f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - little-endian
+   * - `>f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - big-endian
+   * - `>f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - big-endian
+   * - `>f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - big-endian
+   * - `<c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - little-endian
+   * - `<c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - little-endian
+   * - `>c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - big-endian
+   * - `>c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - big-endian
+
+Floating point types correspond to basic binary interchange formats as
+defined by IEEE 754-2008.
+
+
+Chunk grids
+-----------
+
+A chunk grid defines a set of chunks which contain the elements of an
+array. The chunks of a grid form a tessellation of the array space,
+which is a space defined by the dimensionality and shape of the
+array. This means that every element of the array is a member of one
+chunk, and there are no gaps or overlaps between chunks.
+
+In general there are different possible types of grids. The core
+protocol defines the regular grid type, where all chunks are
+hyperrectangles of the same shape. Protocol extensions may define
+other grid types, such as rectilinear grids where chunks are still
+hyperrectangles but do not all share the same shape.
+
+A grid type also defines rules for constructing a unique key for each
+chunk, which is a string of ASCII characters that can be used to save
+and retrieve chunk data in a store.
+
+Regular grids
+~~~~~~~~~~~~~
+
+A regular grid is a type of grid where an array is divided into chunks
+such that each chunk is a hyperrectangle of the same shape. The
+dimensionality of the grid is the same as the dimensionality of the
+array. Each chunk in the grid can be addressed by a tuple of positive
+integers (i, j, k, ...) corresponding to the indices of the chunk
+along each dimension.
+
+The origin vertex of a chunk has coordinates in the array space (i *
+dx, j * dy, k * dz, ...) where (dx, dy, dz, ...) are the grid spacings
+along each dimension, also known as the chunk shape. Thus the origin
+vertex of the chunk at grid index (0, 0, 0, ...) is at coordinate (0,
+0, 0, ...) in the array space, i.e., the grid is aligned with the
+origin of the array. If the length of any array dimension is not
+perfectly divisible by the chunk length along the same dimension, then
+the grid will overhang the edge of the array space.
+
+The shape of the chunk grid will be (ceil(x / dx), ceil(y / dy),
+ceil(z / dz), ...)  where (x, y, z, ...) is the array shape, / is the
+division operator and ceil() is the ceiling function. For example, if
+a 3 dimensional array has shape (10, 200, 3000), and has chunk shape
+(5, 20, 400), then the shape of the chunk grid will be (2, 10, 8),
+meaning that there will be 2 chunks along the first dimension, 10
+along the second dimension, and 8 along the third dimension.
+
+An element of an array with coordinates (i, j, k, ...) will occur
+within the chunk at grid index (i // dx, j // dy, k // dz, ...), where
+// is the floor division operator. The element will have coordinates
+(i % dx, j % dy, k % dz, ...) within that chunk. For example, @@TODO
+example.
+
+The key for chunk with grid index (i, j, k, ...) is formed by joining
+together the path of the array in which the chunk occurs, then a
+forward slash character ("/"), then a prefix, then the ASCII string
+representations of each index, then a suffix. The prefix, chunk
+indices and suffix are joined using a separator. The default value for
+the prefix is the empty string (""), the default value for the
+separator is the period character (".") and the default value for the
+suffix is the empty string (""), but these values may be configured,
+see the section on `Array metadata`_ below.
+
+For example, in a 3 dimensional array at path "/foo/bar" configured
+with default values for the chunk key prefix, suffix and separator,
+the key for the chunk at grid index (1, 23, 45) is the string
+"/foo/bar/1.23.45".
+
+Note that this specification does not consider the case where the
+chunk grid and the array space are not aligned at the origin vertices
+of the array and the chunk at grid index (0, 0, 0, ...). However,
+protocol extensions may define variations on the regular grid type
+such that the grid indices may include negative integers, and the
+origin vertex of the array may occur at an arbitrary position within
+any chunk, which is required to allow arrays to be extended by an
+arbitrary length in a "negative" direction along any dimension.
 
 Memory layouts
 --------------
 
-TODO define "C" and "F" memory layouts
+An array has a memory layout, which defines the way that the binary
+values of the array elements are organised within each chunk to form a
+contiguous sequence of bytes. This contiguous binary representation of
+a chunk is then the input to the array's chunk encoding pipeline,
+described in later sections. Typically, when reading data, an
+implementation will load this binary representation into a contiguous
+memory buffer to allow direct access to array elements without having
+to copy data.
 
-Codec interface
----------------
+The core protocol defines two types of contiguous memory
+layout. However, protocol extensions may define other memory
+layouts. Note that there may be an interdependency between memory
+layouts and data types, such that certain memory layouts may only be
+applicable to arrays with certain data types.
 
-TODO define the codec interface
+C contiguous memory layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this memory layout, the binary values of the array elements are
+organised into a sequence such that the last dimension of the array is
+the fastest changing dimension, also known as "row-major" order. This
+layout is only applicable to arrays with fixed size data types.
+
+For example, for a two-dimensional array with chunk shape (dx, dy),
+the binary values for a given chunk are taken from chunk elements in
+the order (0, 0), (0, 1), (0, 2), ..., (dx - 1, dy - 3), (dx - 1, dy -
+2), (dx - 1, dy - 1).
+
+F contiguous memory layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this memory layout, the binary values of the array elements are
+organised into a sequence such that the first dimension of the array
+is the fastest changing dimension, also known as "column-major"
+order. This layout is only applicable to arrays with fixed size data
+types.
+
+For example, for a two-dimensional array with chunk shape (dx, dy),
+the binary values for a given chunk are taken from chunk elements in
+the order (0, 0), (1, 0), (2, 0), ..., (dx - 3, dy - 1), (dx - 2, dy -
+1), (dx - 1, dy - 1).
+
+
+Codecs
+------
+
+An array may be configured with a chunk encoding pipeline, which is a
+sequence of zero or more codecs used to transform the binary
+representation of each chunk prior to storage, and to reverse the
+transformation during retrieval.
+
+A codec is defined as a pair of algorithms named *encode* and
+*decode*. Both of these algorithms transform a sequence of bytes
+(input) into another sequence of bytes (output). The *decode*
+algorithm is the reverse of the *encode* algorithm, but it is not
+required that the reversal is perfect. For example, a codec may be a
+lossy compressor for floating point data, which will lose some
+numerical precision during encoding and thus not reproduce exactly the
+original byte sequence after subsequent decoding. However, if *a* is
+the binary representation of a chunk with data type *d* and internal
+memory layout *m*, then the result *b = decode(encode(a))* must be
+consistent with the data type and memory layout of *a*.
+
+To allow for flexibility to define and implement new codecs, this
+specification does not define any codecs, nor restrict the set of
+codecs that may be used. Each codec must be defined via a separate
+specification. In order to refer to codecs in array metadata
+documents, each codec must have a unique identifier, which is a URI
+that dereferences to a human-readable specification of the codec. A
+codec specification must declare the codec identifier, and describe
+(or cite documents that describe) the encoding and decoding algorithms
+and the format of the encoded data.
+
+A codec may have configuration parameters which modify the behaviour
+of the codec in some way. For example, a compression codec may have a
+compression level parameter, which is an integer that affects the
+resulting compression ratio of the data. Configuration parameters must
+be declared in the codec specification, including a definition of how
+configuration parameters are represented as JSON.
+
+The Zarr core development team maintains a repository of codec
+specifications, which are hosted alongside this specification in the
+`zarr-specs GitHub repository
+<https://github.org/zarr-developers/zarr-specs>`_, and which are
+published on the `zarr-specs documentation Web site
+<http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+recommended that codec specifications are contributed to the
+zarr-specs GitHub repository. However, codec specifications may be
+maintained by any group or organisation and published in any location
+on the Web. For further details of the process for contributing a
+codec specification to the zarr-specs GitHub repository, see the Zarr
+community process specification @@TODO link.
+
+Further details of how a chunk encoding pipeline is configured for an
+array are given in the section below on `Array metadata`_.
 
 
 Core metadata
@@ -346,3 +715,7 @@ References
 .. [RFC8259] T. Bray, Ed. The JavaScript Object Notation (JSON) Data
    Interchange Format. December 2017. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc8259
+
+.. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
+   Requirement Levels. March 1997. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc2119
