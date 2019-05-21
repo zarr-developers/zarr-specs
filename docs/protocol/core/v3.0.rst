@@ -554,8 +554,9 @@ in the metadata object and must be used as defined below.
 Array metadata
 ~~~~~~~~~~~~~~
 
-In addition to `zarr_format` and `extensions`, a Zarr array metadata
-document must also contain the following names, used as defined below.
+In addition to `zarr_format`, `extensions` and `attributes`, a Zarr
+array metadata document must also contain the following names, used as
+defined below.
     
 `shape`
 
