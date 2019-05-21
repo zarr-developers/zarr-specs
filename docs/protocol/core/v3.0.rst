@@ -486,7 +486,7 @@ codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification @@TODO link.
 
 Further details of how a chunk encoding pipeline is configured for an
-array are given in the section below on `Array metadata`_.
+array are given in the section below on `Array metadata documents`_.
 
 
 Core metadata
