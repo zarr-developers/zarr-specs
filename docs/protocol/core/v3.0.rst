@@ -435,10 +435,58 @@ the order (0, 0), (1, 0), (2, 0), ..., (dx - 3, dy - 1), (dx - 2, dy -
 1), (dx - 1, dy - 1).
 
 
-Codec interface
----------------
+Codecs
+------
 
-TODO define the codec interface
+An array may be configured with a chunk encoding pipeline, which is a
+sequence of zero or more codecs used to transform the binary
+representation of each chunk prior to storage, and to reverse the
+transformation during retrieval.
+
+A codec is defined as a pair of algorithms named *encode* and
+*decode*. Both of these algorithms transform a sequence of bytes
+(input) into another sequence of bytes (output). The *decode*
+algorithm is the reverse of the *encode* algorithm, but it is not
+required that the reversal is perfect. For example, a codec may be a
+lossy compressor for floating point data, which will lose some
+numerical precision during encoding and thus not reproduce exactly the
+original byte sequence after subsequent decoding. However, if *a* is
+the binary representation of a chunk with data type *d* and internal
+memory layout *m*, then the result *b = decode(encode(a))* must be
+consistent with the data type and memory layout of *a*.
+
+To allow for flexibility to define and implement new codecs, this
+specification does not define any codecs, nor restrict the set of
+codecs that may be used. Each codec must be defined via a separate
+specification. In order to refer to codecs in array metadata
+documents, each codec must have a unique identifier, which is a URI
+that dereferences to a human-readable specification of the codec. A
+codec specification must declare the codec identifier, and describe
+(or cite documents that describe) the encoding and decoding algorithms
+and the format of the encoded data.
+
+A codec may have configuration parameters which modify the behaviour
+of the codec in some way. For example, a compression codec may have a
+compression level parameter, which is an integer that affects the
+resulting compression ratio of the data. Configuration parameters must
+be declared in the codec specification, including a definition of how
+configuration parameters are represented as JSON.
+
+The Zarr core development team maintains a repository of codec
+specifications, which are hosted alongside this specification in the
+`zarr-specs GitHub repository
+<https://github.org/zarr-developers/zarr-specs>`_, and which are
+published on the `zarr-specs documentation Web site
+<http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+recommended that codec specifications are contributed to the
+zarr-specs GitHub repository. However, codec specifications may be
+maintained by any group or organisation and published in any location
+on the Web. For further details of the process for contributing a
+codec specification to the zarr-specs GitHub repository, see the Zarr
+community process specification @@TODO link.
+
+Further details of how a chunk encoding pipeline is configured for an
+array are given in the section below on `Array metadata`_.
 
 
 Array metadata
