@@ -189,7 +189,129 @@ allowed for sibling nodes.
 Data types
 ----------
 
-TODO define core data types
+A data type describes the set of possible binary values that an array
+element may take, along with some information about how the values
+should be interpreted.
+
+This protocol defines a limited set of data types to represent Boolean
+values, integers, floating point numbers and complex numbers. Protocol
+extensions may define additional data types. All of the data types
+defined here have a fixed size, in the sense that all values require
+the same number of bytes. However, protocol extensions may define
+variable sized data types.
+
+Note that the Zarr protocol is intended to enable communication of
+data between a variety of computing environments. The native byte
+order may differ between machines used to write and read the data.
+
+Each data type is associated with an identifier, which can be used in
+metadata documents to refer to the data type. For the data types
+defined in this protocol, the identifier is a simple ASCII
+string. However, protocol extensions may use any JSON value to
+identify a data type.
+
+Core data types
+~~~~~~~~~~~~~~~
+
+.. list-table:: Data types
+   :header-rows: 1
+
+   * - Identifier
+     - Numerical type
+     - Size (no. bytes)
+     - Byte order
+   * - `bool`
+     - Boolean, with False encoded as `\x00` and True encoded as `\x01`
+     - 1
+     - None
+   * - `i1`
+     - signed integer
+     - 1
+     - None
+   * - `<i2`
+     - signed integer
+     - 2
+     - little-endian
+   * - `<i4`
+     - signed integer
+     - 4
+     - little-endian
+   * - `<i8`
+     - signed integer
+     - 8
+     - little-endian
+   * - `>i2`
+     - signed integer
+     - 2
+     - big-endian
+   * - `>i4`
+     - signed integer
+     - 4
+     - big-endian
+   * - `>i8`
+     - signed integer
+     - 8
+     - big-endian
+   * - `u1`
+     - signed integer
+     - 1
+     - None
+   * - `<u2`
+     - unsigned integer
+     - 2
+     - little-endian
+   * - `<u4`
+     - unsigned integer
+     - 4
+     - little-endian
+   * - `<u8`
+     - unsigned integer
+     - 8
+     - little-endian
+   * - `<f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - little-endian
+   * - `<f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - little-endian
+   * - `<f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - little-endian
+   * - `>f2`
+     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2
+     - big-endian
+   * - `>f4`
+     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4
+     - big-endian
+   * - `>f8`
+     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8
+     - big-endian
+   * - `<c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - little-endian
+   * - `<c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - little-endian
+   * - `>c8`
+     - complex number, represented by two 32-bit floats (real and imaginary components)
+     - 8
+     - big-endian
+   * - `>c16`
+     - complex number, represented by two 64-bit floats (real and imaginary components)
+     - 16
+     - big-endian
+
+Floating point types correspond to basic binary interchange formats as
+defined by IEEE 754-2008.
+
 
 Regular chunk grids
 -------------------
