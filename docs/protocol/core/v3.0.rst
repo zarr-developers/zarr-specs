@@ -87,7 +87,7 @@ by joining together the "/" character, followed by the names of all
 ancestor nodes separated by the "/" character, followed by the name of 
 the node itself. For example, the path "/foo/bar" identifies a node 
 named "bar", whose parent is named "foo", whose parent is the root of 
-the hierarchy. The string "/" identifies the root node.
+the hierarchy. The path "/" identifies the root node.
 
 An array has a fixed number of zero or more *dimensions*. Each dimension has an
 integer length. The core protocol only considers the case where the
@@ -148,16 +148,10 @@ information about the node. For example, an array metadata document
 will specify the number of dimensions, length of each dimension, data
 type, chunk shape, memory layout and encoding pipeline for that array.
 
-Each node in a hierarchy may have an *attributes document*, which is a
-machine-readable document containing information that may be useful to
-users of the data but is not essential to the basic processing of the
-node.
-
-The metadata, attributes and encoded chunk data for all nodes in a
-hierarchy are held in a *store*. To enable a variety of different
-store types to be used, the core protocol defines a simple *store
-interface* which is a common set of operations that a store must
-provide.
+The metadata and encoded chunk data for all nodes in a hierarchy are
+held in a *store*. To enable a variety of different store types to be
+used, the core protocol defines a simple *store interface* which is a
+common set of operations that a store must provide.
 
 
 Node names
