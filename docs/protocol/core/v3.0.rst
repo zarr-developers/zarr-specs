@@ -210,6 +210,7 @@ defined in this protocol, the identifier is a simple ASCII
 string. However, protocol extensions may use any JSON value to
 identify a data type.
 
+
 Core data types
 ~~~~~~~~~~~~~~~
 
@@ -373,7 +374,7 @@ indices and suffix are joined using a separator. The default value for
 the prefix is the empty string (""), the default value for the
 separator is the period character (".") and the default value for the
 suffix is the empty string (""), but these values may be configured,
-see the section on `Array metadata documents`_ below.
+see the section on `Array metadata`_ below.
 
 For example, in a 3 dimensional array at path "/foo/bar" configured
 with default values for the chunk key prefix, suffix and separator,
@@ -388,6 +389,7 @@ such that the grid indices may include negative integers, and the
 origin vertex of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
+
 
 Memory layouts
 --------------
@@ -486,20 +488,20 @@ codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification @@TODO link.
 
 Further details of how a chunk encoding pipeline is configured for an
-array are given in the section below on `Array metadata documents`_.
+array are given in the section below on `Array metadata`_.
 
 
-Core metadata
--------------
+Metadata
+--------
 
-This section defines core metadata documents for Zarr arrays and
-groups.  A Zarr metadata document is a [RFC8259]_ JSON document
-containing configuration metadata for a Zarr array or group. In this
-section, the terms "value", "number", "string" and "object" are used
-as defined in [RFC8259]_. The term "array" is also used as defined in
-[RFC8259]_ and means a JSON array, except where qualified as "Zarr
-array". Following [RFC8259]_, this section also describes an object as
-a set of name/value pairs.
+This section defines metadata documents for Zarr arrays and groups. A
+Zarr metadata document is a [RFC8259]_ JSON document containing
+configuration metadata for a Zarr array or group. In this section, the
+terms "value", "number", "string" and "object" are used as defined in
+[RFC8259]_. The term "array" is also used as defined in [RFC8259]_ and
+means a JSON array, except where qualified as "Zarr array". Following
+[RFC8259]_, this section also describes an object as a set of
+name/value pairs.
 
 A Zarr array or group metadata document must contain a single object,
 here called the metadata object. The following names must be present
@@ -533,15 +535,15 @@ in the metadata object and must be used as defined below.
     Provides protocol extensions which define additional features used
     by the Zarr array or group or other modifications to the metadata
     format. The value must be an array containing zero or more
-    objects, each of which identifies an extension used and provides
-    any additional extension configuration metadata. Each extension
+    objects, each of which identifies an extension and provides any
+    additional extension configuration metadata. Each extension
     configuration object must contain the name `extension` whose value
     is a URI that identifies a Zarr protocol extension and
     dereferences to a human readable representation of the extension
     specification. Each object must also contain the name
     `must_understand` whose value is either the literal ``true`` or
-    ``false``. Each object may contain other name/value pairs as
-    defined by the protocol extension.
+    ``false``. Each object may contain other name/value pairs as defined
+    by the protocol extension.
 
     If an implementation of this specification encounters an extension
     that it does not recognise, but the value of `must_understand` is
@@ -557,8 +559,8 @@ in the metadata object and must be used as defined below.
     the object contains.
 
 
-Array metadata documents
-~~~~~~~~~~~~~~~~~~~~~~~~
+Array metadata
+~~~~~~~~~~~~~~
 
 In addition to `zarr_format` and `extensions`, a Zarr array metadata
 document must also contain the following names, used as defined below.
@@ -675,9 +677,41 @@ point values, or within the `extensions`, or in a separate metadata
 object stored under a different key in the store. See also the section
 on `Protocol extensions`_ below.
 
+For example, the JSON document below defines a two-dimensional array
+of 64-bit little-endian floating point numbers, with 10000 and 1000
+columns, divided into a regular chunk grid where each chunk has 1000
+rows and 100 columns, and thus there will be 100 chunks in total
+arranged into a 10 by 10 grid. Within each chunk the binary values are
+laid out in C contiguous order. Each chunk is compressed using gzip
+compression prior to storage::
 
-Group metadata documents
-~~~~~~~~~~~~~~~~~~~~~~~~
+    {
+        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+	"shape": [10000, 1000],
+	"data_type": "<f8",
+	"chunk_grid": {
+	    "type": "regular",
+	    "chunk_shape": [1000, 100]
+	},
+	"chunk_memory_layout": "C",
+	"chunk_codecs": [
+            {
+	        "codec": "http://purl.org/zarr/spec/codec/gzip",
+		"level": 1
+	    }
+	],
+	"fill_value": "NaN",
+	"extensions": [],
+	"attributes": {
+	    "foo": 42,
+	    "bar": "apples",
+	    "baz": [1, 2, 3, 4]
+	}
+    }
+
+
+Group metadata
+~~~~~~~~~~~~~~
 
 A Zarr group metadata object must contain the `zarr_format`,
 `extensions` and `attributes` names as defined above. All other names
@@ -688,6 +722,17 @@ metadata must be provided elsewhere, e.g., within any of the extension
 point values, or within the `extensions`, or in a separate metadata
 object stored under a different key in the store. See also the section
 on `Protocol extensions`_ below.
+
+For example, the JSON document below defines a group::
+
+    {
+        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+	"extensions": [],
+	"attributes": {
+	    "spam": "ham",
+	    "eggs": 42,
+	}
+    }
 
 
 Store interface
