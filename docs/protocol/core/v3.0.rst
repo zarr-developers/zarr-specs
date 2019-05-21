@@ -373,7 +373,7 @@ indices and suffix are joined using a separator. The default value for
 the prefix is the empty string (""), the default value for the
 separator is the period character (".") and the default value for the
 suffix is the empty string (""), but these values may be configured,
-see the section on `Array metadata`_ below.
+see the section on `Array metadata documents`_ below.
 
 For example, in a 3 dimensional array at path "/foo/bar" configured
 with default values for the chunk key prefix, suffix and separator,
