@@ -77,8 +77,9 @@ either a *group* or an *array*. Group nodes may have children
 but array nodes may not.
 
 Each node in a hierarchy has a *name* which is a string of ASCII
-characters with some additional constraints. Two sibling nodes cannot 
-have the same name. The root node does not have a name.
+characters with some additional constraints defined in the section on
+`Node names`_ below. Two sibling nodes cannot have the same name. The
+root node does not have a name.
 
 Each node in a hierarchy has a *path* which uniquely identifies that
 node and defines its location within the hierarchy. The path is formed 
@@ -162,7 +163,27 @@ provide.
 Node names
 ----------
 
-TODO define constraints on node names
+Except for the root node, each node in a hierarchy must have a name,
+which is a string of ASCII characters. To ensure consistent behaviour
+across different storage systems, the following constraints apply to
+node names:
+
+* must not be the empty string ("")
+
+* must consist only of characters in the sets `a-z`, `A-Z`, `0-9`,
+  `-_.`
+
+* must not be a string composed only of period characters, e.g. "." or
+  ".."
+
+* must be at most 255 characters long
+
+Note that node names are used to form storage keys, and that some
+storage systems will perform a case-insensitive comparison of storage
+keys during retrieval. Therefore, within a hierarchy, all nodes within
+a set of sibling nodes must have a name that is unique under
+case-insensitive comparison. E.g., the names "foo" and "FOO" are not
+allowed for sibling nodes.
 
 
 Data types
