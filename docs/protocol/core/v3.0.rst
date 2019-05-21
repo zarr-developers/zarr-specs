@@ -744,72 +744,77 @@ Store interface
 The store interface is intended to be simple to implement using a
 variety of different underlying storage technologies. It is defined in
 a general way here, but it should be straightforward to translate into
-a software interface in any given programming languages. The goal is
+a software interface in any given programming language. The goal is
 that an implementation of this specification could be modular and
 allow for different store implementations to be used.
 
 The store interface defines a set of operations involving `keys` and
 `values`. In the context of this interface, a `key` is any ASCII
-string containing only characters in the ranges `a-z`, `A-Z`, `0-9`,
-or in the set `/.-_`; and a `value` is any sequence of bytes. It is
-assumed that the store holds (`key`, `value`) pairs, with only one
-such pair for any given `key`. I.e., a store is a mapping from keys to
-values.
+string containing only characters in the ranges ``a-z``, ``A-Z``,
+``0-9``, or in the set ``/.-_`` and a `value` is any sequence of
+bytes. It is assumed that the store holds (`key`, `value`) pairs, with
+only one such pair for any given `key`. I.e., a store is a mapping
+from keys to values.
 
 The following operations are **required**:
-
-``set`` - Store a (`key`, `value`) pair.
-
-    | Parameters: `key`, `value`
-    | Output: none
 
 ``get`` - Retrieve the `value` associated with a given `key`.
 
     | Parameters: `key`
     | Output: `value`
 
-``del`` - Delete the given key/value pair from the store.
+``set`` - Store a (`key`, `value`) pair.
+
+    | Parameters: `key`, `value`
+    | Output: none
+
+``delete`` - Delete the given key/value pair from the store.
 
     | Parameters: `key`
     | Output: none
+
+The following operations are **optional**, but if supported may be
+used by an implementation of this protocol to provide additional
+functionality and/or optimisations:
 
 ``list`` - Retrieve all `keys` in the store.
 
     | Parameters: none
     | Output: set of `keys`
 
-The following operations are **optional**, but if provided may be used
-by an implementation of this protocol to optimise some operations:
-
 ``listpre`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
     | Output: set of `keys` with the given `prefix`
 
-    For example, if a store contains the keys "a/b" and "a/c", then
-    ``listpre("a/")`` would return "a/b" and "a/c".
+    For example, if a store contains the keys "a/b", "a/c/d" and
+    "e/f/g", then ``listpre("a/")`` would return "a/b" and "a/c/d".
 
-    If ``listpre`` is not supported, fallback to ``list`` with
-    post-processing of the results.
+    If ``listpre`` is not supported by a store, an implementation of
+    this protocol could fall back to ``list`` with post-processing of
+    the results.
 
-``listdir`` - Retrieve all keys with a given prefix and which do not
-contain "/" after the prefix. (Analogous to listing "files" in a
-"directory".)
+``listdir`` - Retrieve all keys and prefixes with a given prefix and
+which do not contain "/" after the given prefix.
 
     | Parameters: `prefix`
-    | Output: set of `keys`
+    | Output: set of `keys` and set of `prefixes`
 
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
-    then ``listdir("a/")`` would return "a/b" and "a/c".
+    "a/f/g", then ``listdir("a/")`` would return keys "a/b" and "a/c"
+    and prefixes "a/d/" and "a/f/".
 
-    If ``listdir`` is not supported, fallback to ``listpre`` with
-    post-processing of the results.
+    If ``listdir`` is not supported by a store, an implementation of
+    this protocol could fallback to ``listpre`` with post-processing
+    of the results.
 
 
 Store implementations
 ~~~~~~~~~~~~~~~~~~~~~
 
-TODO 
+(This subsection is not normative.)
+
+TODO describe possible implementations.
 
 
 Storage protocol
@@ -819,39 +824,42 @@ This section describes how to translate high level operations to
 create, delete or modify Zarr hierarchies, groups or arrays, into low
 level operations on the key/value store interface defined above.
 
+In this section a "hierarchy path" is a logical path which identifies
+a group or array node within a Zarr hierarchy, and a "storage key" is
+a key used to store and retrieve metadata or data via the store
+interface. There is a further distinction between "metadata keys"
+which are storage keys used to store metadata documents, and "data
+keys" which are storage keys used to store encoded chunks.
+
+Note that any non-root hierarchy path will have ancestor paths that
+identify ancestor nodes in the hierarchy. For example, the path
+"/foo/bar" has ancestor paths "/foo" and "/".
+
 Storage keys
 ~~~~~~~~~~~~
 
-This section makes a distinction between `hierarchy paths`, which are
-logical paths which define the location of group or array nodes within
-a Zarr hierarchy, and `storage keys`, which are keys used to store and
-retrieve metadata and data via the store interface. There is a further
-distinction between `metadata keys`, which are storage keys used to
-store metadata documents, and `data keys`, which are storage keys used
-to store encoded chunks.
-
-The Zarr storage protocol uses a mapping between hierarchy paths and
-storage keys, described as follows.
-
-For a group at an arbitrary non-root hierarchy path `P`, the metadata
-key for the group metadata document is formed by concatenating
-"meta", `P`, and "/group.json".
+For a group at a non-root hierarchy path `P`, the metadata key for the
+group metadata document is formed by concatenating "meta", `P`, and
+".group.json".
 
 For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/foo/bar/group.json".
+corresponding metadata key is "meta/foo/bar.group.json".
 
-For an array at an arbitrary hierarchy path `P`, the metadata key for
+For an array at a non-root hierarchy path `P`, the metadata key for
 the array metadata document is formed by concatenating "meta", `P`,
-and "/array.json". The data key for array chunks is formed by
-concatenating "data", `P`, "/", and the chunk key suffix.
+and ".array.json". The data key for array chunks is formed by
+concatenating "data", `P`, "/", and the chunk identifier as defined by
+the chunk grid layout.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/foo/baz/array.json". If the array
-has two dimensions, the data key for the chunk with grid coordinates
-(0, 0) is "data/foo/baz/0.0".
+corresponding metadata key is "meta/foo/baz.array.json". If the array
+has two dimensions and a regular chunk grid, the data key for the
+chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
 
-If the root node is a group, the metadata key is "meta/group.json". If
-the root node is an array, the metadata key is "meta/array.json".
+@@TODO what about storage keys for the root node, wheter group or
+array?  If the root node is a group, the metadata key is
+"root.group.json". If the root node is an array, the metadata key is
+"root.array.json".
 
 
 Protocol operations
@@ -859,68 +867,82 @@ Protocol operations
 
 Let `P` be an arbitrary hierarchy path.
 
-Let `group_meta_key(P)` be a function that returns the group metadata
-key for `P`.
+Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
+``group_meta_key(P)`` be the group metadata key for `P`.
 
-Let `array_meta_key(P)` be a function that returns the array metadata
-key for `P`.
-
-Let `data_key(P, i, j, ...)` be a function that returns the data key
-for `P` for the chunk with grid coordinates (i, j, ...).
+Let ``data_key(P, i, j, ...)`` be the data key for `P` for the chunk
+with grid coordinates (i, j, ...).
 
 Let "+" be the string concatenation operator.
 
-**Create a group at hierarchy path `P`:**
+**Create a group**
 
-    Let `value` be the serialisation of a valid group metadata
-    document.
+    To create a group at hierarchy path `P`, perform
+    ``set(group_meta_key(P), value)``, where `value` is the
+    serialisation of a valid group metadata document.
 
-    Let `key` be ``group_meta_key(P)``.
+    If `P` is a non-root path then it is **not** necessary to create
+    or check for the existence of metadata documents for groups at any
+    of the ancestor paths of `P`. Creating a group at path `P` implies
+    the existence of groups at all ancestor paths of `P`.
 
-    Perform ``set(key, value)``.
+**Create an array**
 
-**Create an array at hierarchy path `P`:**
+    To create an array at hierarchy path `P`, perform
+    ``set(array_meta_key(P), value)``, where `value` is the
+    serialisation of a valid array metadata document.
 
-    Let `value` be the serialisation of a valid array metadata
-    document.
+    If `P` is a non-root path then it is **not** necessary to create
+    or check for the existence of metadata documents for groups at any
+    of the ancestor paths of `P`. Creating an array at path `P`
+    implies the existence of groups at all ancestor paths of `P`.
 
-    Let `key` be ``array_meta_key(P)``.
-
-    Perform ``set(key, value)``.
-
-**List children of the group at hierarchy path `P`.**
-
-    @@TODO
-    
-**List all nodes in a hierarchy.**
-
-    @@TODO
-
-**Delete a node at path `P`.**
-
-    @@TODO
-
-**Store element values in an array.**
+**Store element values in an array**
 
     @@TODO
     
-**Retrieve element values in an array.**
+**Retrieve element values in an array**
 
     @@TODO
     
-**Determine if a node exists at a given hierarchy path.**
+**Discover children of a group**
+
+    To discover the children of a group at hierarchy path `P`, perform
+    ``listdir("meta" + P + "/")``. Any returned key ending in
+    ".array.json" indicates an array. Any returned key ending in
+    ".group.json" indicates a group. Any returned prefix indicates a
+    child group implied by some descendant.
+
+    For example, if a group is created at path "/foo/bar" and an array
+    is created at path "/foo/baz/qux", then the store will contain the
+    keys "meta/foo/bar.group.json" and
+    "meta/foo/bar/baz/qux.array.json". Groups at paths "/", "/foo" and
+    "/foo/baz" have not been explicitly created but are implied by
+    their descendants. To list the children of the group at path
+    "/foo", perform ``listdir("meta/foo/")``, which will return the
+    key "meta/foo/bar.group.json" and the prefix "meta/foo/baz/". From
+    this it can be inferred that child groups "/foo/bar" and
+    "/foo/baz" are present.
+
+    If a store does not support any of the list operations then
+    discovery of group children is not possible, and the contents of
+    the hierarchy must be communicated by some other means, such as
+    via a protocol extension, or via some out of band communication.
+    
+**Discover all nodes in a hierarchy**
 
     @@TODO
-    
 
-@@TODO describe implicit groups...@@ When a group is created at path
-`P` where `P` is not the root hierarchy path, then it is **not**
-necessary to check if groups already exist at all ancestor paths of
-`P`. For example, if `P` is "/foo/bar", it is not necessary to check
-if groups exist at paths "/" and "/foo", nor is it necessary to create
-groups at these ancestor paths if they do not exist. Explicitly
-creating a group at a non-root path `P` implicitly creates groups at
-all ancestor paths.
+**Delete a group or array**
+
+    @@TODO
+
+**Determine if a node exists**
+
+    @@TODO
+
+
+@@TODO need to describe/explain implicit groups more?
 
 
 Protocol extensions
