@@ -40,17 +40,17 @@ or obsoleted by other documents at any time. It is inappapropriate to
 cite this document as other than work in progress.
 
 Comments, questions or contributions to this document are very
-welcome. Comments and questions should be raised via [GitHub
-issues](https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0). When
+welcome. Comments and questions should be raised via `GitHub issues
+<https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_. When
 raising an issue, please add the label
 "core-protocol-v3.0". Contributions and suggested edits can be made
-via GitHub via the [online
-editor](https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst)
+via GitHub via the `online editor
+<https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 or by making a pull request against the "core-protocol-v3.0-dev"
 branch.
 
-This document was produced by the [Zarr core development
-team](https://github.com/orgs/zarr-developers/teams/core-devs).
+This document was produced by the `Zarr core development team
+<https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
 
 Document conventions
