@@ -373,7 +373,7 @@ indices and suffix are joined using a separator. The default value for
 the prefix is the empty string (""), the default value for the
 separator is the period character (".") and the default value for the
 suffix is the empty string (""), but these values may be configured,
-see the section on `Array metadata`_ below.
+see the section on `Array metadata documents`_ below.
 
 For example, in a 3 dimensional array at path "/foo/bar" configured
 with default values for the chunk key prefix, suffix and separator,
@@ -486,25 +486,208 @@ codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification @@TODO link.
 
 Further details of how a chunk encoding pipeline is configured for an
-array are given in the section below on `Array metadata`_.
+array are given in the section below on `Array metadata documents`_.
 
 
-Array metadata
---------------
+Core metadata
+-------------
 
-TODO define the structure and content of array metadata documents
+This section defines core metadata documents for Zarr arrays and
+groups.  A Zarr metadata document is a [RFC8259]_ JSON document
+containing configuration metadata for a Zarr array or group. In this
+section, the terms "value", "number", "string" and "object" are used
+as defined in [RFC8259]_. The term "array" is also used as defined in
+[RFC8259]_ and means a JSON array, except where qualified as "Zarr
+array". Following [RFC8259]_, this section also describes an object as
+a set of name/value pairs.
+
+A Zarr array or group metadata document must contain a single object,
+here called the metadata object. The following names must be present
+in the metadata object and must be used as defined below.
+
+`zarr_format`
+
+    URI of the Zarr core protocol specification that defines the
+    metadata format. For Zarr arrays conforming to this specification,
+    the value must be the string
+    "http://purl.org/zarr/spec/protocol/core/3.0".
+
+    Implementations of this protocol may assume that the final path
+    segment of this URI ("3.0") represents the core protocol version
+    number, where "3" is the major version number and "0" is the minor
+    version number. Implementations of this protocol may also assume
+    that future versions of this protocol that retain the same major
+    versioning number ("3") will be backwards-compatible, in the sense
+    that any new features added to the protocol can be safely
+    ignored. In other words, implementations of this protocol may read
+    any metadata object where the major version number is "3" and
+    interpret the metadata as defined in this specification, ignoring
+    any name/value pairs where the name is not defined here.
+
+    Note that this value is given as a URI rather than just as a
+    simple version number string to help with discovery of this
+    specification.
+
+`extensions`
+
+    Provides protocol extensions which define additional features used
+    by the Zarr array or group or other modifications to the metadata
+    format. The value must be an array containing zero or more
+    objects, each of which identifies an extension used and provides
+    any additional extension configuration metadata. Each extension
+    configuration object must contain the name `extension` whose value
+    is a URI that identifies a Zarr protocol extension and
+    dereferences to a human readable representation of the extension
+    specification. Each object must also contain the name
+    `must_understand` whose value is either the literal ``true`` or
+    ``false``. Each object may contain other name/value pairs as
+    defined by the protocol extension.
+
+    If an implementation of this specification encounters an extension
+    that it does not recognise, but the value of `must_understand` is
+    ``false``, then the extension may be ignored and processing may
+    continue. If the extension is not recognised and the value of
+    `must_understand` is ``true`` then processing must terminate and
+    an appropriate error raised.
+
+`attributes`
+
+    Provides user- or application-defined metadata. The value must be
+    an object, but there are no constraints on what name/value pairs
+    the object contains.
 
 
-Group metadata
---------------
+Array metadata documents
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO define the structure and content of group metadata documents
+In addition to `zarr_format` and `extensions`, a Zarr array metadata
+document must also contain the following names, used as defined below.
+    
+`shape`
+
+    An array of integers providing the length of each dimension of the
+    Zarr array. For example, a value ``[10, 20]`` indicates a
+    two-dimensional Zarr array, where the first dimension has length
+    10 and the second dimension has length 20.
+
+`data_type`
+
+    The data type of the Zarr array. If the data type is defined in
+    this specification, then the value must be the data type
+    identifier provided as a string. For example, ``"<f8"`` for
+    little-endian 64-bit floating point number.
+
+    The `data_type` value is an extension point and may be defined by
+    a protocol extension. If the data type is defined by a protocol
+    extension, then the value must be an object containing the names
+    `extension`, `type` and `fallback`. The `extension` is required
+    and its value must be a URI that identifies the protocol extension
+    and dereferences to a human-readable representation of the
+    specification.  The `type` is required and its value is defined by
+    the protocol extension. The `fallback` is optional and, if
+    provided, its value must be one of the data type identifiers
+    defined in this specification. If an implementation does not
+    recognise the extension, but a `fallback` is present, then the
+    implementation may proceed using the `fallback` value as the data
+    type. The object may also contain other name/value pairs as
+    defined by the protocol extension.
+
+`chunk_grid`
+
+    The chunk grid of the Zarr array. If the chunk grid is a regular
+    chunk grid as defined in this specification, then the value must
+    be an object with the names `type` and `chunk_shape`. The value of
+    `type` must be the string ``"regular"``, and the value of
+    `chunk_shape` must be an array of integers providing the lengths
+    of the chunk along each dimension of the array. For example,
+    ``{"type": "regular", "chunk_shape": [2, 5]}`` means a regular
+    grid where the chunks have length 2 along the first dimension and
+    length 5 along the second dimension.
+
+    The `chunk_grid` value is an extension point and may be defined by
+    a protocol extension. If the chunk grid type is defined by a
+    protocol extension, then the value must be an object containing
+    the names `extension` and `type`. The `extension` is required and
+    the value must be a URI that identifies the protocol extension and
+    dereferences to a human-readable representation of the
+    specification.  The `type` is required and the value is defined by
+    the protocol extension. The object may also contain other
+    name/value pairs as defined by the protocol extension.
+
+`chunk_memory_layout`
+
+    The internal memory layout of the chunks. Use the value ``"C"`` to
+    indicate C contiguous memory layout or ``"F"`` to indicate F
+    contiguous memory layout as defined in this specification @@TODO
+    link to sections@@.
+
+    The `chunk_memory_layout` value is an extension point and may be
+    defined by a protocol extension. If the chunk memory layout type
+    is defined by a protocol extension, then the value must be an
+    object containing the names `extension` and `type`. The
+    `extension` is required and the value must be a URI that
+    identifies the protocol extension and dereferences to a
+    human-readable representation of the specification.  The `type` is
+    required and the value is defined by the protocol extension. The
+    object may also contain other name/value pairs as defined by the
+    protocol extension.
+
+`chunk_codecs`
+
+    Specifies a sequence of zero or more codecs to be used for
+    encoding and decoding chunks. The value must be an array, where
+    each member of the array is an object that provides configuration
+    metadata for a codec. Each codec configuration object must contain
+    the name `codec` whose value is a URI that identifies a codec and
+    dereferences to a human readable representation of the codec
+    specification. Each codec configuration object may contain other
+    name/value pairs providing addition configuration metadata, as
+    defined by the corresponding codec specification.
+
+    The codec configuration objects must be given in the order that
+    the codecs are applied during chunk encoding. I.e., the first
+    codec configuration object defines the first codec applied during
+    chunk encoding, and the last codec applied during chunk decoding.
+
+`fill_value`
+
+    Provides an element value to use for uninitialised portions of the
+    Zarr array.
+
+    If the data type of the Zarr array is Boolean then the value must
+    be the literal ``false`` or ``true``. If the data type is one of
+    the integer data types defined in this specification, then the
+    value must be a number with no fraction or exponent part and must
+    be within the range of the data type. TODO what about floating
+    point data types? TODO what about complex data types? TODO what
+    about nan and inf? TODO what about extension data types?
+
+    For any data type, if the `fill_value` is the literal `null` then
+    the fill value is undefined and the implementation may use any
+    arbitrary value that is consistent with the data type as the fill
+    value.
+
+All other names are reserved for future versions of this
+specification. Implementations and protocol extensions must not define
+or use any other names within the metadata object. Any additional
+metadata must be provided elsewhere, e.g., within any of the extension
+point values, or within the `extensions`, or in a separate metadata
+object stored under a different key in the store. See also the section
+on `Protocol extensions`_ below.
 
 
-User attributes
----------------
+Group metadata documents
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO define attributes documents
+A Zarr group metadata object must contain the `zarr_format`,
+`extensions` and `attributes` names as defined above. All other names
+are reserved for future versions of this
+specification. Implementations and protocol extensions must not define
+or use any other names within the metadata object. Any additional
+metadata must be provided elsewhere, e.g., within any of the extension
+point values, or within the `extensions`, or in a separate metadata
+object stored under a different key in the store. See also the section
+on `Protocol extensions`_ below.
 
 
 Store interface
@@ -520,8 +703,18 @@ TODO define how high level operations like creating a group or array
 translate into low level key/value operations on the store interface
 
 
+Protocol extensions
+-------------------
+
+TODO define different types of protocol extension.
+
+
 References
 ----------
+
+.. [RFC8259] T. Bray, Ed. The JavaScript Object Notation (JSON) Data
+   Interchange Format. December 2017. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc8259
 
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
