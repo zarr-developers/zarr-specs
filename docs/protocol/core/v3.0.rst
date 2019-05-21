@@ -322,7 +322,48 @@ TODO define regular chunk grids, including how to form a key for each chunk in a
 Memory layouts
 --------------
 
-TODO define "C" and "F" memory layouts
+An array has a memory layout, which defines the way that the binary
+values of the array elements are organised within each chunk to form a
+contiguous sequence of bytes. This contiguous binary representation of
+a chunk is then the input to the array's chunk encoding pipeline,
+described in later sections. Typically, when reading data, an
+implementation will load this binary representation into a contiguous
+memory buffer to allow direct access to array elements without having
+to copy data.
+
+The core protocol defines two types of contiguous memory
+layout. However, protocol extensions may define other memory
+layouts. Note that there may be an interdependency between memory
+layouts and data types, such that certain memory layouts may only be
+applicable to arrays with certain data types.
+
+C contiguous memory layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this memory layout, the binary values of the array elements are
+organised into a sequence such that the last dimension of the array is
+the fastest changing dimension, also known as "row-major" order. This
+layout is only applicable to arrays with fixed size data types.
+
+For example, for a two-dimensional array with chunk shape (dx, dy),
+the binary values for a given chunk are taken from chunk elements in
+the order (0, 0), (0, 1), (0, 2), ..., (dx - 1, dy - 3), (dx - 1, dy -
+2), (dx - 1, dy - 1).
+
+F contiguous memory layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this memory layout, the binary values of the array elements are
+organised into a sequence such that the first dimension of the array
+is the fastest changing dimension, also known as "column-major"
+order. This layout is only applicable to arrays with fixed size data
+types.
+
+For example, for a two-dimensional array with chunk shape (dx, dy),
+the binary values for a given chunk are taken from chunk elements in
+the order (0, 0), (1, 0), (2, 0), ..., (dx - 3, dy - 1), (dx - 2, dy -
+1), (dx - 1, dy - 1).
+
 
 Codec interface
 ---------------
