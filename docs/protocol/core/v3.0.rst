@@ -329,9 +329,10 @@ hyperrectangles of the same shape. Protocol extensions may define
 other grid types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
 
-A grid type also defines rules for constructing a unique key for each
-chunk, which is a string of ASCII characters that can be used to save
-and retrieve chunk data in a store.
+A grid type must also defines rules for constructing an identifier for
+each chunk that is unique within the grid, which is a string of ASCII
+characters that can be used to construct keys to save and retrieve
+chunk data in a store, see also the `Storage protocol`_ section.
 
 Regular grids
 ~~~~~~~~~~~~~
@@ -340,46 +341,43 @@ A regular grid is a type of grid where an array is divided into chunks
 such that each chunk is a hyperrectangle of the same shape. The
 dimensionality of the grid is the same as the dimensionality of the
 array. Each chunk in the grid can be addressed by a tuple of positive
-integers (i, j, k, ...) corresponding to the indices of the chunk
-along each dimension.
+integers (`i`, `j`, `k`, ...) corresponding to the indices of the
+chunk along each dimension.
 
-The origin vertex of a chunk has coordinates in the array space (i *
-dx, j * dy, k * dz, ...) where (dx, dy, dz, ...) are the grid spacings
-along each dimension, also known as the chunk shape. Thus the origin
-vertex of the chunk at grid index (0, 0, 0, ...) is at coordinate (0,
-0, 0, ...) in the array space, i.e., the grid is aligned with the
-origin of the array. If the length of any array dimension is not
-perfectly divisible by the chunk length along the same dimension, then
-the grid will overhang the edge of the array space.
+The origin vertex of a chunk has coordinates in the array space (`i` *
+`dx`, `j` * `dy`, `k` * `dz`, ...) where (`dx`, `dy`, `dz`, ...) are
+the grid spacings along each dimension, also known as the chunk
+shape. Thus the origin vertex of the chunk at grid index (0, 0, 0,
+...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
+grid is aligned with the origin of the array. If the length of any
+array dimension is not perfectly divisible by the chunk length along
+the same dimension, then the grid will overhang the edge of the array
+space.
 
-The shape of the chunk grid will be (ceil(x / dx), ceil(y / dy),
-ceil(z / dz), ...)  where (x, y, z, ...) is the array shape, / is the
-division operator and ceil() is the ceiling function. For example, if
-a 3 dimensional array has shape (10, 200, 3000), and has chunk shape
-(5, 20, 400), then the shape of the chunk grid will be (2, 10, 8),
-meaning that there will be 2 chunks along the first dimension, 10
-along the second dimension, and 8 along the third dimension.
+The shape of the chunk grid will be (ceil(`x` / `dx`), ceil(`y` /
+`dy`), ceil(`z` / `dz`), ...)  where (`x`, `y`, `z`, ...) is the array
+shape, "/" is the division operator and "ceil" is the ceiling
+function. For example, if a 3 dimensional array has shape (10, 200,
+3000), and has chunk shape (5, 20, 400), then the shape of the chunk
+grid will be (2, 10, 8), meaning that there will be 2 chunks along the
+first dimension, 10 along the second dimension, and 8 along the third
+dimension.
 
-An element of an array with coordinates (i, j, k, ...) will occur
-within the chunk at grid index (i // dx, j // dy, k // dz, ...), where
-// is the floor division operator. The element will have coordinates
-(i % dx, j % dy, k % dz, ...) within that chunk. For example, @@TODO
-example.
+An element of an array with coordinates (`i`, `j`, `k`, ...) will
+occur within the chunk at grid index (`i` // `dx`, `j` // `dy`, `k` //
+`dz`, ...), where "//" is the floor division operator. The element
+will have coordinates (`i` % `dx`, `j` % `dy`, `k` % `dz`, ...) within
+that chunk. For example, @@TODO example.
 
-The key for chunk with grid index (i, j, k, ...) is formed by joining
-together the path of the array in which the chunk occurs, then a
-forward slash character ("/"), then a prefix, then the ASCII string
-representations of each index, then a suffix. The prefix, chunk
-indices and suffix are joined using a separator. The default value for
-the prefix is the empty string (""), the default value for the
-separator is the period character (".") and the default value for the
-suffix is the empty string (""), but these values may be configured,
-see the section on `Array metadata`_ below.
+The identifier for chunk with grid index (`i`, `j`, `k`, ...) is
+formed by joining together ASCII string representations of each index
+using a separator. The default value for the separator is the period
+character ("."), but this may be configured by providing a `separator`
+value within the `chunk_grid` metadata object, see the section on
+`Array metadata`_ below.
 
-For example, in a 3 dimensional array at path "/foo/bar" configured
-with default values for the chunk key prefix, suffix and separator,
-the key for the chunk at grid index (1, 23, 45) is the string
-"/foo/bar/1.23.45".
+For example, in a 3 dimensional array, the identifier for the chunk at
+grid index (1, 23, 45) is the string "1.23.45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
@@ -417,10 +415,10 @@ organised into a sequence such that the last dimension of the array is
 the fastest changing dimension, also known as "row-major" order. This
 layout is only applicable to arrays with fixed size data types.
 
-For example, for a two-dimensional array with chunk shape (dx, dy),
+For example, for a two-dimensional array with chunk shape (`dx`, `dy`),
 the binary values for a given chunk are taken from chunk elements in
-the order (0, 0), (0, 1), (0, 2), ..., (dx - 1, dy - 3), (dx - 1, dy -
-2), (dx - 1, dy - 1).
+the order (0, 0), (0, 1), (0, 2), ..., (`dx` - 1, `dy` - 3), (`dx` - 1, `dy` -
+2), (`dx` - 1, `dy` - 1).
 
 F contiguous memory layout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -431,10 +429,10 @@ is the fastest changing dimension, also known as "column-major"
 order. This layout is only applicable to arrays with fixed size data
 types.
 
-For example, for a two-dimensional array with chunk shape (dx, dy),
-the binary values for a given chunk are taken from chunk elements in
-the order (0, 0), (1, 0), (2, 0), ..., (dx - 3, dy - 1), (dx - 2, dy -
-1), (dx - 1, dy - 1).
+For example, for a two-dimensional array with chunk shape (`dx`,
+`dy`), the binary values for a given chunk are taken from chunk
+elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
+1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
 
 
 Codecs
