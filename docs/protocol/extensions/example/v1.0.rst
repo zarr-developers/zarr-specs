@@ -1,4 +1,0 @@
-Example protocol extension version 1.0
-======================================
-
-A Zarr protocol extension would live in a location like this.
