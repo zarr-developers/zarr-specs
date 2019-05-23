@@ -6,10 +6,7 @@ Zarr core protocol version 3.0
 
 **Work in Progress**
 
-This version:
-    http://purl.org/zarr/spec/protocol/core/3.0/dev
-    TODO replace "dev" with a git tag when a draft is tagged, and create a PURL redirecting to RTFD
-Latest version:
+Specification URI:
     http://purl.org/zarr/spec/protocol/core/3.0
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
@@ -757,3 +754,20 @@ References
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc2119
+
+
+Change log
+----------
+
+This section is a placeholder for keeping a log of the snapshots of
+this document that are tagged in GitHub and what changed between them. 
+
+@@tag@@
+~~~~~~~
+
+Links: `view spec
+<https://zarr-specs.readthedocs.io/en/@@tag@@/protocol/core/v3.0.html>`_;
+`view source
+<https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/protocol/core/v3.0.rst>`_
+
+@@TODO summary of changes since previous tag.
