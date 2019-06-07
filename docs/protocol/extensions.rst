@@ -7,5 +7,5 @@ Under construction.
    :maxdepth: 1
    :caption: Contents:
 
-   extensions/example/v1.0
+   extensions/datetime-dtypes/v1.0
 
