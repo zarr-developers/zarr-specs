@@ -775,17 +775,23 @@ allow for different store implementations to be used.
 The store interface defines a set of operations involving `keys` and
 `values`. In the context of this interface, a `key` is any ASCII
 string containing only characters in the ranges ``a-z``, ``A-Z``,
-``0-9``, or in the set ``/.-_`` and a `value` is any sequence of
+``0-9``, or in the set ``/.-_``, and a `value` is any sequence of
 bytes. It is assumed that the store holds (`key`, `value`) pairs, with
 only one such pair for any given `key`. I.e., a store is a mapping
 from keys to values.
 
-The following operations are **required**:
+The store operations are grouped into three sets of capabilities:
+**readable**, **writeable** and **listable**. It is not necessary for
+a store implementation to support all of these capabilities. 
+
+A **readable store** supports the following operation:
 
 ``get`` - Retrieve the `value` associated with a given `key`.
 
     | Parameters: `key`
     | Output: `value`
+
+A **writeable store** supports the following operations:
 
 ``set`` - Store a (`key`, `value`) pair.
 
@@ -797,40 +803,31 @@ The following operations are **required**:
     | Parameters: `key`
     | Output: none
 
-The following operations are **optional**, but if supported may be
-used by an implementation of this protocol to provide additional
-functionality and/or optimisations:
+A **listable store** supports any one or more of the following
+operations:
 
 ``list`` - Retrieve all `keys` in the store.
 
     | Parameters: none
     | Output: set of `keys`
 
-``listpre`` - Retrieve all keys with a given prefix.
+``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
     | Output: set of `keys` with the given `prefix`
 
     For example, if a store contains the keys "a/b", "a/c/d" and
-    "e/f/g", then ``listpre("a/")`` would return "a/b" and "a/c/d".
+    "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
-    If ``listpre`` is not supported by a store, an implementation of
-    this protocol could fall back to ``list`` with post-processing of
-    the results.
-
-``listdir`` - Retrieve all keys and prefixes with a given prefix and
+``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain "/" after the given prefix.
 
     | Parameters: `prefix`
     | Output: set of `keys` and set of `prefixes`
 
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
-    "a/f/g", then ``listdir("a/")`` would return keys "a/b" and "a/c"
+    "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
-
-    If ``listdir`` is not supported by a store, an implementation of
-    this protocol could fallback to ``listpre`` with post-processing
-    of the results.
 
 
 Store implementations
@@ -838,7 +835,45 @@ Store implementations
 
 (This subsection is not normative.)
 
-TODO describe possible implementations.
+A store implementation maps the abstract operations of the store
+interface onto concrete operations on some underlying storage
+system. This specification does not constrain or make any assumptions
+about the nature of the underlying storage system. Thus it is possible
+to implement the store interface in a variety of different ways.
+
+For example, a store implementation might use a conventional file
+system as the underlying storage system, mapping keys onto file paths
+and values onto file contents. The ``get`` operation could then be
+implemented by reading a file, the ``set`` operation implemented by
+writing a file, and the ``list_dir`` operation implemented by listing
+a directory.
+
+For example, a store implementation might use a key-value database
+such as BerkeleyDB or LMDB as the underlying storage system. In this
+case the implementation of ``get`` and ``set`` operations would be
+obvious, being whatever are the native operations provided by the
+database for getting and setting key/value pairs. Such a store
+implementation might natively support the ``list`` operation but might
+not support ``list_prefix`` or ``list_dir``, although these could be
+implemented via ``list`` with post-processing of the returned keys.
+
+For example, a store implementation might use a cloud object storage
+service such as Amazon S3, Azure Blob Storage, or Google Cloud Storage
+as the underlying storage system, mapping keys to object names and
+values to object contents. The store interface operations would then
+be implemented via concrete operations of the service's REST API,
+i.e., via HTTP requests. E.g., the ``get`` operation could be
+implemented via an HTTP GET request to an object URL, the ``set``
+operation could be implemented via an HTTP PUT request to an object
+URL, and the list operations could be implemented via an HTTP GET
+request to a bucket URL (i.e., listing a bucket).
+
+The examples above are meant to be illustrative only, and other
+implementations are possible. This specification does not attempt to
+standardise any store implementations, however where a store
+implementation is expected to be widely used then it is recommended to
+create a store implementation spec and contribute it to the zarr-specs
+GitHub repository. @@TODO more info and example.
 
 
 Storage protocol
@@ -850,10 +885,10 @@ level operations on the key/value store interface defined above.
 
 In this section a "hierarchy path" is a logical path which identifies
 a group or array node within a Zarr hierarchy, and a "storage key" is
-a key used to store and retrieve metadata or data via the store
-interface. There is a further distinction between "metadata keys"
-which are storage keys used to store metadata documents, and "data
-keys" which are storage keys used to store encoded chunks.
+a key used to store and retrieve data via the store interface. There
+is a further distinction between "metadata keys" which are storage
+keys used to store metadata documents, and "chunk keys" which are
+storage keys used to store encoded chunks.
 
 Note that any non-root hierarchy path will have ancestor paths that
 identify ancestor nodes in the hierarchy. For example, the path
@@ -863,11 +898,11 @@ Storage keys
 ~~~~~~~~~~~~
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating "meta", `P`, and
-".group.json".
+group metadata document is formed by concatenating "meta/root", `P`,
+and ".group.json".
 
 For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/foo/bar.group.json".
+corresponding metadata key is "meta/root/foo/bar.group.json".
 
 For an array at a non-root hierarchy path `P`, the metadata key for
 the array metadata document is formed by concatenating "meta", `P`,
@@ -876,14 +911,14 @@ concatenating "data", `P`, "/", and the chunk identifier as defined by
 the chunk grid layout.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/foo/baz.array.json". If the array
-has two dimensions and a regular chunk grid, the data key for the
-chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
+corresponding metadata key is "meta/root/foo/baz.array.json". If the
+array has two dimensions and a regular chunk grid, the data key for
+the chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
 
-@@TODO what about storage keys for the root node, wheter group or
-array?  If the root node is a group, the metadata key is
-"root.group.json". If the root node is an array, the metadata key is
-"root.array.json".
+If the root node is a group, the metadata key is
+"meta/root.group.json". If the root node is an array, the metadata key
+is "meta/root.array.json", and the data keys are formed by
+concatenating "data/" and the chunk identifier.
 
 
 Protocol operations
@@ -932,7 +967,7 @@ Let "+" be the string concatenation operator.
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
-    ``listdir("meta" + P + "/")``. Any returned key ending in
+    ``list_dir("meta" + P + "/")``. Any returned key ending in
     ".array.json" indicates an array. Any returned key ending in
     ".group.json" indicates a group. Any returned prefix indicates a
     child group implied by some descendant.
@@ -943,7 +978,7 @@ Let "+" be the string concatenation operator.
     "meta/foo/bar/baz/qux.array.json". Groups at paths "/", "/foo" and
     "/foo/baz" have not been explicitly created but are implied by
     their descendants. To list the children of the group at path
-    "/foo", perform ``listdir("meta/foo/")``, which will return the
+    "/foo", perform ``list_dir("meta/foo/")``, which will return the
     key "meta/foo/bar.group.json" and the prefix "meta/foo/baz/". From
     this it can be inferred that child groups "/foo/bar" and
     "/foo/baz" are present.
