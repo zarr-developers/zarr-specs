@@ -37,8 +37,8 @@ cite this document as other than work in progress.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
-<https://github.com/zarr-developers/zarr-specs/labels/datetime-dtypes-v1.0>`_. When
-raising an issue, please add the label "datetime-dtypes-v1.0".
+<https://github.com/zarr-developers/zarr-specs/labels/complex-dtypes-v1.0>`_. When
+raising an issue, please add the label "complex-dtypes-v1.0".
 
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
