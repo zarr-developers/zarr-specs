@@ -1,7 +1,9 @@
-Datetime data types version 1.0
-===============================
-
-**Work in Progress**
+===================================
+ Datetime data types (version 1.0)
+===================================
+-----------------------------
+ Editor's draft 11 June 2019
+-----------------------------
 
 Specification URI:
     http://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0
@@ -20,7 +22,7 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 
 
 Abstract
---------
+========
 
 This specification is a Zarr protocol extension defining data types
 for datetimes (moment in time) and timedeltas (difference between two
@@ -28,7 +30,7 @@ datetimes).
 
 
 Status of this document
------------------------
+=======================
 
 This document is a **Work in Progress**. It may be updated, replaced
 or obsoleted by other documents at any time. It is inappapropriate to
@@ -44,7 +46,7 @@ This document was produced by the `Zarr core development team
 
 
 Document conventions
---------------------
+====================
 
 Conformance requirements are expressed with a combination of
 descriptive assertions and [RFC2119]_ terminology. The key words
@@ -60,7 +62,7 @@ this specification are introduced with the words "for example".
 
 
 Extension data types
---------------------
+====================
 
 Two extension data types are defined to represent datetime and
 timedelta values. The definitions of these data types are based on the
@@ -69,7 +71,7 @@ are intended to be portable across Zarr implementations in different
 programming languages.
 
 Datetime
-~~~~~~~~
+--------
 
 The datetime data type represents a single moment in time. It is a
 logical data type based on the 64-bit integer data type, with
@@ -85,7 +87,7 @@ time span for 'D' (day) is exactly 24 times longer than the time span
 for 'h' (hour).
 
 Timedelta
-~~~~~~~~~
+---------
 
 The timedelta data type represents a difference between two
 datatimes. It is a logical data type based on the 64-bit integer data
@@ -97,7 +99,7 @@ because different months have different numbers of days.
 
 
 Units
------
+=====
 
 ====  ============  ====================  ======================
 Code  Meaning       Time span (relative)  Time span (absolute)
@@ -119,7 +121,7 @@ as    attosecond    +/- 9.2 seconds       [1969 AD, 1970 AD]
 
 
 Data type identifiers
----------------------
+=====================
 
 An identifier for a datetime data type is constructed from the string
 pattern "[endianness]M8[[units]]" where `endianness` is either "<"
@@ -137,7 +139,7 @@ nanosecond units.
 
 
 References
-----------
+==========
 
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
@@ -149,6 +151,6 @@ References
 
 				    
 Change log
-----------
+==========
 
 @@TODO

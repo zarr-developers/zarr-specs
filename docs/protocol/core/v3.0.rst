@@ -1,15 +1,18 @@
 .. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
 
-
-Zarr core protocol version 3.0
-==============================
-
-**Work in Progress**
+==================================
+ Zarr core protocol (version 3.0)
+==================================
+-----------------------------
+ Editor's draft 11 June 2019
+-----------------------------
 
 Specification URI:
     http://purl.org/zarr/spec/protocol/core/3.0
+
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
+
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 
@@ -23,14 +26,14 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 
 
 Abstract
---------
+========
 
-This specification defines a core protocol for storage and retrieval
-of N-dimensional typed arrays.
+This specification defines the Zarr core protocol for storage and
+retrieval of N-dimensional typed arrays.
 
 
 Status of this document
------------------------
+=======================
 
 This document is a **Work in Progress**. It may be updated, replaced
 or obsoleted by other documents at any time. It is inappapropriate to
@@ -51,7 +54,7 @@ This document was produced by the `Zarr core development team
 
 
 Document conventions
---------------------
+====================
 
 Conformance requirements are expressed with a combination of
 descriptive assertions and [RFC2119]_ terminology. The key words
@@ -66,93 +69,193 @@ explicitly marked as non-normative, examples, and notes. Examples in
 this specification are introduced with the words "for example".
 
 
-Conceptual model
-----------------
+Concepts and terminology
+========================
 
-A Zarr *hierarchy* is a tree structure, where each node in the tree is
-either a *group* or an *array*. Group nodes may have children
-but array nodes may not.
+This section introduces and defines some key terms and explains the
+conceptual model underpinning the Zarr protocol.
 
-Each node in a hierarchy has a *name* which is a string of ASCII
-characters with some additional constraints defined in the section on
-`Node names`_ below. Two sibling nodes cannot have the same name. The
-root node does not have a name.
+.. _hierarchy:
 
-Each node in a hierarchy has a *path* which uniquely identifies that
-node and defines its location within the hierarchy. The path is formed 
-by joining together the "/" character, followed by the names of all 
-ancestor nodes separated by the "/" character, followed by the name of 
-the node itself. For example, the path "/foo/bar" identifies a node 
-named "bar", whose parent is named "foo", whose parent is the root of 
-the hierarchy. The path "/" identifies the root node.
+*Hierarchy*
 
-An array has a fixed number of zero or more *dimensions*. Each dimension has an
-integer length. The core protocol only considers the case where the
-lengths of all dimensions are finite. However, protocol extensions may
-be defined which allow a dimension to have infinite or variable
-length.
+    A Zarr hierarchy is a tree structure, where each node in the tree
+    is either a group_ or an array_. Group nodes may have children but
+    array nodes may not. All nodes in a hierarchy have a name_ and a
+    path_.
 
-The *shape* of an array is the tuple of dimension lengths. For
-example, if an array has 2 dimensions, where the length of the first
-dimension is 100 and the length of the second dimension is 20, then
-the shape of the array is (100, 20).
+.. _group:
+.. _groups:
 
-An array contains zero or more *elements*. Each element can be
-identified by a tuple of coordinates, one for each dimension of the
-array. If all dimensions of an array have finite length, then the
-number of elements in the array is given by the product of the
-dimension lengths. An array element may be empty, or it may have a
-value.
+*Group*
 
-An array is associated with a *data type*. A data type defines the set
-of possible values that the array may contain, and a binary
-representation (i.e., sequence of bytes) for each possible value. For
-example, the little-endian 32-bit signed integer data type defines
-binary representations for all integers in the range −2,147,483,648 to
-2,147,483,647. The core protocol only considers a limited set of data
-types, but protocol extensions may define other data types.
+    A group is a node in a hierarchy_ that may have child nodes.
 
-An array is divided into a set of *chunks*, where each chunk is a
-hyperrectangle defined by a tuple of intervals, one for each dimension
-of the array. The shape of a chunk is the tuple of interval lengths,
-and the size of a chunk (i.e., number of elements contained within the
-chunk) is the product of its interval lengths.
+.. _array:
+.. _arrays:
 
-The chunks of an array are organised into a *grid*. The core protocol
-only considers the case where all chunks have the same shape and the
-chunks form a regular grid. However, protocol extensions may define
-other grid types such as rectilinear grids.
+*Array*
 
-An array is associated with a *memory layout* which defines how to
-construct a binary representation of a single chunk by organising the
-binary values within the chunk into a single contiguous sequence of
-bytes. The core protocol defines two types of memory layout based on
-"C" (row-major) and "F" (column-major) ordering of values, but
-protocol extensions may define other memory layouts.
+    An array is a node in a hierarchy_. An array is a data structure
+    with zero or more dimensions_ whose lengths define the shape_ of
+    the array. An array contains zero or more data elements_. All
+    elements_ in an array conform to the same `data type`_. An array
+    may not have child nodes.
 
-An array is associated with an *encoding pipeline*, which is a
-sequence of zero or more *codecs* that transforms the binary
-representation of a chunk in some way. For example, an encoding
-pipeline might include a checksum codec to ensure data integrity, and
-a compression codec to reduce data size. All codecs implement a common
-*codec interface* which provides a pair of operations, one to perform
-the transformation (encode), the other to reverse the transformation
-(decode).
+.. _name:
+.. _names:
 
-Each node in a hierarchy is represented by a *metadata document*,
-which is a machine-readable document containing essential processing
-information about the node. For example, an array metadata document
-will specify the number of dimensions, length of each dimension, data
-type, chunk shape, memory layout and encoding pipeline for that array.
+*Name*
 
-The metadata and encoded chunk data for all nodes in a hierarchy are
-held in a *store*. To enable a variety of different store types to be
-used, the core protocol defines a simple *store interface* which is a
-common set of operations that a store must provide.
+    Each node in a hierarchy_ has a name, which is a string of
+    characters with some additional constraints defined in the section
+    on `node names`_ below. Two sibling nodes cannot have the same
+    name. The root node does not have a name.
+
+.. _path:
+.. _paths:
+
+*Path*
+
+    Each node in a hierarchy_ has a path which uniquely identifies
+    that node and defines its location within the hierarchy_. The path
+    is formed by joining together the "/" character, followed by the
+    name_ of each ancestor node separated by the "/" character,
+    followed by the name_ of the node itself. For example, the path
+    "/foo/bar" identifies a node named "bar", whose parent is named
+    "foo", whose parent is the root of the hierarchy. The path "/"
+    identifies the root node.
+
+.. _dimension:
+.. _dimensions:
+
+*Dimension*
+
+    An array_ has a fixed number of zero or more dimensions. Each
+    dimension has an integer length. This specification only considers
+    the case where the lengths of all dimensions are finite. However,
+    protocol extensions may be defined which allow a dimension to have
+    infinite or variable length.
+
+.. _shape:
+
+*Shape*
+
+    The shape of an array_ is the tuple of dimension_ lengths. For
+    example, if an array_ has 2 dimensions_, where the length of the
+    first dimension_ is 100 and the length of the second dimension_ is
+    20, then the shape of the array_ is (100, 20).
+
+.. _element:
+.. _elements:
+
+*Element*
+
+    An array_ contains zero or more elements. Each element can be
+    identified by a tuple of integer coordinates, one for each
+    dimension_ of the array_. If all dimensions_ of an array_ have
+    finite length, then the number of elements in the array_ is given
+    by the product of the dimension_ lengths. An array_ element may be
+    empty, or it may have a value.
+
+.. _data type:
+.. _data types:
+
+*Data type*
+
+    A data type defines the set of possible values that an array_ may
+    contain, and a binary representation (i.e., sequence of bytes) for
+    each possible value. For example, the little-endian 32-bit signed
+    integer data type defines binary representations for all integers
+    in the range −2,147,483,648 to 2,147,483,647. This specification
+    only defines a limited set of data types, but protocol extensions
+    may define other data types.
+
+.. _chunk:
+.. _chunks:
+
+*Chunk*
+
+    An array_ is divided into a set of chunks, where each chunk is a
+    hyperrectangle defined by a tuple of intervals, one for each
+    dimension_ of the array_. The chunk shape is the tuple of interval
+    lengths, and the chunk size (i.e., number of elements_ contained
+    within the chunk) is the product of its interval lengths.
+
+.. _grid:
+.. _grids:
+
+*Grid*
+
+    The chunks_ of an array_ are organised into a grid. This
+    specification only considers the case where all chunks_ have the
+    same chunk shape and the chunks form a regular grid. However,
+    protocol extensions may define other grid types such as
+    rectilinear grids.
+
+.. _memory layout:
+.. _memory layouts:
+
+*Memory layout*
+
+    An array_ is associated with a memory layout which defines how to
+    construct a binary representation of a single chunk_ by organising
+    the binary values of the elements_ within the chunk_ into a single
+    contiguous sequence of bytes. This specification defines two types
+    of memory layout based on "C" (row-major) and "F" (column-major)
+    ordering of elements_, but protocol extensions may define other
+    memory layouts.
+
+.. _compressor:
+.. _compressors:
+
+*Compressor*
+
+    An array_ may be associated with an compressor, which is a codec_
+    that transforms the binary representation of a chunk_ in some way,
+    usually to reduce data size.
+
+.. _codec:
+.. _codecs:
+
+*Codec*
+
+    A codec is a pair of algorithms which transform binary data in
+    some way and are used to encode and decode chunks_. This
+    specification defines a common `codec interface`_ which comprises
+    a pair of operations, one to perform the transformation (encode),
+    the other to reverse the transformation (decode). This
+    specification only considers the case where a codec is used as a
+    compressor_, but protocol extensions may extend the chunk encoding
+    process, for example, to add support for one or more filter codecs
+    to be applied prior to compression.
+
+.. _metadata document:
+.. _metadata documents:
+
+*Metadata document*
+
+    Each node in a hierarchy_ is represented by a metadata document,
+    which is a machine-readable document containing essential
+    processing information about the node. For example, an array_
+    metadata document will specify the number of dimensions_, shape_,
+    `data type`_, grid_, `memory layout`_ and compressor_ for that
+    array_.
+
+.. _store:
+.. _stores:
+
+*Store*
+
+    The `metadata documents`_ and encoded chunk_ data for all nodes in
+    a hierarchy_ are held in a store. To enable a variety of different
+    store types to be used, this specification defines a simple `store
+    interface`_ which is a common set of operations that stores may
+    provide.
 
 
 Node names
-----------
+==========
 
 Except for the root node, each node in a hierarchy must have a name,
 which is a string of ASCII characters. To ensure consistent behaviour
@@ -178,7 +281,7 @@ allowed for sibling nodes.
 
 
 Data types
-----------
+==========
 
 A data type describes the set of possible binary values that an array
 element may take, along with some information about how the values
@@ -203,7 +306,7 @@ identify a data type.
 
 
 Core data types
-~~~~~~~~~~~~~~~
+---------------
 
 .. list-table:: Data types
    :header-rows: 1
@@ -284,29 +387,13 @@ Core data types
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
-   * - `<c8`
-     - complex number, represented by two 32-bit floats (real and imaginary components)
-     - 8
-     - little-endian
-   * - `<c16`
-     - complex number, represented by two 64-bit floats (real and imaginary components)
-     - 16
-     - little-endian
-   * - `>c8`
-     - complex number, represented by two 32-bit floats (real and imaginary components)
-     - 8
-     - big-endian
-   * - `>c16`
-     - complex number, represented by two 64-bit floats (real and imaginary components)
-     - 16
-     - big-endian
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
 
 
 Chunk grids
------------
+===========
 
 A chunk grid defines a set of chunks which contain the elements of an
 array. The chunks of a grid form a tessellation of the array space,
@@ -326,7 +413,7 @@ characters that can be used to construct keys to save and retrieve
 chunk data in a store, see also the `Storage protocol`_ section.
 
 Regular grids
-~~~~~~~~~~~~~
+-------------
 
 A regular grid is a type of grid where an array is divided into chunks
 such that each chunk is a hyperrectangle of the same shape. The
@@ -381,7 +468,7 @@ arbitrary length in a "negative" direction along any dimension.
 
 
 Memory layouts
---------------
+==============
 
 An array has a memory layout, which defines the way that the binary
 values of the array elements are organised within each chunk to form a
@@ -399,7 +486,7 @@ layouts and data types, such that certain memory layouts may only be
 applicable to arrays with certain data types.
 
 C contiguous memory layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the last dimension of the array is
@@ -412,7 +499,7 @@ the order (0, 0), (0, 1), (0, 2), ..., (`dx` - 1, `dy` - 3), (`dx` - 1, `dy` -
 2), (`dx` - 1, `dy` - 1).
 
 F contiguous memory layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the first dimension of the array
@@ -426,13 +513,12 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
 
 
-Codecs
-------
+Codec interface
+===============
 
-An array may be configured with a chunk encoding pipeline, which is a
-sequence of zero or more codecs used to transform the binary
-representation of each chunk prior to storage, and to reverse the
-transformation during retrieval.
+An array may be configured with a compressor, which a codec used to
+transform the binary representation of each chunk prior to storage,
+and to reverse the transformation during retrieval.
 
 A codec is defined as a pair of algorithms named *encode* and
 *decode*. Both of these algorithms transform a sequence of bytes
@@ -476,32 +562,45 @@ on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification @@TODO link.
 
-Further details of how a chunk encoding pipeline is configured for an
-array are given in the section below on `Array metadata`_.
+Further details of how a compressor is configured for an array are
+given in the section below on `Array metadata`_.
 
 
 Metadata
---------
+========
 
-This section defines metadata documents for Zarr arrays and groups. A
-Zarr metadata document is a [RFC8259]_ JSON document containing
-configuration metadata for a Zarr array or group. In this section, the
-terms "value", "number", "string" and "object" are used as defined in
-[RFC8259]_. The term "array" is also used as defined in [RFC8259]_ and
-means a JSON array, except where qualified as "Zarr array". Following
+This section defines the structure of metadata documents for Zarr
+arrays and groups. Metadata documents are defined here using the JSON
+type system defined in [RFC8259]_. In this section, the terms "value",
+"number", "string" and "object" are used to denote the types as
+defined in [RFC8259]_. The term "array" is also used as defined in
+[RFC8259]_, except where qualified as "Zarr array". Following
 [RFC8259]_, this section also describes an object as a set of
 name/value pairs.
 
-A Zarr array or group metadata document must contain a single object,
-here called the metadata object. The following names must be present
-in the metadata object and must be used as defined below.
+This section also defines how metadata documents are encoded for
+storage. The canonical encoding is JSON, however any other encoding
+which supports an equivalent type system may be used for array and
+group metadata documents.
 
-`zarr_format`
+Bootstrap metadata
+------------------
 
-    URI of the Zarr core protocol specification that defines the
-    metadata format. For Zarr arrays conforming to this specification,
-    the value must be the string
-    "http://purl.org/zarr/spec/protocol/core/3.0".
+Each Zarr hierarchy must have a bootstrap metadata document, which
+provides essential information regarding the protocol version being
+used, the encoding being used for group and array metadata, and any
+protocol extensions that affect the layout or interpretation of data
+in the store.
+
+The bootstrap metadata document must contain a single object
+containing the following names:
+
+``zarr_format``
+
+    A string containing the URI of the Zarr core protocol
+    specification that defines the metadata format. For Zarr
+    hierarchies conforming to this specification, the value must be
+    the string "http://purl.org/zarr/spec/protocol/core/3.0".
 
     Implementations of this protocol may assume that the final path
     segment of this URI ("3.0") represents the core protocol version
@@ -510,138 +609,151 @@ in the metadata object and must be used as defined below.
     that future versions of this protocol that retain the same major
     versioning number ("3") will be backwards-compatible, in the sense
     that any new features added to the protocol can be safely
-    ignored. In other words, implementations of this protocol may read
-    any metadata object where the major version number is "3" and
-    interpret the metadata as defined in this specification, ignoring
-    any name/value pairs where the name is not defined here.
+    ignored. In other words, if the major version number is "3",
+    implementations of this protocol may read and interpret metadata
+    as defined in this specification, ignoring any name/value pairs
+    where the name is not defined here.
 
-    Note that this value is given as a URI rather than just as a
-    simple version number string to help with discovery of this
+    Note that this value is given as a URI rather than as a simple
+    version number string to help with discovery of this
     specification.
 
-`extensions`
+``metadata_encoding``
 
-    Provides protocol extensions which define additional features used
-    by the Zarr array or group or other modifications to the metadata
-    format. The value must be an array containing zero or more
-    objects, each of which identifies an extension and provides any
-    additional extension configuration metadata. Each extension
-    configuration object must contain the name `extension` whose value
-    is a URI that identifies a Zarr protocol extension and
-    dereferences to a human readable representation of the extension
-    specification. Each object must also contain the name
-    `must_understand` whose value is either the literal ``true`` or
-    ``false``. Each object may contain other name/value pairs as defined
-    by the protocol extension.
+    A string containing the MIME type that has been used for encoding
+    group and array metadata documents. If JSON encoding is used, this
+    value must be "application/json".
+
+``extensions``
+
+    An array containing zero or more objects, each of which identifies
+    a protocol extension and provides any additional extension
+    configuration metadata. Each object must contain the name
+    ``extension`` whose value is a URI that identifies a Zarr protocol
+    extension and dereferences to a human readable representation of
+    the extension specification. Each object must also contain the
+    name ``must_understand`` whose value is either the literal
+    ``true`` or ``false``. Each object may also contain the name
+    ``configuration`` whose value is defined by the protocol
+    extension.
 
     If an implementation of this specification encounters an extension
-    that it does not recognise, but the value of `must_understand` is
-    ``false``, then the extension may be ignored and processing may
+    that it does not recognise, but the value of ``must_understand``
+    is ``false``, then the extension may be ignored and processing may
     continue. If the extension is not recognised and the value of
-    `must_understand` is ``true`` then processing must terminate and
+    ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
-`attributes`
+For example, below is a bootstrap metadata document, specifying that
+JSON is being used for encoding of group and array metadata::
 
-    Provides user- or application-defined metadata. The value must be
-    an object, but there are no constraints on what name/value pairs
-    the object contains.
+    {
+        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+        "metadata_encoding": "application/json",
+        "extensions": []
+    }
+
+For example, below is a bootstrap metadata document as above, but also
+specifying that a protocol extension is being used which may be
+ignored if not understood::
+
+    {
+        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+        "metadata_encoding": "application/json",
+        "extensions": [
+            {
+                "extension": "http://example.org/zarr/extension/foo",
+                "must_understand": false,
+                "configuration": {
+                    "foo": "bar"
+                }
+            }
+        ]
+    }
 
 
 Array metadata
-~~~~~~~~~~~~~~
+--------------
 
-In addition to `zarr_format`, `extensions` and `attributes`, a Zarr
-array metadata document must also contain the following names, used as
-defined below.
-    
-`shape`
+Each Zarr array in a hierarchy must have an array metadata
+document. This document must contain a single object with the
+following names:
+
+``shape``
 
     An array of integers providing the length of each dimension of the
     Zarr array. For example, a value ``[10, 20]`` indicates a
     two-dimensional Zarr array, where the first dimension has length
     10 and the second dimension has length 20.
 
-`data_type`
+``data_type``
 
     The data type of the Zarr array. If the data type is defined in
     this specification, then the value must be the data type
     identifier provided as a string. For example, ``"<f8"`` for
     little-endian 64-bit floating point number.
 
-    The `data_type` value is an extension point and may be defined by
-    a protocol extension. If the data type is defined by a protocol
+    The ``data_type`` value is an extension point and may be defined
+    by a protocol extension. If the data type is defined by a protocol
     extension, then the value must be an object containing the names
-    `extension`, `type` and `fallback`. The `extension` is required
-    and its value must be a URI that identifies the protocol extension
-    and dereferences to a human-readable representation of the
-    specification.  The `type` is required and its value is defined by
-    the protocol extension. The `fallback` is optional and, if
-    provided, its value must be one of the data type identifiers
-    defined in this specification. If an implementation does not
-    recognise the extension, but a `fallback` is present, then the
-    implementation may proceed using the `fallback` value as the data
-    type. The object may also contain other name/value pairs as
-    defined by the protocol extension.
+    ``extension``, ``type`` and ``fallback``. The ``extension`` is
+    required and its value must be a URI that identifies the protocol
+    extension and dereferences to a human-readable representation of
+    the specification.  The ``type`` is required and its value is
+    defined by the protocol extension. The ``fallback`` is optional
+    and, if provided, its value must be one of the data type
+    identifiers defined in this specification. If an implementation
+    does not recognise the extension, but a ``fallback`` is present,
+    then the implementation may proceed using the ``fallback`` value
+    as the data type. 
 
-`chunk_grid`
+``chunk_grid``
 
     The chunk grid of the Zarr array. If the chunk grid is a regular
     chunk grid as defined in this specification, then the value must
-    be an object with the names `type` and `chunk_shape`. The value of
-    `type` must be the string ``"regular"``, and the value of
-    `chunk_shape` must be an array of integers providing the lengths
+    be an object with the names ``type`` and ``chunk_shape``. The
+    value of ``type`` must be the string "regular", and the value of
+    ``chunk_shape`` must be an array of integers providing the lengths
     of the chunk along each dimension of the array. For example,
     ``{"type": "regular", "chunk_shape": [2, 5]}`` means a regular
     grid where the chunks have length 2 along the first dimension and
     length 5 along the second dimension.
 
-    The `chunk_grid` value is an extension point and may be defined by
-    a protocol extension. If the chunk grid type is defined by a
+    The ``chunk_grid`` value is an extension point and may be defined
+    by a protocol extension. If the chunk grid type is defined by a
     protocol extension, then the value must be an object containing
-    the names `extension` and `type`. The `extension` is required and
-    the value must be a URI that identifies the protocol extension and
-    dereferences to a human-readable representation of the
-    specification.  The `type` is required and the value is defined by
-    the protocol extension. The object may also contain other
-    name/value pairs as defined by the protocol extension.
+    the names ``extension`` and ``type``. The ``extension`` is
+    required and the value must be a URI that identifies the protocol
+    extension and dereferences to a human-readable representation of
+    the specification.  The ``type`` is required and the value is
+    defined by the protocol extension. 
 
-`chunk_memory_layout`
+``chunk_memory_layout``
 
-    The internal memory layout of the chunks. Use the value ``"C"`` to
-    indicate C contiguous memory layout or ``"F"`` to indicate F
+    The internal memory layout of the chunks. Use the value "C" to
+    indicate C contiguous memory layout or "F" to indicate F
     contiguous memory layout as defined in this specification @@TODO
     link to sections@@.
 
-    The `chunk_memory_layout` value is an extension point and may be
+    The ``chunk_memory_layout`` value is an extension point and may be
     defined by a protocol extension. If the chunk memory layout type
     is defined by a protocol extension, then the value must be an
-    object containing the names `extension` and `type`. The
-    `extension` is required and the value must be a URI that
+    object containing the names ``extension`` and ``type``. The
+    ``extension`` is required and the value must be a URI that
     identifies the protocol extension and dereferences to a
-    human-readable representation of the specification.  The `type` is
-    required and the value is defined by the protocol extension. The
-    object may also contain other name/value pairs as defined by the
-    protocol extension.
+    human-readable representation of the specification.  The ``type`` is
+    required and the value is defined by the protocol extension.
 
-`chunk_codecs`
+``compressor``
 
-    Specifies a sequence of zero or more codecs to be used for
-    encoding and decoding chunks. The value must be an array, where
-    each member of the array is an object that provides configuration
-    metadata for a codec. Each codec configuration object must contain
-    the name `codec` whose value is a URI that identifies a codec and
-    dereferences to a human readable representation of the codec
-    specification. Each codec configuration object may contain other
-    name/value pairs providing addition configuration metadata, as
+    Specifies a codec to be used for encoding and decoding chunks. The
+    value must be an object containing the name ``codec`` whose value
+    is a URI that identifies a codec and dereferences to a human
+    readable representation of the codec specification. The codec
+    object may also contain a ``configuration`` name whose value is
     defined by the corresponding codec specification.
 
-    The codec configuration objects must be given in the order that
-    the codecs are applied during chunk encoding. I.e., the first
-    codec configuration object defines the first codec applied during
-    chunk encoding, and the last codec applied during chunk decoding.
-
-`fill_value`
+``fill_value``
 
     Provides an element value to use for uninitialised portions of the
     Zarr array.
@@ -654,81 +766,83 @@ defined below.
     point data types? TODO what about complex data types? TODO what
     about nan and inf? TODO what about extension data types?
 
-    For any data type, if the `fill_value` is the literal `null` then
-    the fill value is undefined and the implementation may use any
-    arbitrary value that is consistent with the data type as the fill
-    value.
+    For any data type, if the ``fill_value`` is the literal ``null``
+    then the fill value is undefined and the implementation may use
+    any arbitrary value that is consistent with the data type as the
+    fill value.
 
-All other names are reserved for future versions of this
-specification. Implementations and protocol extensions must not define
-or use any other names within the metadata object. Any additional
-metadata must be provided elsewhere, e.g., within any of the extension
-point values, or within the `extensions`, or in a separate metadata
-object stored under a different key in the store. See also the section
-on `Protocol extensions`_ below.
+``extensions``
 
-For example, the JSON document below defines a two-dimensional array
-of 64-bit little-endian floating point numbers, with 10000 and 1000
-columns, divided into a regular chunk grid where each chunk has 1000
-rows and 100 columns, and thus there will be 100 chunks in total
-arranged into a 10 by 10 grid. Within each chunk the binary values are
-laid out in C contiguous order. Each chunk is compressed using gzip
-compression prior to storage::
+    The value @@TODO
+
+``attributes``
+
+    The value must be an object. The object may contain any name/value
+    pairs.
+
+All other names within the array metadata object are reserved for
+future versions of this specification.
+
+For example, the array metadata document below defines a
+two-dimensional array of 64-bit little-endian floating point numbers,
+with 10000 and 1000 columns, divided into a regular chunk grid where
+each chunk has 1000 rows and 100 columns, and thus there will be 100
+chunks in total arranged into a 10 by 10 grid. Within each chunk the
+binary values are laid out in C contiguous order. Each chunk is
+compressed using gzip compression prior to storage::
 
     {
-        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
-	"shape": [10000, 1000],
-	"data_type": "<f8",
-	"chunk_grid": {
-	    "type": "regular",
-	    "chunk_shape": [1000, 100]
-	},
-	"chunk_memory_layout": "C",
-	"chunk_codecs": [
-            {
-	        "codec": "http://purl.org/zarr/spec/codec/gzip",
-		"level": 1
-	    }
-	],
-	"fill_value": "NaN",
-	"extensions": [],
-	"attributes": {
-	    "foo": 42,
-	    "bar": "apples",
-	    "baz": [1, 2, 3, 4]
-	}
+        "shape": [10000, 1000],
+        "data_type": "<f8",
+        "chunk_grid": {
+            "type": "regular",
+            "chunk_shape": [1000, 100]
+        },
+        "chunk_memory_layout": "C",
+        "compressor": {
+            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "configuration": {
+                "level": 1
+            }
+        },
+        "fill_value": "NaN",
+        "extensions": [],
+        "attributes": {
+            "foo": 42,
+            "bar": "apples",
+            "baz": [1, 2, 3, 4]
+        }
     }
 
 The following example illustrates an array with the same shape and
 chunking as above, but using an extension data type::
 
     {
-        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
-	"shape": [10000, 1000],
-	"data_type": {
-	    "extension": "http://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0",
-	    "type": "<M8[ns]",
-	    "fallback": "<i8"
-	},
-	"chunk_grid": {
-	    "type": "regular",
-	    "chunk_shape": [1000, 100]
-	},
-	"chunk_memory_layout": "C",
-	"chunk_codecs": [
-            {
-	        "codec": "http://purl.org/zarr/spec/codec/gzip",
-		"level": 1
-	    }
-	],
-	"fill_value": null,
-	"extensions": [],
-	"attributes": {}
+        "shape": [10000, 1000],
+        "data_type": {
+            "extension": "http://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0",
+            "type": "<M8[ns]",
+            "fallback": "<i8"
+        },
+        "chunk_grid": {
+            "type": "regular",
+            "chunk_shape": [1000, 100]
+        },
+        "chunk_memory_layout": "C",
+        "compressor": {
+            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "configuration": {
+                "level": 1
+            }
+        },
+        "fill_value": null,
+        "extensions": [],
+        "attributes": {}
     }
 
 
 Group metadata
-~~~~~~~~~~~~~~
+--------------
 
 A Zarr group metadata object must contain the `zarr_format`,
 `extensions` and `attributes` names as defined above. All other names
@@ -743,36 +857,283 @@ on `Protocol extensions`_ below.
 For example, the JSON document below defines a group::
 
     {
-        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
-	"extensions": [],
-	"attributes": {
-	    "spam": "ham",
-	    "eggs": 42,
+        "extensions": [],
+        "attributes": {
+            "spam": "ham",
+            "eggs": 42,
 	}
     }
 
 
+Metadata encoding
+-----------------
+
+The bootstrap metadata document must be encoded as JSON. The array and
+group metadata documents must be encoded as per the MIME type given in
+the ``metadata_encoding`` field in the bootstrap metadata document.
+
+@@TODO more explanation needed?
+
+
+Stores
+======
+
+A Zarr store is a system that can be used to store and retrieve data
+from a Zarr hierarchy. For a store to be compatible with this
+protocol, it must support a set of operations defined in the `Store
+interface`_ subsection. The store interface can be implemented using a
+variety of underlying storage technologies, described in the
+subsection on `Store implementations`_.
+
 Store interface
 ---------------
 
-TODO define the store interface
+The store interface is intended to be simple to implement using a
+variety of different underlying storage technologies. It is defined in
+a general way here, but it should be straightforward to translate into
+a software interface in any given programming language. The goal is
+that an implementation of this specification could be modular and
+allow for different store implementations to be used.
+
+The store interface defines a set of operations involving `keys` and
+`values`. In the context of this interface, a `key` is any ASCII
+string containing only characters in the ranges ``a-z``, ``A-Z``,
+``0-9``, or in the set ``/.-_``, and a `value` is any sequence of
+bytes. It is assumed that the store holds (`key`, `value`) pairs, with
+only one such pair for any given `key`. I.e., a store is a mapping
+from keys to values.
+
+The store operations are grouped into three sets of capabilities:
+**readable**, **writeable** and **listable**. It is not necessary for
+a store implementation to support all of these capabilities. 
+
+A **readable store** supports the following operation:
+
+``get`` - Retrieve the `value` associated with a given `key`.
+
+    | Parameters: `key`
+    | Output: `value`
+
+A **writeable store** supports the following operations:
+
+``set`` - Store a (`key`, `value`) pair.
+
+    | Parameters: `key`, `value`
+    | Output: none
+
+``delete`` - Delete the given key/value pair from the store.
+
+    | Parameters: `key`
+    | Output: none
+
+A **listable store** supports any one or more of the following
+operations:
+
+``list`` - Retrieve all `keys` in the store.
+
+    | Parameters: none
+    | Output: set of `keys`
+
+``list_prefix`` - Retrieve all keys with a given prefix.
+
+    | Parameters: `prefix`
+    | Output: set of `keys` with the given `prefix`
+
+    For example, if a store contains the keys "a/b", "a/c/d" and
+    "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
+
+``list_dir`` - Retrieve all keys and prefixes with a given prefix and
+which do not contain "/" after the given prefix.
+
+    | Parameters: `prefix`
+    | Output: set of `keys` and set of `prefixes`
+
+    For example, if a store contains the keys "a/b", "a/c", "a/d/e",
+    "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
+    and prefixes "a/d/" and "a/f/".
+
+
+Store implementations
+---------------------
+
+(This subsection is not normative.)
+
+A store implementation maps the abstract operations of the store
+interface onto concrete operations on some underlying storage
+system. This specification does not constrain or make any assumptions
+about the nature of the underlying storage system. Thus it is possible
+to implement the store interface in a variety of different ways.
+
+For example, a store implementation might use a conventional file
+system as the underlying storage system, mapping keys onto file paths
+and values onto file contents. The ``get`` operation could then be
+implemented by reading a file, the ``set`` operation implemented by
+writing a file, and the ``list_dir`` operation implemented by listing
+a directory.
+
+For example, a store implementation might use a key-value database
+such as BerkeleyDB or LMDB as the underlying storage system. In this
+case the implementation of ``get`` and ``set`` operations would be
+obvious, being whatever are the native operations provided by the
+database for getting and setting key/value pairs. Such a store
+implementation might natively support the ``list`` operation but might
+not support ``list_prefix`` or ``list_dir``, although these could be
+implemented via ``list`` with post-processing of the returned keys.
+
+For example, a store implementation might use a cloud object storage
+service such as Amazon S3, Azure Blob Storage, or Google Cloud Storage
+as the underlying storage system, mapping keys to object names and
+values to object contents. The store interface operations would then
+be implemented via concrete operations of the service's REST API,
+i.e., via HTTP requests. E.g., the ``get`` operation could be
+implemented via an HTTP GET request to an object URL, the ``set``
+operation could be implemented via an HTTP PUT request to an object
+URL, and the list operations could be implemented via an HTTP GET
+request to a bucket URL (i.e., listing a bucket).
+
+The examples above are meant to be illustrative only, and other
+implementations are possible. This specification does not attempt to
+standardise any store implementations, however where a store
+implementation is expected to be widely used then it is recommended to
+create a store implementation spec and contribute it to the zarr-specs
+GitHub repository. @@TODO more info and example.
 
 
 Storage protocol
-----------------
+================
 
-TODO define how high level operations like creating a group or array 
-translate into low level key/value operations on the store interface
+This section describes how to translate high level operations to
+create, delete or modify Zarr hierarchies, groups or arrays, into low
+level operations on the key/value store interface defined above.
+
+In this section a "hierarchy path" is a logical path which identifies
+a group or array node within a Zarr hierarchy, and a "storage key" is
+a key used to store and retrieve data via the store interface. There
+is a further distinction between "metadata keys" which are storage
+keys used to store metadata documents, and "chunk keys" which are
+storage keys used to store encoded chunks.
+
+Note that any non-root hierarchy path will have ancestor paths that
+identify ancestor nodes in the hierarchy. For example, the path
+"/foo/bar" has ancestor paths "/foo" and "/".
+
+Storage keys
+------------
+
+For a group at a non-root hierarchy path `P`, the metadata key for the
+group metadata document is formed by concatenating "meta/root", `P`,
+and ".group".
+
+For example, for a group at hierarchy path "/foo/bar", the
+corresponding metadata key is "meta/root/foo/bar.group".
+
+For an array at a non-root hierarchy path `P`, the metadata key for
+the array metadata document is formed by concatenating "meta", `P`,
+and ".array". The data key for array chunks is formed by concatenating
+"data", `P`, "/", and the chunk identifier as defined by the chunk
+grid layout.
+
+For example, for an array at hierarchy path "/foo/baz", the
+corresponding metadata key is "meta/root/foo/baz.array". If the array
+has two dimensions and a regular chunk grid, the data key for the
+chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
+
+If the root node is a group, the metadata key is "meta/root.group". If
+the root node is an array, the metadata key is "meta/root.array", and
+the data keys are formed by concatenating "data/" and the chunk
+identifier.
+
+
+Protocol operations
+-------------------
+
+Let `P` be an arbitrary hierarchy path.
+
+Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
+``group_meta_key(P)`` be the group metadata key for `P`.
+
+Let ``data_key(P, i, j, ...)`` be the data key for `P` for the chunk
+with grid coordinates (i, j, ...).
+
+Let "+" be the string concatenation operator.
+
+**Create a group**
+
+    To create a group at hierarchy path `P`, perform
+    ``set(group_meta_key(P), value)``, where `value` is the
+    serialisation of a valid group metadata document.
+
+    If `P` is a non-root path then it is **not** necessary to create
+    or check for the existence of metadata documents for groups at any
+    of the ancestor paths of `P`. Creating a group at path `P` implies
+    the existence of groups at all ancestor paths of `P`.
+
+**Create an array**
+
+    To create an array at hierarchy path `P`, perform
+    ``set(array_meta_key(P), value)``, where `value` is the
+    serialisation of a valid array metadata document.
+
+    If `P` is a non-root path then it is **not** necessary to create
+    or check for the existence of metadata documents for groups at any
+    of the ancestor paths of `P`. Creating an array at path `P`
+    implies the existence of groups at all ancestor paths of `P`.
+
+**Store element values in an array**
+
+    @@TODO
+    
+**Retrieve element values in an array**
+
+    @@TODO
+    
+**Discover children of a group**
+
+    To discover the children of a group at hierarchy path `P`, perform
+    ``list_dir("meta" + P + "/")``. Any returned key ending in
+    ".array.json" indicates an array. Any returned key ending in
+    ".group.json" indicates a group. Any returned prefix indicates a
+    child group implied by some descendant.
+
+    For example, if a group is created at path "/foo/bar" and an array
+    is created at path "/foo/baz/qux", then the store will contain the
+    keys "meta/foo/bar.group" and "meta/foo/bar/baz/qux.array". Groups
+    at paths "/", "/foo" and "/foo/baz" have not been explicitly
+    created but are implied by their descendants. To list the children
+    of the group at path "/foo", perform ``list_dir("meta/foo/")``,
+    which will return the key "meta/foo/bar.group" and the prefix
+    "meta/foo/baz/". From this it can be inferred that child groups
+    "/foo/bar" and "/foo/baz" are present.
+
+    If a store does not support any of the list operations then
+    discovery of group children is not possible, and the contents of
+    the hierarchy must be communicated by some other means, such as
+    via a protocol extension, or via some out of band communication.
+    
+**Discover all nodes in a hierarchy**
+
+    @@TODO
+
+**Delete a group or array**
+
+    @@TODO
+
+**Determine if a node exists**
+
+    @@TODO
+
+
+@@TODO need to describe/explain implicit groups more?
 
 
 Protocol extensions
--------------------
+===================
 
 TODO define different types of protocol extension.
 
 
 References
-----------
+==========
 
 .. [RFC8259] T. Bray, Ed. The JavaScript Object Notation (JSON) Data
    Interchange Format. December 2017. Best Current Practice. URL:
@@ -784,13 +1145,13 @@ References
 
 
 Change log
-----------
+==========
 
 This section is a placeholder for keeping a log of the snapshots of
 this document that are tagged in GitHub and what changed between them. 
 
 @@tag@@
-~~~~~~~
+-------
 
 Links: `view spec
 <https://zarr-specs.readthedocs.io/en/@@tag@@/protocol/core/v3.0.html>`_;

@@ -1,5 +1,6 @@
-Core
-====
+=============
+Core protocol
+=============
 
 Under construction.
 
