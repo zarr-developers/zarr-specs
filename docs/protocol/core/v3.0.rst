@@ -1,10 +1,11 @@
 .. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
 
-
-Zarr core protocol version 3.0
-==============================
-
-**Work in Progress**
+==================================
+ Zarr core protocol (version 3.0)
+==================================
+-----------------------------
+ Editor's draft 11 June 2019
+-----------------------------
 
 Specification URI:
     http://purl.org/zarr/spec/protocol/core/3.0
@@ -25,14 +26,14 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 
 
 Abstract
---------
+========
 
 This specification defines the Zarr core protocol for storage and
 retrieval of N-dimensional typed arrays.
 
 
 Status of this document
------------------------
+=======================
 
 This document is a **Work in Progress**. It may be updated, replaced
 or obsoleted by other documents at any time. It is inappapropriate to
@@ -53,7 +54,7 @@ This document was produced by the `Zarr core development team
 
 
 Document conventions
---------------------
+====================
 
 Conformance requirements are expressed with a combination of
 descriptive assertions and [RFC2119]_ terminology. The key words
@@ -69,7 +70,7 @@ this specification are introduced with the words "for example".
 
 
 Concepts and terminology
-------------------------
+========================
 
 This section introduces and defines some key terms and explains the
 conceptual model underpinning the Zarr protocol.
@@ -254,7 +255,7 @@ conceptual model underpinning the Zarr protocol.
 
 
 Node names
-----------
+==========
 
 Except for the root node, each node in a hierarchy must have a name,
 which is a string of ASCII characters. To ensure consistent behaviour
@@ -280,7 +281,7 @@ allowed for sibling nodes.
 
 
 Data types
-----------
+==========
 
 A data type describes the set of possible binary values that an array
 element may take, along with some information about how the values
@@ -305,7 +306,7 @@ identify a data type.
 
 
 Core data types
-~~~~~~~~~~~~~~~
+---------------
 
 .. list-table:: Data types
    :header-rows: 1
@@ -392,7 +393,7 @@ defined by IEEE 754-2008.
 
 
 Chunk grids
------------
+===========
 
 A chunk grid defines a set of chunks which contain the elements of an
 array. The chunks of a grid form a tessellation of the array space,
@@ -412,7 +413,7 @@ characters that can be used to construct keys to save and retrieve
 chunk data in a store, see also the `Storage protocol`_ section.
 
 Regular grids
-~~~~~~~~~~~~~
+-------------
 
 A regular grid is a type of grid where an array is divided into chunks
 such that each chunk is a hyperrectangle of the same shape. The
@@ -467,7 +468,7 @@ arbitrary length in a "negative" direction along any dimension.
 
 
 Memory layouts
---------------
+==============
 
 An array has a memory layout, which defines the way that the binary
 values of the array elements are organised within each chunk to form a
@@ -485,7 +486,7 @@ layouts and data types, such that certain memory layouts may only be
 applicable to arrays with certain data types.
 
 C contiguous memory layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the last dimension of the array is
@@ -498,7 +499,7 @@ the order (0, 0), (0, 1), (0, 2), ..., (`dx` - 1, `dy` - 3), (`dx` - 1, `dy` -
 2), (`dx` - 1, `dy` - 1).
 
 F contiguous memory layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the first dimension of the array
@@ -513,7 +514,7 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 
 
 Codec interface
----------------
+===============
 
 An array may be configured with a compressor, which a codec used to
 transform the binary representation of each chunk prior to storage,
@@ -566,7 +567,7 @@ given in the section below on `Array metadata`_.
 
 
 Metadata
---------
+========
 
 This section defines the structure of metadata documents for Zarr
 arrays and groups. Metadata documents are defined here using the JSON
@@ -583,7 +584,7 @@ which supports an equivalent type system may be used for array and
 group metadata documents.
 
 Bootstrap metadata
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Each Zarr hierarchy must have a bootstrap metadata document, which
 provides essential information regarding the protocol version being
@@ -672,7 +673,7 @@ ignored if not understood::
 
 
 Array metadata
-~~~~~~~~~~~~~~
+--------------
 
 Each Zarr array in a hierarchy must have an array metadata
 document. This document must contain a single object with the
@@ -841,7 +842,7 @@ chunking as above, but using an extension data type::
 
 
 Group metadata
-~~~~~~~~~~~~~~
+--------------
 
 A Zarr group metadata object must contain the `zarr_format`,
 `extensions` and `attributes` names as defined above. All other names
@@ -865,7 +866,7 @@ For example, the JSON document below defines a group::
 
 
 Metadata encoding
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The bootstrap metadata document must be encoded as JSON. The array and
 group metadata documents must be encoded as per the MIME type given in
@@ -875,7 +876,7 @@ the ``metadata_encoding`` field in the bootstrap metadata document.
 
 
 Stores
-------
+======
 
 A Zarr store is a system that can be used to store and retrieve data
 from a Zarr hierarchy. For a store to be compatible with this
@@ -885,7 +886,7 @@ variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
 Store interface
-~~~~~~~~~~~~~~~
+---------------
 
 The store interface is intended to be simple to implement using a
 variety of different underlying storage technologies. It is defined in
@@ -953,7 +954,7 @@ which do not contain "/" after the given prefix.
 
 
 Store implementations
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 (This subsection is not normative.)
 
@@ -999,7 +1000,7 @@ GitHub repository. @@TODO more info and example.
 
 
 Storage protocol
-----------------
+================
 
 This section describes how to translate high level operations to
 create, delete or modify Zarr hierarchies, groups or arrays, into low
@@ -1017,7 +1018,7 @@ identify ancestor nodes in the hierarchy. For example, the path
 "/foo/bar" has ancestor paths "/foo" and "/".
 
 Storage keys
-~~~~~~~~~~~~
+------------
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
 group metadata document is formed by concatenating "meta/root", `P`,
@@ -1044,7 +1045,7 @@ identifier.
 
 
 Protocol operations
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Let `P` be an arbitrary hierarchy path.
 
@@ -1126,13 +1127,13 @@ Let "+" be the string concatenation operator.
 
 
 Protocol extensions
--------------------
+===================
 
 TODO define different types of protocol extension.
 
 
 References
-----------
+==========
 
 .. [RFC8259] T. Bray, Ed. The JavaScript Object Notation (JSON) Data
    Interchange Format. December 2017. Best Current Practice. URL:
@@ -1144,13 +1145,13 @@ References
 
 
 Change log
-----------
+==========
 
 This section is a placeholder for keeping a log of the snapshots of
 this document that are tagged in GitHub and what changed between them. 
 
 @@tag@@
-~~~~~~~
+-------
 
 Links: `view spec
 <https://zarr-specs.readthedocs.io/en/@@tag@@/protocol/core/v3.0.html>`_;
