@@ -705,7 +705,7 @@ following names:
     identifiers defined in this specification. If an implementation
     does not recognise the extension, but a ``fallback`` is present,
     then the implementation may proceed using the ``fallback`` value
-    as the data type. 
+    as the data type.
 
 ``chunk_grid``
 
@@ -726,7 +726,7 @@ following names:
     required and the value must be a URI that identifies the protocol
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and the value is
-    defined by the protocol extension. 
+    defined by the protocol extension.
 
 ``chunk_memory_layout``
 
@@ -905,7 +905,7 @@ from keys to values.
 
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
-a store implementation to support all of these capabilities. 
+a store implementation to support all of these capabilities.
 
 A **readable store** supports the following operation:
 
@@ -1084,17 +1084,17 @@ Let "+" be the string concatenation operator.
 **Store element values in an array**
 
     @@TODO
-    
+
 **Retrieve element values in an array**
 
     @@TODO
-    
+
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
     ``list_dir("meta" + P + "/")``. Any returned key ending in
-    ".array.json" indicates an array. Any returned key ending in
-    ".group.json" indicates a group. Any returned prefix indicates a
+    ".array" indicates an array. Any returned key ending in
+    ".group" indicates a group. Any returned prefix indicates a
     child group implied by some descendant.
 
     For example, if a group is created at path "/foo/bar" and an array
@@ -1111,7 +1111,7 @@ Let "+" be the string concatenation operator.
     discovery of group children is not possible, and the contents of
     the hierarchy must be communicated by some other means, such as
     via a protocol extension, or via some out of band communication.
-    
+
 **Discover all nodes in a hierarchy**
 
     @@TODO
@@ -1150,7 +1150,7 @@ Change log
 ==========
 
 This section is a placeholder for keeping a log of the snapshots of
-this document that are tagged in GitHub and what changed between them. 
+this document that are tagged in GitHub and what changed between them.
 
 @@tag@@
 -------
