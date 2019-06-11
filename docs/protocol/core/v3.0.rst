@@ -1020,6 +1020,8 @@ identify ancestor nodes in the hierarchy. For example, the path
 Storage keys
 ------------
 
+The bootstrap metadata document is stored under the key "zarr.json".
+
 For a group at a non-root hierarchy path `P`, the metadata key for the
 group metadata document is formed by concatenating "meta/root", `P`,
 and ".group".
