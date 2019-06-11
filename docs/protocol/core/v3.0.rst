@@ -130,14 +130,14 @@ bytes. The core protocol defines two types of memory layout based on
 "C" (row-major) and "F" (column-major) ordering of values, but
 protocol extensions may define other memory layouts.
 
-An array is associated with an *encoding pipeline*, which is a
-sequence of zero or more *codecs* that transforms the binary
-representation of a chunk in some way. For example, an encoding
-pipeline might include a checksum codec to ensure data integrity, and
-a compression codec to reduce data size. All codecs implement a common
-*codec interface* which provides a pair of operations, one to perform
-the transformation (encode), the other to reverse the transformation
-(decode).
+An array is associated with an *compressor*, which is a *codec* that
+transforms the binary representation of a chunk in some way, usually
+to reduce data size. All codecs implement a common *codec interface*
+which provides a pair of operations, one to perform the transformation
+(encode), the other to reverse the transformation (decode). Protocol
+extensions may extend the chunk encoding process, for example, to add
+support for one or more filter codecs to be applied prior to
+compression.
 
 Each node in a hierarchy is represented by a *metadata document*,
 which is a machine-readable document containing essential processing
@@ -284,22 +284,6 @@ Core data types
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
-   * - `<c8`
-     - complex number, represented by two 32-bit floats (real and imaginary components)
-     - 8
-     - little-endian
-   * - `<c16`
-     - complex number, represented by two 64-bit floats (real and imaginary components)
-     - 16
-     - little-endian
-   * - `>c8`
-     - complex number, represented by two 32-bit floats (real and imaginary components)
-     - 8
-     - big-endian
-   * - `>c16`
-     - complex number, represented by two 64-bit floats (real and imaginary components)
-     - 16
-     - big-endian
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
@@ -429,10 +413,9 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 Codecs
 ------
 
-An array may be configured with a chunk encoding pipeline, which is a
-sequence of zero or more codecs used to transform the binary
-representation of each chunk prior to storage, and to reverse the
-transformation during retrieval.
+An array may be configured with a compressor, which a codec used to
+transform the binary representation of each chunk prior to storage,
+and to reverse the transformation during retrieval.
 
 A codec is defined as a pair of algorithms named *encode* and
 *decode*. Both of these algorithms transform a sequence of bytes
@@ -476,8 +459,8 @@ on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification @@TODO link.
 
-Further details of how a chunk encoding pipeline is configured for an
-array are given in the section below on `Array metadata`_.
+Further details of how a compressor is configured for an array are
+given in the section below on `Array metadata`_.
 
 
 Metadata
@@ -548,7 +531,8 @@ containing the following names:
     the extension specification. Each object must also contain the
     name ``must_understand`` whose value is either the literal
     ``true`` or ``false``. Each object may also contain the name
-    ``config`` whose value is defined by the protocol extension.
+    ``configuration`` whose value is defined by the protocol
+    extension.
 
     If an implementation of this specification encounters an extension
     that it does not recognise, but the value of ``must_understand``
@@ -577,7 +561,7 @@ ignored if not understood::
             {
                 "extension": "http://example.org/zarr/extension/foo",
                 "must_understand": false,
-                "config": {
+                "configuration": {
                     "foo": "bar"
                 }
             }
@@ -657,22 +641,14 @@ following names:
     human-readable representation of the specification.  The ``type`` is
     required and the value is defined by the protocol extension.
 
-``chunk_codecs``
+``compressor``
 
-    Specifies a sequence of zero or more codecs to be used for
-    encoding and decoding chunks. The value must be an array, where
-    each member of the array is an object that provides configuration
-    metadata for a codec. Each codec configuration object must contain
-    the name ``codec`` whose value is a URI that identifies a codec
-    and dereferences to a human readable representation of the codec
-    specification. Each codec configuration object may contain a
-    ``config`` name whose value is defined by the corresponding codec
-    specification.
-
-    The codec metadata objects must be given in the order that the
-    codecs are applied during chunk encoding. I.e., the first codec
-    configuration object defines the first codec applied during chunk
-    encoding, and the last codec applied during chunk decoding.
+    Specifies a codec to be used for encoding and decoding chunks. The
+    value must be an object containing the name ``codec`` whose value
+    is a URI that identifies a codec and dereferences to a human
+    readable representation of the codec specification. The codec
+    object may also contain a ``configuration`` name whose value is
+    defined by the corresponding codec specification.
 
 ``fill_value``
 
@@ -694,7 +670,7 @@ following names:
 
 ``extensions``
 
-    The value 
+    The value @@TODO
 
 ``attributes``
 
@@ -720,14 +696,12 @@ compressed using gzip compression prior to storage::
             "chunk_shape": [1000, 100]
         },
         "chunk_memory_layout": "C",
-        "chunk_codecs": [
-            {
-                "codec": "http://purl.org/zarr/spec/codec/gzip",
-                "config": {
-                    "level": 1
-                }
+        "compressor": {
+            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "configuration": {
+                "level": 1
             }
-        ],
+        },
         "fill_value": "NaN",
         "extensions": [],
         "attributes": {
@@ -752,14 +726,12 @@ chunking as above, but using an extension data type::
             "chunk_shape": [1000, 100]
         },
         "chunk_memory_layout": "C",
-        "chunk_codecs": [
-            {
-                "codec": "http://purl.org/zarr/spec/codec/gzip",
-                "config": {
-                    "level": 1
-                }
+        "compressor": {
+            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "configuration": {
+                "level": 1
             }
-        ],
+        },
         "fill_value": null,
         "extensions": [],
         "attributes": {}
@@ -947,26 +919,26 @@ Storage keys
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
 group metadata document is formed by concatenating "meta/root", `P`,
-and ".group.json".
+and ".group".
 
 For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/root/foo/bar.group.json".
+corresponding metadata key is "meta/root/foo/bar.group".
 
 For an array at a non-root hierarchy path `P`, the metadata key for
 the array metadata document is formed by concatenating "meta", `P`,
-and ".array.json". The data key for array chunks is formed by
-concatenating "data", `P`, "/", and the chunk identifier as defined by
-the chunk grid layout.
+and ".array". The data key for array chunks is formed by concatenating
+"data", `P`, "/", and the chunk identifier as defined by the chunk
+grid layout.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/root/foo/baz.array.json". If the
-array has two dimensions and a regular chunk grid, the data key for
-the chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
+corresponding metadata key is "meta/root/foo/baz.array". If the array
+has two dimensions and a regular chunk grid, the data key for the
+chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
 
-If the root node is a group, the metadata key is
-"meta/root.group.json". If the root node is an array, the metadata key
-is "meta/root.array.json", and the data keys are formed by
-concatenating "data/" and the chunk identifier.
+If the root node is a group, the metadata key is "meta/root.group". If
+the root node is an array, the metadata key is "meta/root.array", and
+the data keys are formed by concatenating "data/" and the chunk
+identifier.
 
 
 Protocol operations
@@ -1022,14 +994,13 @@ Let "+" be the string concatenation operator.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
-    keys "meta/foo/bar.group.json" and
-    "meta/foo/bar/baz/qux.array.json". Groups at paths "/", "/foo" and
-    "/foo/baz" have not been explicitly created but are implied by
-    their descendants. To list the children of the group at path
-    "/foo", perform ``list_dir("meta/foo/")``, which will return the
-    key "meta/foo/bar.group.json" and the prefix "meta/foo/baz/". From
-    this it can be inferred that child groups "/foo/bar" and
-    "/foo/baz" are present.
+    keys "meta/foo/bar.group" and "meta/foo/bar/baz/qux.array". Groups
+    at paths "/", "/foo" and "/foo/baz" have not been explicitly
+    created but are implied by their descendants. To list the children
+    of the group at path "/foo", perform ``list_dir("meta/foo/")``,
+    which will return the key "meta/foo/bar.group" and the prefix
+    "meta/foo/baz/". From this it can be inferred that child groups
+    "/foo/bar" and "/foo/baz" are present.
 
     If a store does not support any of the list operations then
     discovery of group children is not possible, and the contents of
