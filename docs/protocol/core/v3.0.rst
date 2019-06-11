@@ -8,8 +8,10 @@ Zarr core protocol version 3.0
 
 Specification URI:
     http://purl.org/zarr/spec/protocol/core/3.0
+
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
+
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 
@@ -66,89 +68,189 @@ explicitly marked as non-normative, examples, and notes. Examples in
 this specification are introduced with the words "for example".
 
 
-Conceptual model
-----------------
+Concepts and terminology
+------------------------
 
-A Zarr *hierarchy* is a tree structure, where each node in the tree is
-either a *group* or an *array*. Group nodes may have children
-but array nodes may not.
+This section introduces and defines some key terms and explains the
+conceptual model underpinning the Zarr protocol.
 
-Each node in a hierarchy has a *name* which is a string of ASCII
-characters with some additional constraints defined in the section on
-`Node names`_ below. Two sibling nodes cannot have the same name. The
-root node does not have a name.
+.. _hierarchy:
 
-Each node in a hierarchy has a *path* which uniquely identifies that
-node and defines its location within the hierarchy. The path is formed 
-by joining together the "/" character, followed by the names of all 
-ancestor nodes separated by the "/" character, followed by the name of 
-the node itself. For example, the path "/foo/bar" identifies a node 
-named "bar", whose parent is named "foo", whose parent is the root of 
-the hierarchy. The path "/" identifies the root node.
+*Hierarchy*
 
-An array has a fixed number of zero or more *dimensions*. Each
-dimension has an integer length. The core protocol only considers the
-case where the lengths of all dimensions are finite. However, protocol
-extensions may be defined which allow a dimension to have infinite or
-variable length.
+    A Zarr hierarchy is a tree structure, where each node in the tree
+    is either a group_ or an array_. Group nodes may have children but
+    array nodes may not. All nodes in a hierarchy have a name_ and a
+    path_.
 
-The *shape* of an array is the tuple of dimension lengths. For
-example, if an array has 2 dimensions, where the length of the first
-dimension is 100 and the length of the second dimension is 20, then
-the shape of the array is (100, 20).
+.. _group:
+.. _groups:
 
-An array contains zero or more *elements*. Each element can be
-identified by a tuple of coordinates, one for each dimension of the
-array. If all dimensions of an array have finite length, then the
-number of elements in the array is given by the product of the
-dimension lengths. An array element may be empty, or it may have a
-value.
+*Group*
 
-An array is associated with a *data type*. A data type defines the set
-of possible values that the array may contain, and a binary
-representation (i.e., sequence of bytes) for each possible value. For
-example, the little-endian 32-bit signed integer data type defines
-binary representations for all integers in the range −2,147,483,648 to
-2,147,483,647. The core protocol only considers a limited set of data
-types, but protocol extensions may define other data types.
+    A group is a node in a hierarchy_ that may have child nodes.
 
-An array is divided into a set of *chunks*, where each chunk is a
-hyperrectangle defined by a tuple of intervals, one for each dimension
-of the array. The shape of a chunk is the tuple of interval lengths,
-and the size of a chunk (i.e., number of elements contained within the
-chunk) is the product of its interval lengths.
+.. _array:
+.. _arrays:
 
-The chunks of an array are organised into a *grid*. The core protocol
-only considers the case where all chunks have the same shape and the
-chunks form a regular grid. However, protocol extensions may define
-other grid types such as rectilinear grids.
+*Array*
 
-An array is associated with a *memory layout* which defines how to
-construct a binary representation of a single chunk by organising the
-binary values within the chunk into a single contiguous sequence of
-bytes. The core protocol defines two types of memory layout based on
-"C" (row-major) and "F" (column-major) ordering of values, but
-protocol extensions may define other memory layouts.
+    An array is a node in a hierarchy_. An array is a data structure
+    with zero or more dimensions_ whose lengths define the shape_ of
+    the array. An array contains zero or more data elements_. All
+    elements_ in an array conform to the same `data type`_. An array
+    may not have child nodes.
 
-An array is associated with an *compressor*, which is a *codec* that
-transforms the binary representation of a chunk in some way, usually
-to reduce data size. All codecs implement a common *codec interface*
-which provides a pair of operations, one to perform the transformation
-(encode), the other to reverse the transformation (decode). Protocol
-extensions may extend the chunk encoding process, for example, to add
-support for one or more filter codecs to be applied prior to
-compression.
+.. _name:
+.. _names:
 
-Each node in a hierarchy is represented by a *metadata document*,
-which is a machine-readable document containing essential processing
-information about the node. For example, an array metadata document
-will specify the number of dimensions, length of each dimension, data
-type, chunk shape, memory layout and encoding pipeline for that array.
+*Name*
 
-The metadata and encoded chunk data for all nodes in a hierarchy are
-held in a *store*. To enable a variety of different store types to be
-used, the core protocol defines a simple *store interface* which is a
-common set of operations that a store must provide.
+    Each node in a hierarchy_ has a name, which is a string of
+    characters with some additional constraints defined in the section
+    on `node names`_ below. Two sibling nodes cannot have the same
+    name. The root node does not have a name.
+
+.. _path:
+.. _paths:
+
+*Path*
+
+    Each node in a hierarchy_ has a path which uniquely identifies
+    that node and defines its location within the hierarchy_. The path
+    is formed by joining together the "/" character, followed by the
+    name_ of each ancestor node separated by the "/" character,
+    followed by the name_ of the node itself. For example, the path
+    "/foo/bar" identifies a node named "bar", whose parent is named
+    "foo", whose parent is the root of the hierarchy. The path "/"
+    identifies the root node.
+
+.. _dimension:
+.. _dimensions:
+
+*Dimension*
+
+    An array_ has a fixed number of zero or more dimensions. Each
+    dimension has an integer length. This specification only considers
+    the case where the lengths of all dimensions are finite. However,
+    protocol extensions may be defined which allow a dimension to have
+    infinite or variable length.
+
+.. _shape:
+
+*Shape*
+
+    The shape of an array_ is the tuple of dimension_ lengths. For
+    example, if an array_ has 2 dimensions_, where the length of the
+    first dimension_ is 100 and the length of the second dimension_ is
+    20, then the shape of the array_ is (100, 20).
+
+.. _element:
+.. _elements:
+
+*Element*
+
+    An array_ contains zero or more elements. Each element can be
+    identified by a tuple of integer coordinates, one for each
+    dimension_ of the array_. If all dimensions_ of an array_ have
+    finite length, then the number of elements in the array_ is given
+    by the product of the dimension_ lengths. An array_ element may be
+    empty, or it may have a value.
+
+.. _data type:
+.. _data types:
+
+*Data type*
+
+    A data type defines the set of possible values that an array_ may
+    contain, and a binary representation (i.e., sequence of bytes) for
+    each possible value. For example, the little-endian 32-bit signed
+    integer data type defines binary representations for all integers
+    in the range −2,147,483,648 to 2,147,483,647. This specification
+    only defines a limited set of data types, but protocol extensions
+    may define other data types.
+
+.. _chunk:
+.. _chunks:
+
+*Chunk*
+
+    An array_ is divided into a set of chunks, where each chunk is a
+    hyperrectangle defined by a tuple of intervals, one for each
+    dimension_ of the array_. The chunk shape is the tuple of interval
+    lengths, and the chunk size (i.e., number of elements_ contained
+    within the chunk) is the product of its interval lengths.
+
+.. _grid:
+.. _grids:
+
+*Grid*
+
+    The chunks_ of an array_ are organised into a grid. This
+    specification only considers the case where all chunks_ have the
+    same chunk shape and the chunks form a regular grid. However,
+    protocol extensions may define other grid types such as
+    rectilinear grids.
+
+.. _memory layout:
+.. _memory layouts:
+
+*Memory layout*
+
+    An array_ is associated with a memory layout which defines how to
+    construct a binary representation of a single chunk_ by organising
+    the binary values of the elements_ within the chunk_ into a single
+    contiguous sequence of bytes. This specification defines two types
+    of memory layout based on "C" (row-major) and "F" (column-major)
+    ordering of elements_, but protocol extensions may define other
+    memory layouts.
+
+.. _compressor:
+.. _compressors:
+
+*Compressor*
+
+    An array_ may be associated with an compressor, which is a codec_
+    that transforms the binary representation of a chunk_ in some way,
+    usually to reduce data size.
+
+.. _codec:
+.. _codecs:
+
+*Codec*
+
+    A codec is a pair of algorithms which transform binary data in
+    some way and are used to encode and decode chunks_. This
+    specification defines a common `codec interface`_ which comprises
+    a pair of operations, one to perform the transformation (encode),
+    the other to reverse the transformation (decode). This
+    specification only considers the case where a codec is used as a
+    compressor_, but protocol extensions may extend the chunk encoding
+    process, for example, to add support for one or more filter codecs
+    to be applied prior to compression.
+
+.. _metadata document:
+.. _metadata documents:
+
+*Metadata document*
+
+    Each node in a hierarchy_ is represented by a metadata document,
+    which is a machine-readable document containing essential
+    processing information about the node. For example, an array_
+    metadata document will specify the number of dimensions_, shape_,
+    `data type`_, grid_, `memory layout`_ and compressor_ for that
+    array_.
+
+.. _store:
+.. _stores:
+
+*Store*
+
+    The `metadata documents`_ and encoded chunk_ data for all nodes in
+    a hierarchy_ are held in a store. To enable a variety of different
+    store types to be used, this specification defines a simple `store
+    interface`_ which is a common set of operations that stores may
+    provide.
 
 
 Node names
@@ -410,8 +512,8 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
 
 
-Codecs
-------
+Codec interface
+---------------
 
 An array may be configured with a compressor, which a codec used to
 transform the binary representation of each chunk prior to storage,
