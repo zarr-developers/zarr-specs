@@ -844,14 +844,10 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the `zarr_format`,
-`extensions` and `attributes` names as defined above. All other names
+A Zarr group metadata object must contain the `extensions` and `attributes`
+names as defined above. All other names
 are reserved for future versions of this
-specification. Implementations and protocol extensions must not define
-or use any other names within the metadata object. Any additional
-metadata must be provided elsewhere, e.g., within any of the extension
-point values, or within the `extensions`, or in a separate metadata
-object stored under a different key in the store. See also the section
+specification. See also the section
 on `Protocol extensions`_ below.
 
 For example, the JSON document below defines a group::
@@ -861,7 +857,7 @@ For example, the JSON document below defines a group::
         "attributes": {
             "spam": "ham",
             "eggs": 42,
-	}
+        }
     }
 
 
