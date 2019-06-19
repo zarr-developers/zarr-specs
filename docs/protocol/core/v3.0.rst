@@ -4,7 +4,7 @@
  Zarr core protocol (version 3.0)
 ==================================
 -----------------------------
- Editor's draft 11 June 2019
+ Editor's draft 19 June 2019
 -----------------------------
 
 Specification URI:
@@ -467,8 +467,8 @@ any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
 
 
-Memory layouts
-==============
+Chunk memory layouts
+====================
 
 An array has a memory layout, which defines the way that the binary
 values of the array elements are organised within each chunk to form a
@@ -513,12 +513,14 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
 
 
-Codec interface
-===============
+Chunk encoding
+==============
 
 An array may be configured with a compressor, which a codec used to
 transform the binary representation of each chunk prior to storage,
 and to reverse the transformation during retrieval.
+
+@@TODO better explanation of chunk encoding
 
 A codec is defined as a pair of algorithms named *encode* and
 *decode*. Both of these algorithms transform a sequence of bytes
@@ -585,6 +587,9 @@ group metadata documents.
 
 Bootstrap metadata
 ------------------
+
+@@TODO should this be called "entry-point metadata"? Or something
+else?
 
 Each Zarr hierarchy must have a bootstrap metadata document, which
 provides essential information regarding the protocol version being
