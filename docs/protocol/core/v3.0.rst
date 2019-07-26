@@ -222,7 +222,7 @@ conceptual model underpinning the Zarr protocol.
 
     A codec is a pair of algorithms which transform binary data in
     some way and are used to encode and decode chunks_. This
-    specification defines a common `codec interface`_ which comprises
+    specification defines a codec interface which comprises
     a pair of operations, one to perform the transformation (encode),
     the other to reverse the transformation (decode). This
     specification only considers the case where a codec is used as a
@@ -249,7 +249,7 @@ conceptual model underpinning the Zarr protocol.
 
     The `metadata documents`_ and encoded chunk_ data for all nodes in
     a hierarchy_ are held in a store. To enable a variety of different
-    store types to be used, this specification defines a simple `store
+    store types to be used, this specification defines an `Abstract store
     interface`_ which is a common set of operations that stores may
     provide.
 
@@ -881,13 +881,13 @@ Stores
 
 A Zarr store is a system that can be used to store and retrieve data
 from a Zarr hierarchy. For a store to be compatible with this
-protocol, it must support a set of operations defined in the `Store
+protocol, it must support a set of operations defined in the `Abstract store
 interface`_ subsection. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
-Store interface
----------------
+Abstract store interface
+------------------------
 
 The store interface is intended to be simple to implement using a
 variety of different underlying storage technologies. It is defined in

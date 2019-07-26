@@ -3,3 +3,6 @@
 
 # sphinx build files
 docs/_build
+
+# pycharm
+.idea
