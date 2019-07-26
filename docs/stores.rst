@@ -1,6 +1,6 @@
-===============
- Core protocol
-===============
+======
+Stores
+======
 
 Under construction.
 
@@ -8,6 +8,4 @@ Under construction.
    :maxdepth: 1
    :caption: Contents:
 
-   core/v3.0
-
-
+   stores/filesystem/v1.0
