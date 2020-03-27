@@ -8,7 +8,7 @@
 -----------------------------
 
 Specification URI:
-    http://purl.org/zarr/spec/protocol/core/3.0
+    https://purl.org/zarr/spec/protocol/core/3.0
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
@@ -36,7 +36,7 @@ Status of this document
 =======================
 
 This document is a **Work in Progress**. It may be updated, replaced
-or obsoleted by other documents at any time. It is inappapropriate to
+or obsoleted by other documents at any time. It is inappropriate to
 cite this document as other than work in progress.
 
 Comments, questions or contributions to this document are very
@@ -46,8 +46,8 @@ raising an issue, please add the label
 "core-protocol-v3.0". Contributions and suggested edits can be made
 via GitHub via the `online editor
 <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
-or by making a pull request against the "core-protocol-v3.0-dev"
-branch.
+or by making a pull request against the
+`"core-protocol-v3.0-dev" branch <https://github.com/zarr-developers/zarr-specs/tree/core-protocol-v3.0-dev>`_.
 
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
@@ -134,7 +134,7 @@ conceptual model underpinning the Zarr protocol.
     An array_ has a fixed number of zero or more dimensions. Each
     dimension has an integer length. This specification only considers
     the case where the lengths of all dimensions are finite. However,
-    protocol extensions may be defined which allow a dimension to have
+    `protocol extensions`_ may be defined which allow a dimension to have
     infinite or variable length.
 
 .. _shape:
@@ -159,7 +159,6 @@ conceptual model underpinning the Zarr protocol.
     empty, or it may have a value.
 
 .. _data type:
-.. _data types:
 
 *Data type*
 
@@ -211,7 +210,7 @@ conceptual model underpinning the Zarr protocol.
 
 *Compressor*
 
-    An array_ may be associated with an compressor, which is a codec_
+    An array_ may be associated with a compressor, which is a codec_
     that transforms the binary representation of a chunk_ in some way,
     usually to reduce data size.
 
@@ -316,7 +315,7 @@ Core data types
      - Size (no. bytes)
      - Byte order
    * - `bool`
-     - Boolean, with False encoded as `\x00` and True encoded as `\x01`
+     - Boolean, with False encoded as `\\x00` and True encoded as `\\x01`
      - 1
      - None
    * - `i1`
@@ -407,7 +406,7 @@ hyperrectangles of the same shape. Protocol extensions may define
 other grid types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
 
-A grid type must also defines rules for constructing an identifier for
+A grid type must also define rules for constructing an identifier for
 each chunk that is unique within the grid, which is a string of ASCII
 characters that can be used to construct keys to save and retrieve
 chunk data in a store, see also the `Storage protocol`_ section.
@@ -441,17 +440,21 @@ grid will be (2, 10, 8), meaning that there will be 2 chunks along the
 first dimension, 10 along the second dimension, and 8 along the third
 dimension.
 
-An element of an array with coordinates (`i`, `j`, `k`, ...) will
-occur within the chunk at grid index (`i` // `dx`, `j` // `dy`, `k` //
+An element of an array with coordinates (`a`, `b`, `c`, ...) will
+occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
 `dz`, ...), where "//" is the floor division operator. The element
-will have coordinates (`i` % `dx`, `j` % `dy`, `k` % `dz`, ...) within
-that chunk. For example, @@TODO example.
+will have coordinates (`a` % `dx`, `b` % `dy`, `c` % `dz`, ...) within
+that chunk, where "%" is the modulo operator. For example, if a 
+3 dimensional array has shape (10, 200, 3000), and has chunk shape
+(5, 20, 400), then the element of the array with coordinates (7, 150, 900)
+is contained within the chunk at grid index (1, 7, 2) and has coordinates
+(2, 10, 100) within that chunk.
 
 The identifier for chunk with grid index (`i`, `j`, `k`, ...) is
 formed by joining together ASCII string representations of each index
 using a separator. The default value for the separator is the period
-character ("."), but this may be configured by providing a `separator`
-value within the `chunk_grid` metadata object, see the section on
+character ("."), but this may be configured by providing a ``separator``
+value within the ``chunk_grid`` metadata object, see the section on
 `Array metadata`_ below.
 
 For example, in a 3 dimensional array, the identifier for the chunk at
@@ -554,7 +557,7 @@ configuration parameters are represented as JSON.
 The Zarr core development team maintains a repository of codec
 specifications, which are hosted alongside this specification in the
 `zarr-specs GitHub repository
-<https://github.org/zarr-developers/zarr-specs>`_, and which are
+<https://github.com/zarr-developers/zarr-specs>`_, and which are
 published on the `zarr-specs documentation Web site
 <http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
 recommended that codec specifications are contributed to the
@@ -562,7 +565,8 @@ zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
 on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see the Zarr
-community process specification @@TODO link.
+community process specification @@TODO Add link once
+https://github.com/zarr-developers/zarr-specs/pull/12 is merged@@.
 
 Further details of how a compressor is configured for an array are
 given in the section below on `Array metadata`_.
@@ -605,7 +609,7 @@ containing the following names:
     A string containing the URI of the Zarr core protocol
     specification that defines the metadata format. For Zarr
     hierarchies conforming to this specification, the value must be
-    the string "http://purl.org/zarr/spec/protocol/core/3.0".
+    the string "https://purl.org/zarr/spec/protocol/core/3.0".
 
     Implementations of this protocol may assume that the final path
     segment of this URI ("3.0") represents the core protocol version
@@ -653,7 +657,7 @@ For example, below is a bootstrap metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
     {
-        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
         "metadata_encoding": "application/json",
         "extensions": []
     }
@@ -663,7 +667,7 @@ specifying that a protocol extension is being used which may be
 ignored if not understood::
 
     {
-        "zarr_format": "http://purl.org/zarr/spec/protocol/core/3.0",
+        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
         "metadata_encoding": "application/json",
         "extensions": [
             {
@@ -736,9 +740,8 @@ following names:
 ``chunk_memory_layout``
 
     The internal memory layout of the chunks. Use the value "C" to
-    indicate C contiguous memory layout or "F" to indicate F
-    contiguous memory layout as defined in this specification @@TODO
-    link to sections@@.
+    indicate `C contiguous memory layout`_ or "F" to indicate
+    `F contiguous memory layout`_ as defined in this specification.
 
     The ``chunk_memory_layout`` value is an extension point and may be
     defined by a protocol extension. If the chunk memory layout type
