@@ -808,7 +808,7 @@ compressed using gzip compression prior to storage::
         },
         "chunk_memory_layout": "C",
         "compressor": {
-            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
             "configuration": {
                 "level": 1
             }
@@ -838,7 +838,7 @@ chunking as above, but using an extension data type::
         },
         "chunk_memory_layout": "C",
         "compressor": {
-            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
             "configuration": {
                 "level": 1
             }
