@@ -556,8 +556,7 @@ configuration parameters are represented as JSON.
 
 The Zarr core development team maintains a repository of codec
 specifications, which are hosted alongside this specification in the
-`zarr-specs GitHub repository
-<https://github.com/zarr-developers/zarr-specs>`_, and which are
+`zarr-specs GitHub repository`_, and which are
 published on the `zarr-specs documentation Web site
 <http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
 recommended that codec specifications are contributed to the
@@ -999,8 +998,7 @@ The examples above are meant to be illustrative only, and other
 implementations are possible. This specification does not attempt to
 standardise any store implementations, however where a store
 implementation is expected to be widely used then it is recommended to
-create a store implementation spec and contribute it to the
-`zarr-specs GitHub repository <https://github.com/zarr-developers/zarr-specs/>`_.
+create a store implementation spec and contribute it to the `zarr-specs GitHub repository`_.
 For an example of a store implementation spec, see the
 :ref:`file-system-store-v1` specification.
 
@@ -1169,3 +1167,5 @@ Links: `view spec
 <https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/protocol/core/v3.0.rst>`_
 
 @@TODO summary of changes since previous tag.
+
+.. _zarr-specs GitHub repository: https://github.com/zarr-developers/zarr-specs
