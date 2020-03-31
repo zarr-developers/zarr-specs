@@ -257,7 +257,7 @@ Node names
 ==========
 
 Except for the root node, each node in a hierarchy must have a name,
-which is a string of ASCII characters. To ensure consistent behaviour
+which is a string characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
 node names:
 
@@ -287,7 +287,7 @@ element may take, along with some information about how the values
 should be interpreted.
 
 This protocol defines a limited set of data types to represent Boolean
-values, integers, floating point numbers and complex numbers. Protocol
+values, integers, and floating point numbers. Protocol
 extensions may define additional data types. All of the data types
 defined here have a fixed size, in the sense that all values require
 the same number of bytes. However, protocol extensions may define
@@ -556,8 +556,7 @@ configuration parameters are represented as JSON.
 
 The Zarr core development team maintains a repository of codec
 specifications, which are hosted alongside this specification in the
-`zarr-specs GitHub repository
-<https://github.com/zarr-developers/zarr-specs>`_, and which are
+`zarr-specs GitHub repository`_, and which are
 published on the `zarr-specs documentation Web site
 <http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
 recommended that codec specifications are contributed to the
@@ -575,33 +574,31 @@ given in the section below on `Array metadata`_.
 Metadata
 ========
 
-This section defines the structure of metadata documents for Zarr
-arrays and groups. Metadata documents are defined here using the JSON
+This section defines the structure of metadata documents for Zarr hierarchies,
+which consists of three types metadata documents: an entry point metadata document,
+array metadata documents, and group metadata documents. Each type of metadata
+document is described in the following subsections.
+
+Metadata documents are defined here using the JSON
 type system defined in [RFC8259]_. In this section, the terms "value",
 "number", "string" and "object" are used to denote the types as
 defined in [RFC8259]_. The term "array" is also used as defined in
 [RFC8259]_, except where qualified as "Zarr array". Following
 [RFC8259]_, this section also describes an object as a set of
-name/value pairs.
+name/value pairs. This section also defines how metadata documents are
+encoded for storage.
 
-This section also defines how metadata documents are encoded for
-storage. The canonical encoding is JSON, however any other encoding
-which supports an equivalent type system may be used for array and
-group metadata documents.
 
-Bootstrap metadata
-------------------
+Entry point metadata
+--------------------
 
-@@TODO should this be called "entry-point metadata"? Or something
-else?
-
-Each Zarr hierarchy must have a bootstrap metadata document, which
+Each Zarr hierarchy must have an entry point metadata document, which
 provides essential information regarding the protocol version being
 used, the encoding being used for group and array metadata, and any
 protocol extensions that affect the layout or interpretation of data
 in the store.
 
-The bootstrap metadata document must contain a single object
+The entry point metadata document must contain a single object
 containing the following names:
 
 ``zarr_format``
@@ -653,7 +650,7 @@ containing the following names:
     ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
-For example, below is a bootstrap metadata document, specifying that
+For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
     {
@@ -662,7 +659,7 @@ JSON is being used for encoding of group and array metadata::
         "extensions": []
     }
 
-For example, below is a bootstrap metadata document as above, but also
+For example, below is an entry point metadata document as above, but also
 specifying that a protocol extension is being used which may be
 ignored if not understood::
 
@@ -770,9 +767,11 @@ following names:
     be the literal ``false`` or ``true``. If the data type is one of
     the integer data types defined in this specification, then the
     value must be a number with no fraction or exponent part and must
-    be within the range of the data type. TODO what about floating
-    point data types? TODO what about complex data types? TODO what
-    about nan and inf? TODO what about extension data types?
+    be within the range of the data type.
+
+    @@TODO what about floating point data types?
+    @@TODO what about nan and inf?
+    @@TODO what about extension data types?
 
     For any data type, if the ``fill_value`` is the literal ``null``
     then the fill value is undefined and the implementation may use
@@ -791,9 +790,9 @@ following names:
 All other names within the array metadata object are reserved for
 future versions of this specification.
 
-For example, the array metadata document below defines a
+For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
-with 10000 and 1000 columns, divided into a regular chunk grid where
+with 10000 rows and 1000 columns, divided into a regular chunk grid where
 each chunk has 1000 rows and 100 columns, and thus there will be 100
 chunks in total arranged into a 10 by 10 grid. Within each chunk the
 binary values are laid out in C contiguous order. Each chunk is
@@ -808,7 +807,7 @@ compressed using gzip compression prior to storage::
         },
         "chunk_memory_layout": "C",
         "compressor": {
-            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "codec": "https://purl.org/zarr/spec/codec/gzip",
             "configuration": {
                 "level": 1
             }
@@ -828,7 +827,7 @@ chunking as above, but using an extension data type::
     {
         "shape": [10000, 1000],
         "data_type": {
-            "extension": "http://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0",
+            "extension": "https://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0",
             "type": "<M8[ns]",
             "fallback": "<i8"
         },
@@ -838,7 +837,7 @@ chunking as above, but using an extension data type::
         },
         "chunk_memory_layout": "C",
         "compressor": {
-            "codec": "http://purl.org/zarr/spec/codec/gzip",
+            "codec": "https://purl.org/zarr/spec/codec/gzip",
             "configuration": {
                 "level": 1
             }
@@ -852,10 +851,9 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the `extensions` and `attributes`
-names as defined above. All other names
-are reserved for future versions of this
-specification. See also the section
+A Zarr group metadata object must contain the ``extensions`` and ``attributes``
+names as defined above in the `Array metadata`_ section. All other names
+are reserved for future versions of this specification. See also the section
 on `Protocol extensions`_ below.
 
 For example, the JSON document below defines a group::
@@ -872,9 +870,10 @@ For example, the JSON document below defines a group::
 Metadata encoding
 -----------------
 
-The bootstrap metadata document must be encoded as JSON. The array and
+The entry point metadata document must be encoded as JSON. The array and
 group metadata documents must be encoded as per the MIME type given in
-the ``metadata_encoding`` field in the bootstrap metadata document.
+the ``metadata_encoding`` field in the entry point metadata document
+(described below).
 
 @@TODO more explanation needed?
 
@@ -900,7 +899,7 @@ that an implementation of this specification could be modular and
 allow for different store implementations to be used.
 
 The store interface defines a set of operations involving `keys` and
-`values`. In the context of this interface, a `key` is any ASCII
+`values`. In the context of this interface, a `key` is any
 string containing only characters in the ranges ``a-z``, ``A-Z``,
 ``0-9``, or in the set ``/.-_``, and a `value` is any sequence of
 bytes. It is assumed that the store holds (`key`, `value`) pairs, with
@@ -947,7 +946,7 @@ operations:
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
-which do not contain "/" after the given prefix.
+which do not contain the character "/" after the given prefix.
 
     | Parameters: `prefix`
     | Output: set of `keys` and set of `prefixes`
@@ -978,7 +977,7 @@ a directory.
 For example, a store implementation might use a key-value database
 such as BerkeleyDB or LMDB as the underlying storage system. In this
 case the implementation of ``get`` and ``set`` operations would be
-obvious, being whatever are the native operations provided by the
+whatever native operations are provided by the
 database for getting and setting key/value pairs. Such a store
 implementation might natively support the ``list`` operation but might
 not support ``list_prefix`` or ``list_dir``, although these could be
@@ -999,8 +998,11 @@ The examples above are meant to be illustrative only, and other
 implementations are possible. This specification does not attempt to
 standardise any store implementations, however where a store
 implementation is expected to be widely used then it is recommended to
-create a store implementation spec and contribute it to the zarr-specs
-GitHub repository. @@TODO more info and example.
+create a store implementation spec and contribute it to the `zarr-specs GitHub repository`_.
+For an example of a store implementation spec, see the
+:ref:`file-system-store-v1` specification.
+
+@@TODO more info and example.
 
 
 Storage protocol
@@ -1024,7 +1026,7 @@ identify ancestor nodes in the hierarchy. For example, the path
 Storage keys
 ------------
 
-The bootstrap metadata document is stored under the key "zarr.json".
+The entry point metadata document is stored under the key "zarr.json".
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
 group metadata document is formed by concatenating "meta/root", `P`,
@@ -1059,7 +1061,7 @@ Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
 ``group_meta_key(P)`` be the group metadata key for `P`.
 
 Let ``data_key(P, i, j, ...)`` be the data key for `P` for the chunk
-with grid coordinates (i, j, ...).
+with grid coordinates (`i`, `j`, ...).
 
 Let "+" be the string concatenation operator.
 
@@ -1135,7 +1137,7 @@ Let "+" be the string concatenation operator.
 Protocol extensions
 ===================
 
-TODO define different types of protocol extension.
+@@TODO define different types of protocol extension.
 
 
 References
@@ -1165,3 +1167,5 @@ Links: `view spec
 <https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/protocol/core/v3.0.rst>`_
 
 @@TODO summary of changes since previous tag.
+
+.. _zarr-specs GitHub repository: https://github.com/zarr-developers/zarr-specs
