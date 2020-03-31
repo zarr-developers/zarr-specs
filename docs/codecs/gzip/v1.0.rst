@@ -91,7 +91,7 @@ level of 1::
 
     {
         "compressor": {
-            "codec": "http://purl.org/zarr/spec/codecs/gzip/1.0",
+            "codec": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }
