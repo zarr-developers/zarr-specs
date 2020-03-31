@@ -575,7 +575,7 @@ Metadata
 ========
 
 This section defines the structure of metadata documents for Zarr hierarchies,
-which consists of three types metadata documents: a entry point metadata document,
+which consists of three types metadata documents: an entry point metadata document,
 array metadata documents, and group metadata documents. Each type of metadata
 document is described in the following subsections.
 
@@ -592,7 +592,7 @@ encoded for storage.
 Entry point metadata
 --------------------
 
-Each Zarr hierarchy must have a entry point metadata document, which
+Each Zarr hierarchy must have an entry point metadata document, which
 provides essential information regarding the protocol version being
 used, the encoding being used for group and array metadata, and any
 protocol extensions that affect the layout or interpretation of data
@@ -650,7 +650,7 @@ containing the following names:
     ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
-For example, below is a entry point metadata document, specifying that
+For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
     {
@@ -659,7 +659,7 @@ JSON is being used for encoding of group and array metadata::
         "extensions": []
     }
 
-For example, below is a entry point metadata document as above, but also
+For example, below is an entry point metadata document as above, but also
 specifying that a protocol extension is being used which may be
 ignored if not understood::
 
