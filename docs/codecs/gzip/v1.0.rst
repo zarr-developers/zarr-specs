@@ -63,12 +63,14 @@ Chunk encoding/decoding with Gzip
 =================================
 
 @@TODO define how chunks are encoded and decoded
+@@TODO be sure to clarify that the encoded data should conform to the gzip file format
 
-Chunks are encoded and decoded using the Gzip compression algorithm defined in
-[RFC1951]_ and [RFC1952]_. The compression level is an integer from 0 to 9
-which controls the speed and level of compression. A level of 1 is the fastest
-compression method and produces the least compressions, while 9 is slowest and
-produces the most compression. Compression is turned off completely when level is 0.
+Chunks are encoded and decoded using the compression algorithm defined in
+[RFC1951]_ and encoded data should conform to the Gzip file format [RFC1952]_.
+The compression level is an integer from 0 to 9 which controls the speed and
+level of compression. A level of 1 is the fastest compression method and
+produces the least compressions, while 9 is slowest and produces the most
+compression. Compression is turned off completely when level is 0.
 
 
 Configuring codec in array metadata
