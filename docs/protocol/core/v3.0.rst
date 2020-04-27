@@ -263,8 +263,8 @@ node names:
 
 * must not be the empty string ("")
 
-* must consist only of characters in the sets `a-z`, `A-Z`, `0-9`,
-  `-_.`
+* must consist only of characters in the sets ``a-z``, ``A-Z``, ``0-9``,
+  ``-_.``
 
 * must not be a string composed only of period characters, e.g. "." or
   ".."
