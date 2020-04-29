@@ -4,7 +4,7 @@
  Zarr core protocol (version 3.0)
 ==================================
 -----------------------------
- Editor's draft 19 June 2019
+ Editor's draft 25 April 2020
 -----------------------------
 
 Specification URI:
