@@ -16,7 +16,7 @@ Issue tracking:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 
-Copyright 2019 `Zarr core development
+Copyright 2019, 2020 `Zarr core development
 team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
 list institutions?). This work is licensed under a `Creative Commons
 Attribution 3.0 Unported
