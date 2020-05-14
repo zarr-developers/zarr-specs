@@ -440,6 +440,18 @@ grid will be (2, 10, 8), meaning that there will be 2 chunks along the
 first dimension, 10 along the second dimension, and 8 along the third
 dimension.
 
+.. list-table:: Regular Grid Example
+    :header-rows: 1
+
+    * - Array Shape
+      - Chunk Shape
+      - Chunk Grid Shape
+      - Notes
+    * - (10, 200, 3000)
+      - (5, 20, 400)
+      - (2, 10, 8)
+      - The grid does overhang the edge of the array on the 3rd dimension.
+
 An element of an array with coordinates (`a`, `b`, `c`, ...) will
 occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
 `dz`, ...), where "//" is the floor division operator. The element
@@ -449,6 +461,7 @@ that chunk, where "%" is the modulo operator. For example, if a
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
 is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
+
 
 The identifier for chunk with grid index (`i`, `j`, `k`, ...) is
 formed by joining together ASCII string representations of each index
@@ -1036,7 +1049,7 @@ For example, for a group at hierarchy path "/foo/bar", the
 corresponding metadata key is "meta/root/foo/bar.group".
 
 For an array at a non-root hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta", `P`,
+the array metadata document is formed by concatenating "meta/root", `P`,
 and ".array". The data key for array chunks is formed by concatenating
 "data", `P`, "/", and the chunk identifier as defined by the chunk
 grid layout.
@@ -1050,6 +1063,40 @@ If the root node is a group, the metadata key is "meta/root.group". If
 the root node is an array, the metadata key is "meta/root.array", and
 the data keys are formed by concatenating "data/" and the chunk
 identifier.
+
+.. list-table:: Metadata Storage Key example
+    :header-rows: 1
+
+    * - Type
+      - Path "P"
+      - Key for Metadata at path `P`
+    * - Array (Root)
+      - `/`
+      - `meta/root.array`
+    * - Group (Root)
+      - `/`
+      - `meta/root.group`
+    * - Group
+      - `/foo/bar`
+      - `meta/root/foo/bar.group`
+    * - Array
+      - `foo/baz`
+      - `meta/root/foo/baz.array`
+
+
+
+
+
+.. list-table:: Data Storage Key example
+    :header-rows: 1
+
+    * - Type
+      - Path `P` of Chunck
+      - Data Key
+    * - Chunk
+      - `foo/baz/0.0`
+      - `data/foo/baz/0.0`
+
 
 
 Protocol operations
