@@ -301,6 +301,62 @@ conceptual model underpinning the Zarr protocol.
     provide.
 
 
+Goal and Non-Goal of v3 spec with respect to v2 spec
+====================================================
+
+This section is informative and is present to help the reader familiar  with
+previous version of zarr to find and understand the differences and the reasons
+behind them as well as guide the contributor during the draft and review
+period.
+
+Better suitability for HPC file systems and network stores
+----------------------------------------------------------
+
+One goal of the spec v3 is to have a design that minimized the number of
+round-trip operations that must done in order to understand the structure of a
+Zarr store. Especially on highly parallel file system and network stores
+listing keys and accessing metadata can be a expensive – high latency
+– operation. Thus is a nested hierarchy listing all available groups, datasets
+and chunks can be a time consuming operation.
+
+The v3 spec thus tried to separate the metadata, from group and dataset data
+using a prefix, as well as recommend a flatter way of storing keys in order to
+facilitate bulk operations. This should in particular allow to decrease the
+reliance on "metadata consolidation" seen with zarr v2.
+
+Another related changes is the notion of implicit groups created when a dataset
+or chunk can be written via its full path even when the intermediate groups do
+not exists. This allow lock-free write operation for non-contending
+applications without the need for extra operations and round trip to create or
+check existence of intermediate groups.
+
+Consideration of multiple programming languages
+-----------------------------------------------
+
+Zarr spec v3 has an explicit goal of having better compatibility and easier
+implementation with programming languages other then Python. Thus a number of
+core features in previous spec have been relegated to extensions for the time
+being. This include in particular a reduction of the number of datatypes that
+are available in core.
+
+Compatibility with the N5 project
+---------------------------------
+
+The `N5 project <https://github.com/saalfeldlab/n5>`_ and Zarr have similar
+goals. One of the goal of Zarr Spec v3 is to provide compatibility for Most of
+Zarr v2 and N5 users in order to allow consolidation under the v3 spec with the
+end goal of merging the two projects.
+
+Extensibility
+-------------
+
+One of the Non-goal of Zarr Spec V3 is to cover all use cases, and to provide a
+path forward for extensibility and future standardisation of extensions without
+the need to rely on the Zarr core team. A challenge is to make sure
+implementations of the Zarr protocol for which used extension are not available
+can still give user access to data without triggering corruption when possible.
+
+
 Node names
 ==========
 
