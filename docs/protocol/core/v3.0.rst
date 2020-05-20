@@ -269,6 +269,8 @@ node names:
 * must not be a string composed only of period characters, e.g. "." or
   ".."
 
+TODO: likely want to reserver names that start with just a single ``.``
+
 * must be at most 255 characters long
 
 Note that node names are used to form storage keys, and that some
@@ -386,9 +388,21 @@ Core data types
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
+   * - ``r*`` (Optional)
+     - raw bits/bytes,  use for extension type fallbacks
+     - variable, given by ``*``, multiple of 8
+     - N/A
+
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
+
+Additionally to these base types, an implementation should also handle the raw
+pass through type designated by the lowercase letter ``r`` followed by the
+number of bits as a multiple of 8. For example, ``r8``, ``r104`` should be
+understood as fallback types of respectively 1 and 13 bytes longs, and
+implementation should ensure to pass or accept those types unchanged when using
+extension fallback.
 
 
 Chunk grids
@@ -650,6 +664,16 @@ containing the following names:
     ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
+    TODO: can we have must-understand to "true" but limitted to a subset of
+    datasets / groups using this extension ? 
+
+    Each extension can also have a field ``requires``, that contain an unordered
+    list of URI to other extensions specification on which they rely for proper
+    behavior. Implementation MAY rely on the value of these requires to decide
+    in which order to load extensions and resolve types. If an extension
+    requires another one, then implementation should ensure that the required
+    extension is listed in the top-level extensions field.
+
 For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
@@ -676,6 +700,35 @@ ignored if not understood::
             }
         ]
     }
+
+
+
+For example, below is an entry point metadata document as above, but also
+specifying that a protocol extension is being used which may be
+ignored if not understood::
+
+    {
+        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
+        "metadata_encoding": "application/json",
+        "extensions": [
+            {
+                "extension": "http://example.org/zarr/extension/multiverse/1.0",
+                "must_understand": false,
+                "requires": ["http://example.org/zarr/extension/complex_datetime/1.0"]
+            }, 
+            {
+                "extension": "http://example.org/zarr/extension/complex_datetime/1.0",
+                "requires": ["http://example.org/zarr/extension/complex/1.0"]
+                "must_understand": false,
+            }, 
+            {
+                "extension": "http://example.org/zarr/extension/complex/1.0",
+                "must_understand": true,
+                "
+            }
+        ]
+    }
+
 
 
 Array metadata
@@ -711,7 +764,19 @@ following names:
     identifiers defined in this specification. If an implementation
     does not recognise the extension, but a ``fallback`` is present,
     then the implementation may proceed using the ``fallback`` value
-    as the data type.
+    as the data type. For fallback types that do not correspond to base
+    known types, extensions can fallback on on a raw number of bytes using
+
+    TODO: should data_type extension be also available in the entry-point
+    metadata ? I'm going to guess a number of things can't won't be able to
+    dynamically load extensions so need to know immediately. 
+    That would also allow to define datatypes only once on top-level hierarchy.
+    Do we allow multiple version of the same extenions ? 
+
+    Restrict extensions types charset/format to not block the core types to be
+    extended ? Allow different extension to have same named type in multiple
+    context and dispatch depending on extension ? 
+
 
 ``chunk_grid``
 
@@ -780,7 +845,9 @@ following names:
 
 ``extensions``
 
-    The value @@TODO
+    The value of the extension field should be a list of URI of extensions used
+    to write/read the chunks present in this layout. Extension listed in this
+    field must be provided in the entry point metadata document. 
 
 ``attributes``
 
@@ -937,6 +1004,7 @@ operations:
     | Parameters: none
     | Output: set of `keys`
 
+
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
@@ -954,6 +1022,8 @@ which do not contain the character "/" after the given prefix.
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
+
+   @@TODO@@ more general list with depth XXX
 
 
 Store implementations
@@ -1138,6 +1208,16 @@ Protocol extensions
 ===================
 
 @@TODO define different types of protocol extension.
+
+Many types of extensions can exists for a Zarr Protocol, they can be regrouped
+in mostly 3 categories: 
+
+ - Core Datatypes Extensions – for example adding ability store fixed size
+   types like complex and datetime in chunks. 
+ - Arrays Extensions – Non rectilinear grids, and
+   variable length types. 
+ - Group extensions – Better understanding of a group layout : example pyramidal
+   resolution.
 
 
 References
