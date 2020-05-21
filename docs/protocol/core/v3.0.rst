@@ -316,75 +316,75 @@ Core data types
      - Numerical type
      - Size (no. bytes)
      - Byte order
-   * - `bool`
-     - Boolean, with False encoded as `\\x00` and True encoded as `\\x01`
+   * - ``bool``
+     - Boolean, with False encoded as ``x00`` and True encoded as ``x01``
      - 1
      - None
-   * - `i1`
-     - signed integer
-     - 1
-     - None
-   * - `<i2`
-     - signed integer
-     - 2
-     - little-endian
-   * - `<i4`
-     - signed integer
-     - 4
-     - little-endian
-   * - `<i8`
-     - signed integer
-     - 8
-     - little-endian
-   * - `>i2`
-     - signed integer
-     - 2
-     - big-endian
-   * - `>i4`
-     - signed integer
-     - 4
-     - big-endian
-   * - `>i8`
-     - signed integer
-     - 8
-     - big-endian
-   * - `u1`
+   * - ``i1``
      - signed integer
      - 1
      - None
-   * - `<u2`
+   * - ``i2``
+     - signed integer
+     - 2
+     - little-endian
+   * - ``i4``
+     - signed integer
+     - 4
+     - little-endian
+   * - ``i8``
+     - signed integer
+     - 8
+     - little-endian
+   * - ``i2``
+     - signed integer
+     - 2
+     - big-endian
+   * - ``i4``
+     - signed integer
+     - 4
+     - big-endian
+   * - ``i8``
+     - signed integer
+     - 8
+     - big-endian
+   * - ``u1``
+     - signed integer
+     - 1
+     - None
+   * - ``u2``
      - unsigned integer
      - 2
      - little-endian
-   * - `<u4`
+   * - ``u4``
      - unsigned integer
      - 4
      - little-endian
-   * - `<u8`
+   * - ``u8``
      - unsigned integer
      - 8
      - little-endian
-   * - `<f2`
+   * - ``f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - little-endian
-   * - `<f4`
+   * - ``f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - little-endian
-   * - `<f8`
+   * - ``f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - little-endian
-   * - `>f2`
+   * - ``f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - big-endian
-   * - `>f4`
+   * - ``f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - big-endian
-   * - `>f8`
+   * - ``f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
@@ -589,9 +589,10 @@ Metadata
 ========
 
 This section defines the structure of metadata documents for Zarr hierarchies,
-which consists of three types metadata documents: an entry point metadata document,
-array metadata documents, and group metadata documents. Each type of metadata
-document is described in the following subsections.
+which consists of three types metadata documents: an entry point metadata
+document ( e.g. ``zarr.json``), array metadata documents, and group metadata
+documents. Each type of metadata document is described in the following
+subsections.
 
 Metadata documents are defined here using the JSON
 type system defined in [RFC8259]_. In this section, the terms "value",
@@ -667,6 +668,15 @@ containing the following names:
     TODO: can we have must-understand to "true" but limitted to a subset of
     datasets / groups using this extension ? 
 
+    suggestion:
+        affects : "root", "groups", "arrays"
+
+        affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure. 
+        affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups. 
+        affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens. 
+
+
+
     Each extension can also have a field ``requires``, that contain an unordered
     list of URI to other extensions specification on which they rely for proper
     behavior. Implementation MAY rely on the value of these requires to decide
@@ -704,8 +714,7 @@ ignored if not understood::
 
 
 For example, below is an entry point metadata document as above, but also
-specifying that a protocol extension is being used which may be
-ignored if not understood::
+specifying that many protocol extensions are being used; two of which are not required to be understood, one of which is necessary to be able to interprete arrays encoding::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
@@ -724,7 +733,7 @@ ignored if not understood::
             {
                 "extension": "http://example.org/zarr/extension/complex/1.0",
                 "must_understand": true,
-                "
+                "affects": "arrays",
             }
         ]
     }
@@ -735,7 +744,7 @@ Array metadata
 --------------
 
 Each Zarr array in a hierarchy must have an array metadata
-document. This document must contain a single object with the
+document  (``*.array``). This document must contain a single object with the
 following names:
 
 ``shape``
@@ -834,14 +843,21 @@ following names:
     value must be a number with no fraction or exponent part and must
     be within the range of the data type.
 
-    @@TODO what about floating point data types?
-    @@TODO what about nan and inf?
-    @@TODO what about extension data types?
-
     For any data type, if the ``fill_value`` is the literal ``null``
     then the fill value is undefined and the implementation may use
     any arbitrary value that is consistent with the data type as the
     fill value.
+
+    If the ``data_type`` of an array is defined in a ``data_type`` extension,
+    then said extension is responsible for interpreting the value of
+    ``fill_value`` and return a suitable type that can be used.
+
+    For core ``data_type`` which ``fill_value`` are not permitted in JSON or
+    for which decimal representation could be lossy, a string representing of
+    the binary (starting with ```0b``) or hexadecimal value (starting with
+    ``0x``) is accepted. This string must include all leading or trailing
+    zeroes necessary to match the given type size. The string values ``"NaN"``,
+    ``"+Infinity"`` and ``"-Infinity"`` are also understood for floating point datatypes.
 
 ``extensions``
 
@@ -853,6 +869,8 @@ following names:
 
     The value must be an object. The object may contain any name/value
     pairs.
+
+TODO see https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
@@ -918,10 +936,10 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the ``extensions`` and ``attributes``
-names as defined above in the `Array metadata`_ section. All other names
-are reserved for future versions of this specification. See also the section
-on `Protocol extensions`_ below.
+A Zarr group metadata object (``*.group``) must contain the ``extensions`` and
+``attributes`` names as defined above in the `Array metadata`_ section. All
+other names are reserved for future versions of this specification. See also
+the section on `Protocol extensions`_ below.
 
 For example, the JSON document below defines a group::
 
@@ -937,12 +955,14 @@ For example, the JSON document below defines a group::
 Metadata encoding
 -----------------
 
-The entry point metadata document must be encoded as JSON. The array and
-group metadata documents must be encoded as per the MIME type given in
+The entry point metadata document must be encoded as JSON. The array (``*.arrays``) and
+group metadata documents (``*.groups``) must be encoded as per the MIME type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
 
 @@TODO more explanation needed?
+Todo questions : How frequent are non-JSON metadata documents ? and how store specific are those. 
+If we allow arbitrary mimetypes, doe that precude the sections on arrays and group metadata to be normative ? 
 
 
 Stores
@@ -1008,7 +1028,7 @@ operations:
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
-    | Output: set of `keys` with the given `prefix`
+    | Output: set of `keys` with the given `prefix`, 
 
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
@@ -1023,7 +1043,7 @@ which do not contain the character "/" after the given prefix.
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
 
-   @@TODO@@ more general list with depth XXX
+@TODO : should store return trailing slashes when possible ? 
 
 
 Store implementations
@@ -1096,14 +1116,14 @@ identify ancestor nodes in the hierarchy. For example, the path
 Storage keys
 ------------
 
-The entry point metadata document is stored under the key "zarr.json".
+The entry point metadata document is stored under the key ``zarr.json``.
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating "meta/root", `P`,
-and ".group".
+group metadata document is formed by concatenating ``meta/root``, `P`,
+and ``.group``.
 
-For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/root/foo/bar.group".
+For example, for a group at hierarchy path ``/foo/bar``, the
+corresponding metadata key is ``meta/root/foo/bar.group``.
 
 For an array at a non-root hierarchy path `P`, the metadata key for
 the array metadata document is formed by concatenating "meta", `P`,
@@ -1112,7 +1132,7 @@ and ".array". The data key for array chunks is formed by concatenating
 grid layout.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/root/foo/baz.array". If the array
+corresponding metadata key is ``meta/root/foo/baz.array``. If the array
 has two dimensions and a regular chunk grid, the data key for the
 chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
 
