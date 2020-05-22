@@ -1006,6 +1006,18 @@ bytes. It is assumed that the store holds (`key`, `value`) pairs, with
 only one such pair for any given `key`. I.e., a store is a mapping
 from keys to values.
 
+A store can make the following assumption on the structures of the keys it will receive: 
+
+- A key always:
+  - start with ``meta/``
+  - starts  with ``data/``
+  - is exactly ``zarr.json``.
+
+
+
+- List operations ``list_dir`` will always be passed keys ending with a trailing slash, that is to say it will only be asked to work with complete node names. 
+
+
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
 a store implementation to support all of these capabilities.
@@ -1029,6 +1041,14 @@ A **writeable store** supports the following operations:
     | Parameters: `key`
     | Output: none
 
+``delete_prefix`` - Delete all keys with the given prefix from the store, include the prefix itself if it exists as a key:
+
+    | Parameter: `key`
+    | Output: None
+
+    
+    clients of delete_prefix should pay attention to pass a trailing slash on the key to delete a complete dataset or group, otherwise the store may delete similar keys.
+
 A **listable store** supports any one or more of the following
 operations:
 
@@ -1036,6 +1056,16 @@ operations:
 
     | Parameters: none
     | Output: set of `keys`
+
+
+TODO: the 2 spec below is ill-defined – or unclear if the prefix doe not have a
+trailing slash. I'm assuming this is meant to only list after a slash to mimic
+v2, but is equivalent to a glob.
+
+ - /group/dataset
+   /group2/dataset
+
+  - querying list_prefix or list_dir /group (no trailing slash) does list group2
 
 
 ``list_prefix`` - Retrieve all keys with a given prefix.
@@ -1046,6 +1076,9 @@ operations:
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
+    Note that ``list_prefix`` may be passed keys that do not end in in slashes
+    in order to find all node names starting with a prefix. 
+
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
 
@@ -1055,6 +1088,25 @@ which do not contain the character "/" after the given prefix.
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
+
+
+    TODO: i'm thinking on enforcing this one and have a SHOULD or MUST.
+    Stores implementing list dir CAN assume that all keys passed as parameter
+    do end in a trailing slash.
+
+
+    Store user must ensure that the queries to list_dir do endup in 
+
+    Note: if we lift the requirement on trailing slashes, then doing a prefix
+    search can lead to returning keys in the same hierarchy level but longer name. e.g:
+
+     - /meta/foo
+     - /meta/foo/dataset
+     - /meta/foobar
+
+     list_dir('foo') == 'foo'&'foobar'
+     list_dir('foo/') == 'foo/dataset'
+
 
 @TODO : should store return trailing slashes when possible ? 
 
@@ -1149,10 +1201,11 @@ corresponding metadata key is ``meta/root/foo/baz.array``. If the array
 has two dimensions and a regular chunk grid, the data key for the
 chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
 
-If the root node is a group, the metadata key is "meta/root.group". If
+If the root node is a group, the metadata key is ``meta/root.group``. If
 the root node is an array, the metadata key is "meta/root.array", and
 the data keys are formed by concatenating "data/" and the chunk
 identifier.
+
 
 .. list-table:: Metadata Storage Key example
     :header-rows: 1
@@ -1160,6 +1213,9 @@ identifier.
     * - Type
       - Path "P"
       - Key for Metadata at path `P`
+    * - Entry-Point metadata (Zarr.json)
+      - `n/a`
+      - `zarr.json`
     * - Array (Root)
       - `/`
       - `meta/root.array`
@@ -1167,10 +1223,16 @@ identifier.
       - `/`
       - `meta/root.group`
     * - Group
-      - `/foo/bar`
+      - `/foo`
+      - `meta/root/foo.group`
+    * - Array
+      - `/foo`
+      - `meta/root/foo.array`
+    * - Group
+      - `/foo`
       - `meta/root/foo/bar.group`
     * - Array
-      - `foo/baz`
+      - `/foo/baz`
       - `meta/root/foo/baz.array`
 
 
@@ -1184,7 +1246,7 @@ identifier.
       - Path `P` of Chunck
       - Data Key
     * - Chunk
-      - `foo/baz/0.0`
+      - `/foo/baz/0.0`
       - `data/foo/baz/0.0`
 
 
@@ -1202,9 +1264,18 @@ with grid coordinates (`i`, `j`, ...).
 
 Let "+" be the string concatenation operator.
 
+TODO: This kinda force creating a group or an array to check whether the same
+key is also a group or an array, which may create some latencies. I'm assuming
+we don't wan to allow both groups and array to be at the same path P right ? 
+Also have to think about how to handle that for implicit groups, That is to say
+if /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
+all the parents to make sure they are not datasets.
+
+I would suggest to tell store they can assume clients will not try to do the wrong tihng.
+
 **Create a group**
 
-    To create a group at hierarchy path `P`, perform
+    To create an explict group at hierarchy path `P`, perform
     ``set(group_meta_key(P), value)``, where `value` is the
     serialisation of a valid group metadata document.
 
@@ -1261,11 +1332,31 @@ Let "+" be the string concatenation operator.
 
 **Delete a group or array**
 
-    @@TODO
+    To delete an array it is necessary to 
+      - delete the metadata document for the array, (meta/P.array)
+      - delete all keys which prefix have path pointing to this to this array.  (data/P/\*)
+
+    To delete a implicit group. 
+      - delete all arrays under this group
+      - it should be sufficient to deleta all the keys starting with prefix meta/P/ and data/P/
+
+    To delete an explict group. 
+      - delete all arrays under this group, 
+      - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix, 
+
+    Note that store implmentation may decide to reify implicit groups and thus protocol implmentation should attempt to delete the .meta/P/.group file if they really wish to delte an empty implicit group. 
+
+    Store implmentation are also allowed to delete any implicit parent of a deleted implicit groups, so a protocol implmentation should make sure to reify a parent group if they need to keep it.
+
+
+
 
 **Determine if a node exists**
 
-    @@TODO
+    To determine if a node exists at path `P`, perform `exist()` 
+    exists is tricky, you can querry `meta/P.*`, as P might be implicit, 
+    so you need to querry both `meta/P.*` and `meta/P/*`.
+
 
 
 @@TODO need to describe/explain implicit groups more?
