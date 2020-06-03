@@ -1,5 +1,7 @@
 .. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
 
+
+
 ==================================
  Zarr core protocol (version 3.0)
 ==================================
@@ -404,6 +406,14 @@ understood as fallback types of respectively 1 and 13 bytes longs, and
 implementation should ensure to pass or accept those types unchanged when using
 extension fallback.
 
+Note: currently only fixed size elements are supported as a core data type.
+There are many request for variable length element encoding. There are many
+way to encode variable length and we want to keep flexibility. While we seem
+to agree that for random access the most likely contender is to have two
+arrays, one with the actual variable length data and one with fixed size
+(pointer + length) to the variable size data we do nto want to commit to such
+a structure.
+
 
 Chunk grids
 ===========
@@ -672,30 +682,48 @@ containing the following names:
     extension.
 
     If an implementation of this specification encounters an extension
-    that it does not recognise, but the value of ``must_understand``
+    that it does not recognize, but the value of ``must_understand``
     is ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognised and the value of
+    continue. If the extension is not recognized and the value of
     ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
-    TODO: can we have must-understand to "true" but limitted to a subset of
+    TODO: can we have must-understand to "true" but limited to a subset of
     datasets / groups using this extension ? 
 
-    suggestion:
-        affects : "root", "groups", "arrays"
+    TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed. 
 
-        affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure. 
-        affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups. 
-        affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens. 
+    Note: All extensions that are used in a zarr hierarchy must be stored in
+    the entry point metadata and implementation should expect to not
+    encounter any extensions not defined in the metadata entry points.
+    Implementation must ensure that any data written using an extension have
+    this extension added to the top level entry point. The entry point
+    metadata may contain extensions that are not in use in the hierarchy and
+    it is considered a viable trade off that removing extensions from the
+    entrypoint metadata requires a full rescan of the hierarchy.
 
 
 
-    Each extension can also have a field ``requires``, that contain an unordered
-    list of URI to other extensions specification on which they rely for proper
-    behavior. Implementation MAY rely on the value of these requires to decide
-    in which order to load extensions and resolve types. If an extension
-    requires another one, then implementation should ensure that the required
-    extension is listed in the top-level extensions field.
+
+
+..     suggestion:
+..         affects : "root", "groups", "arrays"
+.. 
+..         affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure. 
+..         affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups. 
+..         affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens. 
+
+
+
+..    Each extension can also have a field ``requires``, that contain an unordered
+..    list of URI to other extensions specification on which they rely for proper
+..    behavior. Implementation MAY rely on the value of these requires to decide
+..    in which order to load extensions and resolve types. If an extension
+..    requires another one, then implementation should ensure that the required
+..    extension is listed in the top-level extensions field.
+
+.. it seem unclear whether the dependency should be in the spec or handled by implementations, 
+.. there are pro and cons to both. It seem like listing the dependencies in the spec is not necessary.
 
 For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
@@ -723,34 +751,6 @@ ignored if not understood::
             }
         ]
     }
-
-
-
-For example, below is an entry point metadata document as above, but also
-specifying that many protocol extensions are being used; two of which are not required to be understood, one of which is necessary to be able to interprete arrays encoding::
-
-    {
-        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "application/json",
-        "extensions": [
-            {
-                "extension": "http://example.org/zarr/extension/multiverse/1.0",
-                "must_understand": false,
-                "requires": ["http://example.org/zarr/extension/complex_datetime/1.0"]
-            }, 
-            {
-                "extension": "http://example.org/zarr/extension/complex_datetime/1.0",
-                "requires": ["http://example.org/zarr/extension/complex/1.0"]
-                "must_understand": false,
-            }, 
-            {
-                "extension": "http://example.org/zarr/extension/complex/1.0",
-                "must_understand": true,
-                "affects": "arrays",
-            }
-        ]
-    }
-
 
 
 Array metadata
@@ -867,7 +867,7 @@ following names:
 
     For core ``data_type`` which ``fill_value`` are not permitted in JSON or
     for which decimal representation could be lossy, a string representing of
-    the binary (starting with ```0b``) or hexadecimal value (starting with
+    the binary (starting with ``0b``) or hexadecimal value (starting with
     ``0x``) is accepted. This string must include all leading or trailing
     zeroes necessary to match the given type size. The string values ``"NaN"``,
     ``"+Infinity"`` and ``"-Infinity"`` are also understood for floating point datatypes.
@@ -1094,8 +1094,10 @@ which do not contain the character "/" after the given prefix.
     Stores implementing list dir CAN assume that all keys passed as parameter
     do end in a trailing slash.
 
+    TODO: how does it behave on non-existing path ? 
 
-    Store user must ensure that the queries to list_dir do endup in 
+
+    Store user must ensure that the queries to list_dir do end up in 
 
     Note: if we lift the requirement on trailing slashes, then doing a prefix
     search can lead to returning keys in the same hierarchy level but longer name. e.g:
@@ -1372,10 +1374,13 @@ in mostly 3 categories:
 
  - Core Datatypes Extensions – for example adding ability store fixed size
    types like complex and datetime in chunks. 
+   - this seem to split into two categories: Purely declarative, and more complex.
  - Arrays Extensions – Non rectilinear grids, and
    variable length types. 
  - Group extensions – Better understanding of a group layout : example pyramidal
    resolution.
+
+  see https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
 
 References
