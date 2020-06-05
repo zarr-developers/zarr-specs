@@ -54,6 +54,20 @@ or by making a pull request against the
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
+Goal of v3 spec
+===============
+
+Zarr spec v2 was originally designed around local filesystem, but Zarr has
+grown and is now also often deployed on cloud / object storage. Those kind of
+storage have characteristics, capabilities and usage patterns that can widely
+differ from the assumptions of spec v2. V3 will be design to consider online
+stores in particular we want to achieve the following.
+
+ - no assumption that the underlying store have locking ability.
+ - ability to do concurrent writes with the assumption that writes from clients will be consistent.
+
+
+
 
 Document conventions
 ====================
@@ -236,12 +250,15 @@ conceptual model underpinning the Zarr protocol.
 
 *Metadata document*
 
-    Each node in a hierarchy_ is represented by a metadata document,
+    Each hierarchy_ and array_ is represented by a metadata document,
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
     metadata document will specify the number of dimensions_, shape_,
     `data type`_, grid_, `memory layout`_ and compressor_ for that
     array_.
+
+    Groups can have a optional metadata document which provide extra
+    information about a group.
 
 .. _store:
 .. _stores:
@@ -693,14 +710,16 @@ containing the following names:
 
     TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed. 
 
-    Note: All extensions that are used in a zarr hierarchy must be stored in
-    the entry point metadata and implementation should expect to not
-    encounter any extensions not defined in the metadata entry points.
-    Implementation must ensure that any data written using an extension have
-    this extension added to the top level entry point. The entry point
-    metadata may contain extensions that are not in use in the hierarchy and
-    it is considered a viable trade off that removing extensions from the
-    entrypoint metadata requires a full rescan of the hierarchy.
+..    This seem to be difficult to achieve if there are no locks.
+.. 
+..    Note: All extensions that are used in a zarr hierarchy must be stored in
+..    the entry point metadata and implementation should expect to not
+..    encounter any extensions not defined in the metadata entry points.
+..    Implementation must ensure that any data written using an extension have
+..    this extension added to the top level entry point. The entry point
+..    metadata may contain extensions that are not in use in the hierarchy and
+..    it is considered a viable trade off that removing extensions from the
+..    entrypoint metadata requires a full rescan of the hierarchy.
 
 
 
@@ -874,9 +893,10 @@ following names:
 
 ``extensions``
 
-    The value of the extension field should be a list of URI of extensions used
-    to write/read the chunks present in this layout. Extension listed in this
-    field must be provided in the entry point metadata document. 
+    See the top level metadata extension section for the time being.
+
+    TODO: Add the fact that extensions only affects arrays, and expand on the must-understand. 
+    TODO: Example with named dimensions.
 
 ``attributes``
 
@@ -949,33 +969,45 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object (``*.group``) must contain the ``extensions`` and
-``attributes`` names as defined above in the `Array metadata`_ section. All
+A Zarr group metadata object (``*.group``) must contain the 
+``attributes`` name as defined above in the `Array metadata`_ section. All
 other names are reserved for future versions of this specification. See also
 the section on `Protocol extensions`_ below.
 
-For example, the JSON document below defines a group::
+For example, the JSON document below defines an explicit group::
 
     {
-        "extensions": [],
         "attributes": {
             "spam": "ham",
             "eggs": 42,
         }
     }
 
+.. note:: 
+
+   Groups cannot have extensions attached to them as of spec v3.0 Allowing
+   groups to have extensions would force any implementation to sequentially
+   traverse the store hierarchy in order to check for extensions, which would
+   defeat the purpose of a flat namespace and concurrent access.
+
+   For the time being groups can only have attributes.
+
+.. note::
+   
+   A group does not need a metadata document to exists, see implicit groups.
+
 
 Metadata encoding
 -----------------
 
-The entry point metadata document must be encoded as JSON. The array (``*.arrays``) and
-group metadata documents (``*.groups``) must be encoded as per the MIME type given in
+The entry point metadata document must be encoded as JSON. The array (``*.array``s) and
+group metadata documents (``*.group``s) must be encoded as per the MIME type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
 
 @@TODO more explanation needed?
 Todo questions : How frequent are non-JSON metadata documents ? and how store specific are those. 
-If we allow arbitrary mimetypes, doe that precude the sections on arrays and group metadata to be normative ? 
+If we allow arbitrary mimetypes, does that precude the sections on arrays and group metadata to be normative ? 
 
 
 Stores
@@ -1016,6 +1048,8 @@ A store can make the following assumption on the structures of the keys it will 
 
 
 - List operations ``list_dir`` will always be passed keys ending with a trailing slash, that is to say it will only be asked to work with complete node names. 
+
+Store implementation can assume they will only be given trailing slashes, and protocol implementation Must pass trailing slashes to underlying stores.
 
 
 The store operations are grouped into three sets of capabilities:
