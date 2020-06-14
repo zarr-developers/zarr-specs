@@ -54,19 +54,24 @@ or by making a pull request against the
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
-Goal of v3 spec
-===============
+Goal of v3 spec and main difference from v2
+===========================================
 
 Zarr spec v2 was originally designed around local filesystem, but Zarr has
-grown and is now also often deployed on cloud / object storage. Those kind of
+grown and is now regularly deployed on cloud / object storage. Those kind of
 storage have characteristics, capabilities and usage patterns that can widely
-differ from the assumptions of spec v2. V3 will be design to consider online
+differ from the assumptions of spec v2. V3 is design to consider online
 stores in particular we want to achieve the following.
 
- - no assumption that the underlying store have locking ability.
- - ability to do concurrent writes with the assumption that writes from clients will be consistent.
+ - No assumption that the underlying store have locking ability.
+ - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but non atomic.
 
 
+Unlike Zarr spec version 2, the spec V3 have mainly the following difference:
+  - V3 is a flat key-value store instead of an hierarchical store. Hierarchy is implied. 
+  - V3 has an explicit root, while v2 roots and group could not be distinguished. 
+  - Separation of the data and  metadata key space. 
+  - Explicit support for extensions.
 
 
 Document conventions
@@ -328,6 +333,8 @@ identify a data type.
 Core data types
 ---------------
 
+.. endianess disapear
+
 .. list-table:: Data types
    :header-rows: 1
 
@@ -343,27 +350,27 @@ Core data types
      - signed integer
      - 1
      - None
-   * - ``i2``
+   * - ``<i2``
      - signed integer
      - 2
      - little-endian
-   * - ``i4``
+   * - ``<i4``
      - signed integer
      - 4
      - little-endian
-   * - ``i8``
+   * - ``<i8``
      - signed integer
      - 8
      - little-endian
-   * - ``i2``
+   * - ``>i2``
      - signed integer
      - 2
      - big-endian
-   * - ``i4``
+   * - ``>i4``
      - signed integer
      - 4
      - big-endian
-   * - ``i8``
+   * - ``>i8``
      - signed integer
      - 8
      - big-endian
@@ -371,39 +378,39 @@ Core data types
      - signed integer
      - 1
      - None
-   * - ``u2``
+   * - ``<u2``
      - unsigned integer
      - 2
      - little-endian
-   * - ``u4``
+   * - ``<u4``
      - unsigned integer
      - 4
      - little-endian
-   * - ``u8``
+   * - ``<u8``
      - unsigned integer
      - 8
      - little-endian
-   * - ``f2``
+   * - ``<f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - little-endian
-   * - ``f4``
+   * - ``<f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - little-endian
-   * - ``f8``
+   * - ``<f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - little-endian
-   * - ``f2``
+   * - ``>f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - big-endian
-   * - ``f4``
+   * - ``>f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - big-endian
-   * - ``f8``
+   * - ``>f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
@@ -504,15 +511,15 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
 
-The identifier for chunk with grid index (`i`, `j`, `k`, ...) is
+The identifier for chunk with grid index (``i``, ```j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
 using a separator. The default value for the separator is the period
-character ("."), but this may be configured by providing a ``separator``
+character ( by default ``/``), but this may be configured by providing a ``separator``
 value within the ``chunk_grid`` metadata object, see the section on
 `Array metadata`_ below.
 
 For example, in a 3 dimensional array, the identifier for the chunk at
-grid index (1, 23, 45) is the string "1.23.45".
+grid index (1, 23, 45) is the string "1/23/45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
@@ -522,6 +529,11 @@ such that the grid indices may include negative integers, and the
 origin vertex of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
+
+.. note:: A main difference with spec v2 is the default chunk separator
+   changed from ``.`` to ``/`` this help with compatibility with N5 as well as
+   decrease the maximum number of items in hierarchical stores like directory
+   stores.
 
 
 Chunk memory layouts
@@ -706,7 +718,7 @@ containing the following names:
     an appropriate error raised.
 
     TODO: can we have must-understand to "true" but limited to a subset of
-    datasets / groups using this extension ? 
+    datasets / groups using this extension ?  Should we also precise read/writes ? Example checksums ?
 
     TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed. 
 
@@ -770,6 +782,8 @@ ignored if not understood::
             }
         ]
     }
+  
+TODO: clarify / test:  do we allow the root to also be a group/array. I don't see any issue with doing so as the entrypoint md has a different name. 
 
 
 Array metadata
@@ -965,6 +979,14 @@ chunking as above, but using an extension data type::
         "attributes": {}
     }
 
+.. note:: 
+   comparison with spec v2, 
+   ``dtype`` have been renamed to ``data_type``, 
+   ``chunk`` have been renamed to ``chunk_grid``, 
+   ``order`` have been renamed to ``chunk_memory_layout``, 
+   ``filters`` have been removed, 
+   ``zarr_format`` have been removed, 
+
 
 Group metadata
 --------------
@@ -996,6 +1018,11 @@ For example, the JSON document below defines an explicit group::
    
    A group does not need a metadata document to exists, see implicit groups.
 
+
+Chunks Metadata
+---------------
+
+Do we want to allow per-chunk metadata ? example checksum (concurrent read/writes).
 
 Metadata encoding
 -----------------
@@ -1249,7 +1276,7 @@ identifier.
     * - Type
       - Path "P"
       - Key for Metadata at path `P`
-    * - Entry-Point metadata (Zarr.json)
+    * - Entry-Point metadata (zarr.json)
       - `n/a`
       - `zarr.json`
     * - Array (Root)
@@ -1311,9 +1338,9 @@ I would suggest to tell store they can assume clients will not try to do the wro
 
 **Create a group**
 
-    To create an explict group at hierarchy path `P`, perform
+    To create an explicit group at hierarchy path `P`, perform
     ``set(group_meta_key(P), value)``, where `value` is the
-    serialisation of a valid group metadata document.
+    serialization of a valid group metadata document.
 
     If `P` is a non-root path then it is **not** necessary to create
     or check for the existence of metadata documents for groups at any
@@ -1374,15 +1401,15 @@ I would suggest to tell store they can assume clients will not try to do the wro
 
     To delete a implicit group. 
       - delete all arrays under this group
-      - it should be sufficient to deleta all the keys starting with prefix meta/P/ and data/P/
+      - it should be sufficient to delete all the keys starting with prefix meta/P/ and data/P/
 
-    To delete an explict group. 
+    To delete an explicit group. 
       - delete all arrays under this group, 
       - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix, 
 
-    Note that store implmentation may decide to reify implicit groups and thus protocol implmentation should attempt to delete the .meta/P/.group file if they really wish to delte an empty implicit group. 
+    Note that store implementation may decide to reify implicit groups and thus protocol implementation should attempt to delete the .meta/P/.group file if they really wish to delte an empty implicit group. 
 
-    Store implmentation are also allowed to delete any implicit parent of a deleted implicit groups, so a protocol implmentation should make sure to reify a parent group if they need to keep it.
+    Store implementation are also allowed to delete any implicit parent of a deleted implicit groups, so a protocol implementation should make sure to reify a parent group if they need to keep it.
 
 
 
@@ -1390,8 +1417,8 @@ I would suggest to tell store they can assume clients will not try to do the wro
 **Determine if a node exists**
 
     To determine if a node exists at path `P`, perform `exist()` 
-    exists is tricky, you can querry `meta/P.*`, as P might be implicit, 
-    so you need to querry both `meta/P.*` and `meta/P/*`.
+    exists is tricky, you can query `meta/P.*`, as P might be implicit, 
+    so you need to query both `meta/P.*` and `meta/P/*`.
 
 
 
