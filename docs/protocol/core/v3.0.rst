@@ -511,7 +511,7 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
 
-The identifier for chunk with grid index (``i``, ```j``, ``k``, ...) is
+The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
 using a separator. The default value for the separator is the period
 character ( by default ``/``), but this may be configured by providing a ``separator``
@@ -838,10 +838,10 @@ following names:
     The chunk grid of the Zarr array. If the chunk grid is a regular
     chunk grid as defined in this specification, then the value must
     be an object with the names ``type`` and ``chunk_shape``. The
-    value of ``type`` must be the string "regular", and the value of
+    value of ``type`` must be the string ``"regular"``, and the value of
     ``chunk_shape`` must be an array of integers providing the lengths
     of the chunk along each dimension of the array. For example,
-    ``{"type": "regular", "chunk_shape": [2, 5]}`` means a regular
+    ``{"type": "regular", "chunk_shape": [2, 5], "separator":"/"}`` means a regular
     grid where the chunks have length 2 along the first dimension and
     length 5 along the second dimension.
 
@@ -935,7 +935,8 @@ compressed using gzip compression prior to storage::
         "data_type": "<f8",
         "chunk_grid": {
             "type": "regular",
-            "chunk_shape": [1000, 100]
+            "chunk_shape": [1000, 100], 
+            "separator" : "/"
         },
         "chunk_memory_layout": "C",
         "compressor": {
@@ -965,7 +966,8 @@ chunking as above, but using an extension data type::
         },
         "chunk_grid": {
             "type": "regular",
-            "chunk_shape": [1000, 100]
+            "chunk_shape": [1000, 100],
+            "separator" : "/"
         },
         "chunk_memory_layout": "C",
         "compressor": {
