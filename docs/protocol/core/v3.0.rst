@@ -982,7 +982,7 @@ chunking as above, but using an extension data type::
 .. note:: 
    comparison with spec v2, 
    ``dtype`` have been renamed to ``data_type``, 
-   ``chunk`` have been renamed to ``chunk_grid``, 
+   ``chunks`` have been renamed to ``chunk_grid``, 
    ``order`` have been renamed to ``chunk_memory_layout``, 
    ``filters`` have been removed, 
    ``zarr_format`` have been removed, 
