@@ -960,6 +960,11 @@ which do not contain the character "/" after the given prefix.
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
 
+Note that because keys are case sensitive, it is assumed that the operations 
+``set("foo", a)`` and ``set("FOO", b)`` will result in two separate (key, value) 
+pairs being stored. Subsequently ``get("foo")`` will return *a* and ``get("bar")`` 
+will return *b*. 
+
 
 Store implementations
 ---------------------
