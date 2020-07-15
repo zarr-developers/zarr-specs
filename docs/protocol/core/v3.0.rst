@@ -1187,6 +1187,11 @@ which do not contain the character "/" after the given prefix.
     ``/``, ``.json``, ``.array``, ``.group``, they will otherwise be chunks
     data.
 
+Note that because keys are case sensitive, it is assumed that the operations 
+``set("foo", a)`` and ``set("FOO", b)`` will result in two separate (key, value) 
+pairs being stored. Subsequently ``get("foo")`` will return *a* and ``get("bar")`` 
+will return *b*. 
+
 
 Store implementations
 ---------------------
