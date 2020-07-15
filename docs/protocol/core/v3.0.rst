@@ -319,7 +319,7 @@ node names:
 
 * must be at most 255 characters long
 
-Node names are case sensitive, i.e., the names "foo" and "FOO" are **not**
+Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
 .. note: 
