@@ -1189,7 +1189,7 @@ which do not contain the character "/" after the given prefix.
 
 Note that because keys are case sensitive, it is assumed that the operations 
 ``set("foo", a)`` and ``set("FOO", b)`` will result in two separate (key, value) 
-pairs being stored. Subsequently ``get("foo")`` will return *a* and ``get("bar")`` 
+pairs being stored. Subsequently ``get("foo")`` will return *a* and ``get("FOO")`` 
 will return *b*. 
 
 
