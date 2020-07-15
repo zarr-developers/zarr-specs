@@ -257,7 +257,7 @@ Node names
 ==========
 
 Except for the root node, each node in a hierarchy must have a name,
-which is a string characters. To ensure consistent behaviour
+which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
 node names:
 
@@ -271,12 +271,16 @@ node names:
 
 * must be at most 255 characters long
 
-Note that node names are used to form storage keys, and that some
-storage systems will perform a case-insensitive comparison of storage
-keys during retrieval. Therefore, within a hierarchy, all nodes within
-a set of sibling nodes must have a name that is unique under
-case-insensitive comparison. E.g., the names "foo" and "FOO" are not
-allowed for sibling nodes.
+Node names are case sensitive, i.e., the names "foo" and "FOO" are **not**
+identical.
+
+.. note: 
+    The Zarr core development team recognises that restricting the set 
+    of allowed characters creates an impediment and bias against users
+    of different languages. We are actively discussing whether the full
+    Unicode character set could be allowed and what technical issues 
+    this would entail. If you have experience or views please comment on
+    `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
 
 
 Data types
@@ -904,7 +908,8 @@ string containing only characters in the ranges ``a-z``, ``A-Z``,
 ``0-9``, or in the set ``/.-_``, and a `value` is any sequence of
 bytes. It is assumed that the store holds (`key`, `value`) pairs, with
 only one such pair for any given `key`. I.e., a store is a mapping
-from keys to values.
+from keys to values. It is also assumed that keys are case sensitive, 
+i.e., the keys "foo" and "FOO" are different.
 
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
