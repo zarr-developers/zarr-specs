@@ -1072,9 +1072,29 @@ A store can make the following assumption on the structures of the keys it will 
 
 
 
-- List operations ``list_dir`` will always be passed keys ending with a trailing slash, that is to say it will only be asked to work with complete node names. 
+- List operations ``list_dir`` will always be passed keys ending with a trailing
+  slash, that is to say it will only be asked to work with complete node names. 
 
-Store implementation can assume they will only be given trailing slashes, and protocol implementation Must pass trailing slashes to underlying stores.
+Store implementation can assume they will only be given trailing slashes, and
+protocol implementation MUST pass trailing slashes to underlying stores.
+
+For example, a store containing the following keys:
+
+ - ``meta/2018/.group``
+ - ``meta/2018-01/.group``
+ - ``meta/2018/bar/.array``
+ - ``data/2018/bar/0.0``
+
+The following queries are invalid:
+  - ``list_dir('201')`` is invalid as ``"201"`` is not an existing node.
+  - ``list_dir('2018')`` is invalid querries as ``"2018"`` does not ends with a ``/``,
+
+This is valid:
+  - ``list_dir('2018/')``
+  - ``list_dir('2018-01/')``
+
+This allows store implementation to avoid having to check for trailing slashes,
+and avoid issues like "list_dir('2018')" to return values likes ``-01``
 
 
 The store operations are grouped into three sets of capabilities:
@@ -1171,6 +1191,20 @@ which do not contain the character "/" after the given prefix.
 
 @TODO : should store return trailing slashes when possible ? 
 
+Like would ``list_dir('mydir')`` returns: 
+   - path1
+   - path2
+   - path3/
+   - path4/
+
+In which case you _know_ that 3,4 are dir or
+
+   - path1
+   - path2
+   - path3
+   - path4
+
+Similar to ``ls -p``
 
 Store implementations
 ---------------------
@@ -1332,7 +1366,7 @@ Also have to think about how to handle that for implicit groups, That is to say
 if /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
 all the parents to make sure they are not datasets.
 
-I would suggest to tell store they can assume clients will not try to do the wrong tihng.
+I would suggest to tell store they can assume clients will not try to do the wrong thing.
 
 **Create a group**
 
