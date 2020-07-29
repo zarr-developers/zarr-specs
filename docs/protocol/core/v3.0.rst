@@ -293,8 +293,6 @@ node names:
 * must not be a string composed only of period characters, e.g. "." or
   ".."
 
-TODO: likely want to reserver names that start with just a single ``.``
-
 * must be at most 255 characters long
 
 Note that node names are used to form storage keys, and that some
@@ -415,27 +413,44 @@ Core data types
      - 8
      - big-endian
    * - ``r*`` (Optional)
-     - raw bits/bytes,  use for extension type fallbacks
-     - variable, given by ``*``, multiple of 8
+     - raw bits,  use for extension type fallbacks
+     - variable, given by ``*``, is not limited to be a multiple of 8.
      - N/A
 
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
 
-Additionally to these base types, an implementation should also handle the raw
-pass through type designated by the lowercase letter ``r`` followed by the
-number of bits as a multiple of 8. For example, ``r8``, ``r104`` should be
-understood as fallback types of respectively 1 and 13 bytes longs, and
-implementation should ensure to pass or accept those types unchanged when using
-extension fallback.
+Additionally to these base types, an implementation should also handle the
+raw/opaque pass through type designated by the lowercase letter ``r`` followed
+by the number of bits. For example, ``r3``, ``r11`` should be understood as
+fallback types of respectively 3 and 11 bytes longs, and implementation should
+ensure to pass or accept those types unchanged when using extension fallback.
+For array whose total length is not a multiple of 8, zarr implementation can
+expect expects a buffer which length is a multiple of 8bits, padded with
+appropriate value at the end, and will in the same way return buffers padded to
+the next multiple of 8 bytes. 
+
+For example, here is a array of 5 elements of opaque type r3 will be stored as
+
+ -  ``AAABBBCC CDDDEEE_``, 3*5 = 15 bits, rounded to 2 bytes, with arbitrary
+   last bit.
+
+ - 103*r11 items would take 1136 bits (142 bytes), with the 3 last bits
+   undefined.
+
+This is meant to help replacing the packbits filter from numcodecs, as well as
+storing categorical data via extension in Zarr v3
+
+
+
 
 Note: currently only fixed size elements are supported as a core data type.
 There are many request for variable length element encoding. There are many
 way to encode variable length and we want to keep flexibility. While we seem
 to agree that for random access the most likely contender is to have two
 arrays, one with the actual variable length data and one with fixed size
-(pointer + length) to the variable size data we do nto want to commit to such
+(pointer + length) to the variable size data we do not want to commit to such
 a structure.
 
 
@@ -693,9 +708,9 @@ containing the following names:
 
 ``metadata_encoding``
 
-    A string containing the MIME type that has been used for encoding
+    A string containing the URI that has been used for encoding
     group and array metadata documents. If JSON encoding is used, this
-    value must be "application/json".
+    value must be ``"https://purl.org/zarr/spec/metadata/json/3.0"``.
 
 ``extensions``
 
@@ -1137,16 +1152,6 @@ operations:
     | Output: set of `keys`
 
 
-TODO: the 2 spec below is ill-defined – or unclear if the prefix doe not have a
-trailing slash. I'm assuming this is meant to only list after a slash to mimic
-v2, but is equivalent to a glob.
-
- - /group/dataset
-   /group2/dataset
-
-  - querying list_prefix or list_dir /group (no trailing slash) does list group2
-
-
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
@@ -1155,31 +1160,34 @@ v2, but is equivalent to a glob.
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
-    Note that ``list_prefix`` may be passed keys that do not end in in slashes
-    in order to find all node names starting with a prefix. 
+    Note behavior of ``list_prefix`` is undefined if ``prefix`` does not ends
+    with a trailing slash ``/`` and store can assume there is as least one key
+    that stars with prefix.
+
+
+    TODO : Unlike ``list_dir`` all keys in list prefix are (likely?) to end up with no
+    slash as they are all terminal (unless you have a dangling implicit group
+    when a store does not cleanup after itself?); also not this in list.
 
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
 
-    | Parameters: `prefix`
+    | Parameters: `prefix`, ends with a trailing slash ``/``
     | Output: set of `keys` and set of `prefixes`
 
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
 
-
-    TODO: i'm thinking on enforcing this one and have a SHOULD or MUST.
-    Stores implementing list dir CAN assume that all keys passed as parameter
-    do end in a trailing slash.
-
-    TODO: how does it behave on non-existing path ? 
+    On non-existing prefix, store may return the empty set.
 
 
-    Store user must ensure that the queries to list_dir do end up in 
 
-    Note: if we lift the requirement on trailing slashes, then doing a prefix
-    search can lead to returning keys in the same hierarchy level but longer name. e.g:
+
+    Note: The requirement on trailing slashes is to avoid 
+    search returning keys in the same hierarchy level but longer name, and
+    potentially expensive logic testing for the present of trailing slash on
+    each query. e.g:
 
      - /meta/foo
      - /meta/foo/dataset
@@ -1189,22 +1197,25 @@ which do not contain the character "/" after the given prefix.
      list_dir('foo/') == 'foo/dataset'
 
 
-@TODO : should store return trailing slashes when possible ? 
+    Stores Must return trailing slashes in key responses when those
+    have prefix of other keys. 
 
-Like would ``list_dir('mydir')`` returns: 
-   - path1
-   - path2
-   - path3/
-   - path4/
+    Like would ``list_dir('mydir')`` returns: 
+       - ``path1``
+       - ``path2``
+       - ``path3/``
+       - ``path4/``
 
-In which case you _know_ that 3,4 are dir or
+    Thus we know that path1, and path2 are terminal objects with data, and that
+    ``path3`` and ``path4``
 
-   - path1
-   - path2
-   - path3
-   - path4
 
-Similar to ``ls -p``
+    Similar to ``ls -p``
+
+    Note: In practice I believe this means that this means keys always ends in
+    ``/``, ``.json``, ``.array``, ``.group``, or otherwise they will be chunks
+    data.
+
 
 Store implementations
 ---------------------
@@ -1423,7 +1434,9 @@ I would suggest to tell store they can assume clients will not try to do the wro
 
 **Discover all nodes in a hierarchy**
 
-    @@TODO
+    To discover all nodes in a hierarchy, one can call ``list("meta/")``.
+     - all keys represent either explicit group or arrays. 
+     - all intermediate prefixes ending in a ``/`` are implicit groups.
 
 **Delete a group or array**
 
@@ -1439,9 +1452,29 @@ I would suggest to tell store they can assume clients will not try to do the wro
       - delete all arrays under this group, 
       - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix, 
 
-    Note that store implementation may decide to reify implicit groups and thus protocol implementation should attempt to delete the .meta/P/.group file if they really wish to delte an empty implicit group. 
+    Note that store implementation may decide to reify implicit groups and thus
+    protocol implementation should attempt to delete the .meta/P/.group file if
+    they really wish to delete an empty implicit group. 
 
-    Store implementation are also allowed to delete any implicit parent of a deleted implicit groups, so a protocol implementation should make sure to reify a parent group if they need to keep it.
+    Store implementation are also allowed to delete any implicit parent of a
+    deleted implicit groups, so a protocol implementation should make sure to
+    reify a parent group if they need to keep it. For example assuming the
+    following:
+
+     >>>  z = new_dataset()
+     >>>  z.create_array('/path/to/array')
+
+     >>>  z.delete_array('/path/to/array')
+
+     This may not be sufficient to delete the group ``/path/to/``, as a store
+     implementation, and thus removing ``/path/to/`` may need an implmentation
+     to explicitly call 
+
+     >>> z.delete_group('/path/to/')
+
+     Even if an explicit group was not explicitly created.
+
+
 
 
 
@@ -1453,8 +1486,6 @@ I would suggest to tell store they can assume clients will not try to do the wro
     so you need to query both `meta/P.*` and `meta/P/*`.
 
 
-
-@@TODO need to describe/explain implicit groups more?
 
 
 Protocol extensions
