@@ -341,7 +341,7 @@ Core data types
      - Size (no. bytes)
      - Byte order
    * - ``bool``
-     - Boolean, with False encoded as ``x00`` and True encoded as ``x01``
+     - Boolean, with False encoded as ``\\x00`` and True encoded as ``\\x01``
      - 1
      - None
    * - ``i1``
@@ -671,6 +671,14 @@ name/value pairs. This section also defines how metadata documents are
 encoded for storage.
 
 
+Only the top level metadata document ``zarr.json`` is guarantied to be json, and
+can be used to defined other format to array-level and group-level metadata
+document; in the case where non-json metadata document are use in a zarr
+hierarchy the following sections on group and array level metadata are
+non-normative; but other metadata format as expected to define some equivalence
+relations with the JSON documents.
+
+
 Entry point metadata
 --------------------
 
@@ -841,7 +849,7 @@ following names:
     metadata ? I'm going to guess a number of things can't won't be able to
     dynamically load extensions so need to know immediately. 
     That would also allow to define datatypes only once on top-level hierarchy.
-    Do we allow multiple version of the same extenions ? 
+    Do we allow multiple version of the same extensions ? 
 
     Restrict extensions types charset/format to not block the core types to be
     extended ? Allow different extension to have same named type in multiple
@@ -1044,11 +1052,6 @@ The entry point metadata document must be encoded as JSON. The array (``*.array`
 group metadata documents (``*.group``s) must be encoded as per the MIME type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
-
-@@TODO more explanation needed?
-Todo questions : How frequent are non-JSON metadata documents ? and how store specific are those. 
-If we allow arbitrary mimetypes, does that precude the sections on arrays and group metadata to be normative ? 
-
 
 Stores
 ======
