@@ -255,7 +255,7 @@ conceptual model underpinning the Zarr protocol.
 
 *Metadata document*
 
-    Each hierarchy_ and array_ is represented by a metadata document,
+    Each array_ in a hierarchy_ is represented by a metadata document,
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
     metadata document will specify the number of dimensions_, shape_,
@@ -642,7 +642,7 @@ Metadata
 
 This section defines the structure of metadata documents for Zarr hierarchies,
 which consists of three types metadata documents: an entry point metadata
-document ( e.g. ``zarr.json``), array metadata documents, and group metadata
+document (``zarr.json``), array metadata documents, and group metadata
 documents. Each type of metadata document is described in the following
 subsections.
 
@@ -790,7 +790,7 @@ Array metadata
 --------------
 
 Each Zarr array in a hierarchy must have an array metadata
-document  (``*.array``). This document must contain a single object with the
+document. This document must contain a single object with the
 following names:
 
 ``shape``
@@ -993,7 +993,7 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object (``*.group``) must contain the 
+A Zarr group metadata object must contain the 
 ``attributes`` name as defined above in the `Array metadata`_ section. All
 other names are reserved for future versions of this specification. See also
 the section on `Protocol extensions`_ below.
@@ -1021,10 +1021,6 @@ For example, the JSON document below defines an explicit group::
    A group does not need a metadata document to exists, see implicit groups.
 
 
-Chunks Metadata
----------------
-
-Do we want to allow per-chunk metadata ? example checksum (concurrent read/writes).
 
 Metadata encoding
 -----------------
@@ -1264,7 +1260,7 @@ grid layout.
 For example, for an array at hierarchy path "/foo/baz", the
 corresponding metadata key is ``meta/root/foo/baz.array``. If the array
 has two dimensions and a regular chunk grid, the data key for the
-chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
+chunk with grid coordinates (0, 0) is "data/foo/baz/0/0".
 
 If the root node is a group, the metadata key is ``meta/root.group``. If
 the root node is an array, the metadata key is "meta/root.array", and
@@ -1294,7 +1290,7 @@ identifier.
       - `/foo`
       - `meta/root/foo.array`
     * - Group
-      - `/foo`
+      - `/foo/bar`
       - `meta/root/foo/bar.group`
     * - Array
       - `/foo/baz`
@@ -1307,12 +1303,12 @@ identifier.
 .. list-table:: Data Storage Key example
     :header-rows: 1
 
-    * - Type
-      - Path `P` of Chunck
-      - Data Key
-    * - Chunk
-      - `/foo/baz/0.0`
-      - `data/foo/baz/0.0`
+    * - Path `P` of array
+      - Chunk grid indices
+      - Data key
+    * - `/foo/baz`
+      - `(0, 0)`
+      - `data/foo/baz/0/0`
 
 
 
