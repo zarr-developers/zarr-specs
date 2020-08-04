@@ -72,6 +72,11 @@ Unlike Zarr spec version 2, the spec V3 have mainly the following difference:
   - V3 has an explicit root, while v2 roots and group could not be distinguished. 
   - Separation of the data and  metadata key space. 
   - Explicit support for extensions.
+  - chunk separator is ``/`` by default.
+
+This means that a store cannot be opened at an arbitrary point, and need to be
+opened at the root. User facing convenience functions could walk up a given
+hierarchy and return a sub-group, but this is not part of the API.
 
 
 Document conventions
@@ -146,6 +151,11 @@ conceptual model underpinning the Zarr protocol.
     "/foo/bar" identifies a node named "bar", whose parent is named
     "foo", whose parent is the root of the hierarchy. The path "/"
     identifies the root node.
+    
+    A path always stars with ``/``.
+
+    QUESTION: do we want to codify that group ``path`` end, can end, or must end
+    in ``/`` ?
 
 .. _dimension:
 .. _dimensions:
@@ -424,14 +434,14 @@ defined by IEEE 754-2008.
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass through type designated by the lowercase letter ``r`` followed
 by the number of bits. For example, ``r3``, ``r11`` should be understood as
-fallback types of respectively 3 and 11 bytes longs, and implementation should
+fallback types of respectively 3 and 11 bits longs, and implementation should
 ensure to pass or accept those types unchanged when using extension fallback.
-For array whose total length is not a multiple of 8, zarr implementation can
+For array whose total length is not a multiple of 8, Zarr implementation can
 expect expects a buffer which length is a multiple of 8bits, padded with
 appropriate value at the end, and will in the same way return buffers padded to
-the next multiple of 8 bytes. 
+the next multiple of 8 bits. 
 
-For example, here is a array of 5 elements of opaque type r3 will be stored as
+For example, here is a array of 5 elements of opaque type ``r3`` will be stored as
 
  -  ``AAABBBCC CDDDEEE_``, 3*5 = 15 bits, rounded to 2 bytes, with arbitrary
    last bit.
@@ -441,8 +451,6 @@ For example, here is a array of 5 elements of opaque type r3 will be stored as
 
 This is meant to help replacing the packbits filter from numcodecs, as well as
 storing categorical data via extension in Zarr v3
-
-
 
 
 Note: currently only fixed size elements are supported as a core data type.
@@ -1049,7 +1057,7 @@ Metadata encoding
 -----------------
 
 The entry point metadata document must be encoded as JSON. The array (``*.array``s) and
-group metadata documents (``*.group``s) must be encoded as per the MIME type given in
+group metadata documents (``*.group``s) must be encoded as per the type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
 
@@ -1085,9 +1093,12 @@ A store can make the following assumption on the structures of the keys it will 
 
 - A key always:
   - start with ``meta/``
-  - starts  with ``data/``
+  - start  with ``data/``
   - is exactly ``zarr.json``.
 
+- Most of the keys:
+  - start with ``meta/root``
+  - start with ``data/root``
 
 
 - List operations ``list_dir`` will always be passed keys ending with a trailing
@@ -1105,7 +1116,7 @@ For example, a store containing the following keys:
 
 The following queries are invalid:
   - ``list_dir('201')`` is invalid as ``"201"`` is not an existing node.
-  - ``list_dir('2018')`` is invalid querries as ``"2018"`` does not ends with a ``/``,
+  - ``list_dir('2018')`` is invalid queries as ``"2018"`` does not ends with a ``/``,
 
 This is valid:
   - ``list_dir('2018/')``
@@ -1144,7 +1155,9 @@ A **writeable store** supports the following operations:
     | Output: None
 
     
-    clients of delete_prefix should pay attention to pass a trailing slash on the key to delete a complete dataset or group, otherwise the store may delete similar keys.
+    Clients of delete_prefix should pay attention to pass a trailing slash on
+    the key to delete a complete dataset or group, otherwise the store may
+    delete similar keys.
 
 A **listable store** supports any one or more of the following
 operations:
@@ -1185,8 +1198,6 @@ which do not contain the character "/" after the given prefix.
     On non-existing prefix, store may return the empty set.
 
 
-
-
     Note: The requirement on trailing slashes is to avoid 
     search returning keys in the same hierarchy level but longer name, and
     potentially expensive logic testing for the present of trailing slash on
@@ -1196,27 +1207,27 @@ which do not contain the character "/" after the given prefix.
      - /meta/foo/dataset
      - /meta/foobar
 
-     list_dir('foo') == 'foo'&'foobar'
-     list_dir('foo/') == 'foo/dataset'
+     list_dir('/meta/foo') == '/meta/foo'&'/meta/foobar'
+     list_dir('/meta/foo/') == '/meta/foo/dataset'
 
 
     Stores Must return trailing slashes in key responses when those
-    have prefix of other keys. 
+    are prefix of other keys. 
 
-    Like would ``list_dir('mydir')`` returns: 
-       - ``path1``
-       - ``path2``
-       - ``path3/``
-       - ``path4/``
+    Like would ``list_dir('/meta/mydir')`` returns: 
+       - ``/meta/path1``
+       - ``/meta/path2``
+       - ``/meta/path3/``
+       - ``/meta/path4/``
 
-    Thus we know that path1, and path2 are terminal objects with data, and that
-    ``path3`` and ``path4``
+    Thus we know that ``path1``, and ``path2`` are terminal objects with data,
+    and that ``/meta/path3`` and ``/meta/path4``.
 
 
-    Similar to ``ls -p``
+    This is similar to ``ls -p`` on Unix systems.
 
-    Note: In practice I believe this means that this means keys always ends in
-    ``/``, ``.json``, ``.array``, ``.group``, or otherwise they will be chunks
+    Note: In practice this means that this means most returned keys always ends in
+    ``/``, ``.json``, ``.array``, ``.group``, they will otherwise be chunks
     data.
 
 
@@ -1305,6 +1316,9 @@ and ".array". The data key for array chunks is formed by concatenating
 "data", `P`, "/", and the chunk identifier as defined by the chunk
 grid layout.
 
+To get the path ``P`` from a key, either remove the trailing ``.array`` or
+``.group`` as well as the ``meta/root`` prefix.
+
 For example, for an array at hierarchy path "/foo/baz", the
 corresponding metadata key is ``meta/root/foo/baz.array``. If the array
 has two dimensions and a regular chunk grid, the data key for the
@@ -1377,7 +1391,7 @@ TODO: This kinda force creating a group or an array to check whether the same
 key is also a group or an array, which may create some latencies. I'm assuming
 we don't wan to allow both groups and array to be at the same path P right ? 
 Also have to think about how to handle that for implicit groups, That is to say
-if /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
+if path /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
 all the parents to make sure they are not datasets.
 
 I would suggest to tell store they can assume clients will not try to do the wrong thing.
