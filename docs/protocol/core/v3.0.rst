@@ -436,8 +436,8 @@ raw/opaque pass through type designated by the lowercase letter ``r`` followed
 by the number of bits. For example, ``r3``, ``r11`` should be understood as
 fallback types of respectively 3 and 11 bits longs, and implementation should
 ensure to pass or accept those types unchanged when using extension fallback.
-For array whose total length is not a multiple of 8, Zarr implementation can
-expect expects a buffer which length is a multiple of 8bits, padded with
+For array whose total length is not a multiple of 8 bits, Zarr implementation can
+expect a buffer which length is a multiple of 8 bits, padded with
 appropriate value at the end, and will in the same way return buffers padded to
 the next multiple of 8 bits. 
 
@@ -726,7 +726,7 @@ containing the following names:
 
     A string containing the URI that has been used for encoding
     group and array metadata documents. If JSON encoding is used, this
-    value must be ``"https://purl.org/zarr/spec/metadata/json/3.0"``.
+    value must be ``"https://tools.ietf.org/html/rfc8259"``.
 
 ``extensions``
 
@@ -792,7 +792,7 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "application/json",
+        "metadata_encoding": "https://tools.ietf.org/html/rfc8259",
         "extensions": []
     }
 
@@ -802,7 +802,7 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "application/json",
+        "metadata_encoding": "https://tools.ietf.org/html/rfc8259",
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
@@ -1056,8 +1056,8 @@ For example, the JSON document below defines an explicit group::
 Metadata encoding
 -----------------
 
-The entry point metadata document must be encoded as JSON. The array (``*.array``s) and
-group metadata documents (``*.group``s) must be encoded as per the type given in
+The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
+group metadata documents (``*.group`` s) must be encoded as per the type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
 
