@@ -443,7 +443,7 @@ the next multiple of 8 bits.
 
 For example, here is a array of 5 elements of opaque type ``r3`` will be stored as
 
- -  ``AAABBBCC CDDDEEE_``, 3*5 = 15 bits, rounded to 2 bytes, with arbitrary
+ - ``AAABBBCC CDDDEEE_``, 3*5 = 15 bits, rounded to 2 bytes, with arbitrary
    last bit.
 
  - 103*r11 items would take 1136 bits (142 bytes), with the 3 last bits
