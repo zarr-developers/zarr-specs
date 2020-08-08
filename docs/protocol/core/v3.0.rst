@@ -452,14 +452,20 @@ For example, here is a array of 5 elements of opaque type ``r3`` will be stored 
 This is meant to help replacing the packbits filter from numcodecs, as well as
 storing categorical data via extension in Zarr v3
 
+.. note::
 
-Note: currently only fixed size elements are supported as a core data type.
-There are many request for variable length element encoding. There are many
-way to encode variable length and we want to keep flexibility. While we seem
-to agree that for random access the most likely contender is to have two
-arrays, one with the actual variable length data and one with fixed size
-(pointer + length) to the variable size data we do not want to commit to such
-a structure.
+    We are explicitely looking for more feedback and prototypes of code using the ``r*``,
+    raw bits, for various endianess and wether the spec coudl be made clearer. 
+
+.. note::
+
+    currently only fixed size elements are supported as a core data type.
+    There are many request for variable length element encoding. There are many
+    way to encode variable length and we want to keep flexibility. While we seem
+    to agree that for random access the most likely contender is to have two
+    arrays, one with the actual variable length data and one with fixed size
+    (pointer + length) to the variable size data we do not want to commit to such
+    a structure.
 
 
 Chunk grids
@@ -751,7 +757,7 @@ containing the following names:
     TODO: can we have must-understand to "true" but limited to a subset of
     datasets / groups using this extension ?  Should we also precise read/writes ? Example checksums ?
 
-    TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed.
+    TODO : We seem to agree that "must_understand" is too restrictive, and will need to be relaxed.
 
 ..    This seem to be difficult to achieve if there are no locks.
 ..
@@ -764,28 +770,12 @@ containing the following names:
 ..    it is considered a viable trade off that removing extensions from the
 ..    entrypoint metadata requires a full rescan of the hierarchy.
 
-
-
-
-
 ..     suggestion:
-..         affects : "root", "groups", "arrays"
+..         affects : "root", "arrays"
 ..
 ..         affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure.
-..         affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups.
 ..         affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens.
 
-
-
-..    Each extension can also have a field ``requires``, that contain an unordered
-..    list of URI to other extensions specification on which they rely for proper
-..    behavior. Implementation MAY rely on the value of these requires to decide
-..    in which order to load extensions and resolve types. If an extension
-..    requires another one, then implementation should ensure that the required
-..    extension is listed in the top-level extensions field.
-
-.. it seem unclear whether the dependency should be in the spec or handled by implementations,
-.. there are pro and cons to both. It seem like listing the dependencies in the spec is not necessary.
 
 For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
@@ -1372,7 +1362,7 @@ Let "+" be the string concatenation operator.
 
 .. note::
 
-   Store and implmentation can assume that a client will not try to
+   Store and implementation can assume that a client will not try to
    create both an *array* and *group* at the same path, and thus
    may skip check of existance of a group/array of the same name.
 
@@ -1400,11 +1390,17 @@ Let "+" be the string concatenation operator.
 
 **Store element values in an array**
 
-    @@TODO
+    To store element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``set(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata that is
+    or will be stored in ``array_meta_key(P)``. 
 
 **Retrieve element values in an array**
 
-    @@TODO
+    To retrieve element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``get(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata stored at
+    ``array_meta_key(P)``. 
 
 **Discover children of a group**
 
