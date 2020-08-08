@@ -68,9 +68,9 @@ stores in particular we want to achieve the following.
 
 
 Unlike Zarr spec version 2, the spec V3 have mainly the following difference:
-  - V3 is a flat key-value store instead of an hierarchical store. Hierarchy is implied. 
-  - V3 has an explicit root, while v2 roots and group could not be distinguished. 
-  - Separation of the data and  metadata key space. 
+  - V3 is a flat key-value store instead of an hierarchical store. Hierarchy is implied.
+  - V3 has an explicit root, while v2 roots and group could not be distinguished.
+  - Separation of the data and  metadata key space.
   - Explicit support for extensions.
   - chunk separator is ``/`` by default.
 
@@ -151,8 +151,8 @@ conceptual model underpinning the Zarr protocol.
     "/foo/bar" identifies a node named "bar", whose parent is named
     "foo", whose parent is the root of the hierarchy. The path "/"
     identifies the root node.
-    
-    A path always stars with ``/``.
+
+    A path always starts with ``/``.
 
     QUESTION: do we want to codify that group ``path`` end, can end, or must end
     in ``/`` ?
@@ -439,7 +439,7 @@ ensure to pass or accept those types unchanged when using extension fallback.
 For array whose total length is not a multiple of 8 bits, Zarr implementation can
 expect a buffer which length is a multiple of 8 bits, padded with
 appropriate value at the end, and will in the same way return buffers padded to
-the next multiple of 8 bits. 
+the next multiple of 8 bits.
 
 For example, here is a array of 5 elements of opaque type ``r3`` will be stored as
 
@@ -527,7 +527,7 @@ An element of an array with coordinates (`a`, `b`, `c`, ...) will
 occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
 `dz`, ...), where "//" is the floor division operator. The element
 will have coordinates (`a` % `dx`, `b` % `dy`, `c` % `dz`, ...) within
-that chunk, where "%" is the modulo operator. For example, if a 
+that chunk, where "%" is the modulo operator. For example, if a
 3 dimensional array has shape (10, 200, 3000), and has chunk shape
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
 is contained within the chunk at grid index (1, 7, 2) and has coordinates
@@ -611,8 +611,6 @@ Chunk encoding
 An array may be configured with a compressor, which a codec used to
 transform the binary representation of each chunk prior to storage,
 and to reverse the transformation during retrieval.
-
-@@TODO better explanation of chunk encoding
 
 A codec is defined as a pair of algorithms named *encode* and
 *decode*. Both of these algorithms transform a sequence of bytes
@@ -724,9 +722,11 @@ containing the following names:
 
 ``metadata_encoding``
 
-    A string containing the URI that has been used for encoding
-    group and array metadata documents. If JSON encoding is used, this
-    value must be ``"https://tools.ietf.org/html/rfc8259"``.
+    A string containing the URI pointing to a document describing the method
+    used for encoding group and array metadata documents.
+
+    For document using the default JSON encoding and format describe in this document
+    then the value must be ``"https://purl.org/zarr/spec/protocol/core/3.0``.
 
 ``extensions``
 
@@ -751,10 +751,10 @@ containing the following names:
     TODO: can we have must-understand to "true" but limited to a subset of
     datasets / groups using this extension ?  Should we also precise read/writes ? Example checksums ?
 
-    TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed. 
+    TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed.
 
 ..    This seem to be difficult to achieve if there are no locks.
-.. 
+..
 ..    Note: All extensions that are used in a zarr hierarchy must be stored in
 ..    the entry point metadata and implementation should expect to not
 ..    encounter any extensions not defined in the metadata entry points.
@@ -770,10 +770,10 @@ containing the following names:
 
 ..     suggestion:
 ..         affects : "root", "groups", "arrays"
-.. 
-..         affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure. 
-..         affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups. 
-..         affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens. 
+..
+..         affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure.
+..         affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups.
+..         affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens.
 
 
 
@@ -784,7 +784,7 @@ containing the following names:
 ..    requires another one, then implementation should ensure that the required
 ..    extension is listed in the top-level extensions field.
 
-.. it seem unclear whether the dependency should be in the spec or handled by implementations, 
+.. it seem unclear whether the dependency should be in the spec or handled by implementations,
 .. there are pro and cons to both. It seem like listing the dependencies in the spec is not necessary.
 
 For example, below is an entry point metadata document, specifying that
@@ -792,7 +792,7 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "https://tools.ietf.org/html/rfc8259",
+        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
         "extensions": []
     }
 
@@ -802,7 +802,7 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "https://tools.ietf.org/html/rfc8259",
+        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
@@ -813,8 +813,6 @@ ignored if not understood::
             }
         ]
     }
-  
-TODO: clarify / test:  do we allow the root to also be a group/array. I don't see any issue with doing so as the entrypoint md has a different name. 
 
 
 Array metadata
@@ -855,13 +853,13 @@ following names:
 
     TODO: should data_type extension be also available in the entry-point
     metadata ? I'm going to guess a number of things can't won't be able to
-    dynamically load extensions so need to know immediately. 
+    dynamically load extensions so need to know immediately.
     That would also allow to define datatypes only once on top-level hierarchy.
-    Do we allow multiple version of the same extensions ? 
+    Do we allow multiple version of the same extensions ?
 
     Restrict extensions types charset/format to not block the core types to be
     extended ? Allow different extension to have same named type in multiple
-    context and dispatch depending on extension ? 
+    context and dispatch depending on extension ?
 
 
 ``chunk_grid``
@@ -940,7 +938,7 @@ following names:
 
     See the top level metadata extension section for the time being.
 
-    TODO: Add the fact that extensions only affects arrays, and expand on the must-understand. 
+    TODO: Add the fact that extensions only affects arrays, and expand on the must-understand.
     TODO: Example with named dimensions.
 
 ``attributes``
@@ -966,7 +964,7 @@ compressed using gzip compression prior to storage::
         "data_type": "<f8",
         "chunk_grid": {
             "type": "regular",
-            "chunk_shape": [1000, 100], 
+            "chunk_shape": [1000, 100],
             "separator" : "/"
         },
         "chunk_memory_layout": "C",
@@ -1012,19 +1010,19 @@ chunking as above, but using an extension data type::
         "attributes": {}
     }
 
-.. note:: 
-   comparison with spec v2, 
-   ``dtype`` have been renamed to ``data_type``, 
-   ``chunks`` have been renamed to ``chunk_grid``, 
-   ``order`` have been renamed to ``chunk_memory_layout``, 
-   ``filters`` have been removed, 
-   ``zarr_format`` have been removed, 
+.. note::
+   comparison with spec v2,
+   ``dtype`` have been renamed to ``data_type``,
+   ``chunks`` have been renamed to ``chunk_grid``,
+   ``order`` have been renamed to ``chunk_memory_layout``,
+   ``filters`` have been removed,
+   ``zarr_format`` have been removed,
 
 
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the 
+A Zarr group metadata object must contain the
 ``attributes`` name as defined above in the `Array metadata`_ section. All
 other names are reserved for future versions of this specification. See also
 the section on `Protocol extensions`_ below.
@@ -1038,7 +1036,7 @@ For example, the JSON document below defines an explicit group::
         }
     }
 
-.. note:: 
+.. note::
 
    Groups cannot have extensions attached to them as of spec v3.0 Allowing
    groups to have extensions would force any implementation to sequentially
@@ -1048,7 +1046,7 @@ For example, the JSON document below defines an explicit group::
    For the time being groups can only have attributes.
 
 .. note::
-   
+
    A group does not need a metadata document to exists, see implicit groups.
 
 
@@ -1089,7 +1087,7 @@ bytes. It is assumed that the store holds (`key`, `value`) pairs, with
 only one such pair for any given `key`. I.e., a store is a mapping
 from keys to values.
 
-A store can make the following assumption on the structures of the keys it will receive: 
+A store can make the following assumption on the structures of the keys it will receive:
 
 - A key always:
   - start with ``meta/``
@@ -1102,7 +1100,7 @@ A store can make the following assumption on the structures of the keys it will 
 
 
 - List operations ``list_dir`` will always be passed keys ending with a trailing
-  slash, that is to say it will only be asked to work with complete node names. 
+  slash, that is to say it will only be asked to work with complete node names.
 
 Store implementation can assume they will only be given trailing slashes, and
 protocol implementation MUST pass trailing slashes to underlying stores.
@@ -1154,7 +1152,7 @@ A **writeable store** supports the following operations:
     | Parameter: `key`
     | Output: None
 
-    
+
     Clients of delete_prefix should pay attention to pass a trailing slash on
     the key to delete a complete dataset or group, otherwise the store may
     delete similar keys.
@@ -1171,7 +1169,7 @@ operations:
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
-    | Output: set of `keys` with the given `prefix`, 
+    | Output: set of `keys` with the given `prefix`,
 
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
@@ -1198,7 +1196,7 @@ which do not contain the character "/" after the given prefix.
     On non-existing prefix, store may return the empty set.
 
 
-    Note: The requirement on trailing slashes is to avoid 
+    Note: The requirement on trailing slashes is to avoid
     search returning keys in the same hierarchy level but longer name, and
     potentially expensive logic testing for the present of trailing slash on
     each query. e.g:
@@ -1212,9 +1210,9 @@ which do not contain the character "/" after the given prefix.
 
 
     Stores Must return trailing slashes in key responses when those
-    are prefix of other keys. 
+    are prefix of other keys.
 
-    Like would ``list_dir('/meta/mydir')`` returns: 
+    Like would ``list_dir('/meta/mydir')`` returns:
        - ``/meta/path1``
        - ``/meta/path2``
        - ``/meta/path3/``
@@ -1389,7 +1387,7 @@ Let "+" be the string concatenation operator.
 
 TODO: This kinda force creating a group or an array to check whether the same
 key is also a group or an array, which may create some latencies. I'm assuming
-we don't wan to allow both groups and array to be at the same path P right ? 
+we don't wan to allow both groups and array to be at the same path P right ?
 Also have to think about how to handle that for implicit groups, That is to say
 if path /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
 all the parents to make sure they are not datasets.
@@ -1452,26 +1450,26 @@ I would suggest to tell store they can assume clients will not try to do the wro
 **Discover all nodes in a hierarchy**
 
     To discover all nodes in a hierarchy, one can call ``list("meta/")``.
-     - all keys represent either explicit group or arrays. 
+     - all keys represent either explicit group or arrays.
      - all intermediate prefixes ending in a ``/`` are implicit groups.
 
 **Delete a group or array**
 
-    To delete an array it is necessary to 
+    To delete an array it is necessary to
       - delete the metadata document for the array, (meta/P.array)
       - delete all keys which prefix have path pointing to this to this array.  (data/P/\*)
 
-    To delete a implicit group. 
+    To delete a implicit group.
       - delete all arrays under this group
       - it should be sufficient to delete all the keys starting with prefix meta/P/ and data/P/
 
-    To delete an explicit group. 
-      - delete all arrays under this group, 
-      - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix, 
+    To delete an explicit group.
+      - delete all arrays under this group,
+      - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix,
 
     Note that store implementation may decide to reify implicit groups and thus
     protocol implementation should attempt to delete the .meta/P/.group file if
-    they really wish to delete an empty implicit group. 
+    they really wish to delete an empty implicit group.
 
     Store implementation are also allowed to delete any implicit parent of a
     deleted implicit groups, so a protocol implementation should make sure to
@@ -1485,41 +1483,33 @@ I would suggest to tell store they can assume clients will not try to do the wro
 
      This may not be sufficient to delete the group ``/path/to/``, as a store
      implementation, and thus removing ``/path/to/`` may need an implmentation
-     to explicitly call 
+     to explicitly call
 
      >>> z.delete_group('/path/to/')
 
      Even if an explicit group was not explicitly created.
 
-
-
-
-
-
 **Determine if a node exists**
 
-    To determine if a node exists at path `P`, perform `exist()` 
-    exists is tricky, you can query `meta/P.*`, as P might be implicit, 
-    so you need to query both `meta/P.*` and `meta/P/*`.
+    To determine if a node exists at path `P`, you need to check the existence
+    of one of ``get("meta/root"+P+".array")``, ``get("meta/root"+P+".group")``
+    or ``get("meta/root"+P+"/")``.
 
-
+    TODO: this is up to 3 requests, can we decrease this ?
 
 
 Protocol extensions
 ===================
 
-@@TODO define different types of protocol extension.
-
 Many types of extensions can exists for a Zarr Protocol, they can be regrouped
-in mostly 3 categories: 
+in mostly 3 categories:
 
  - Core Datatypes Extensions – for example adding ability store fixed size
-   types like complex and datetime in chunks. 
+   types like complex and datetime in chunks.
    - this seem to split into two categories: Purely declarative, and more complex.
  - Arrays Extensions – Non rectilinear grids, and
-   variable length types. 
- - Group extensions – Better understanding of a group layout : example pyramidal
-   resolution.
+   variable length types.
+ - There are no group extensions as as Zarr v3.0
 
   see https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
