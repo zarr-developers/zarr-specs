@@ -78,6 +78,18 @@ This means that a store cannot be opened at an arbitrary point, and need to be
 opened at the root. User facing convenience functions could walk up a given
 hierarchy and return a sub-group, but this is not part of the API.
 
+Questions that still need to be resolved
+----------------------------------------
+
+ - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
+ - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions ans
+   see how far we can go. List of extensions to implement: 
+    - Boolean
+    - Complex
+    - Datetime
+    - Named dimensions
+    
+
 
 Document conventions
 ====================
@@ -752,40 +764,6 @@ containing the following names:
     datasets / groups using this extension ?  Should we also precise read/writes ? Example checksums ?
 
     TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed.
-
-..    This seem to be difficult to achieve if there are no locks.
-..
-..    Note: All extensions that are used in a zarr hierarchy must be stored in
-..    the entry point metadata and implementation should expect to not
-..    encounter any extensions not defined in the metadata entry points.
-..    Implementation must ensure that any data written using an extension have
-..    this extension added to the top level entry point. The entry point
-..    metadata may contain extensions that are not in use in the hierarchy and
-..    it is considered a viable trade off that removing extensions from the
-..    entrypoint metadata requires a full rescan of the hierarchy.
-
-
-
-
-
-..     suggestion:
-..         affects : "root", "groups", "arrays"
-..
-..         affects: root : This extension is necessary to understand the complete layout of this hierarchy. For example the groups themselves have a specific structure.
-..         affects: groups: This extension may only affect some groups, implementation may decide to only bail out when encountering groups that need this extension to be understood, or lazily load this extension when entering those groups. Example Multiresolution convention in groups.
-..         affects: arrays: This extension will only affect understanding the arras storage or layout, browsing the hierachy still make sens.
-
-
-
-..    Each extension can also have a field ``requires``, that contain an unordered
-..    list of URI to other extensions specification on which they rely for proper
-..    behavior. Implementation MAY rely on the value of these requires to decide
-..    in which order to load extensions and resolve types. If an extension
-..    requires another one, then implementation should ensure that the required
-..    extension is listed in the top-level extensions field.
-
-.. it seem unclear whether the dependency should be in the spec or handled by implementations,
-.. there are pro and cons to both. It seem like listing the dependencies in the spec is not necessary.
 
 For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
@@ -1502,16 +1480,17 @@ Protocol extensions
 ===================
 
 Many types of extensions can exists for a Zarr Protocol, they can be regrouped
-in mostly 3 categories:
+in mostly 2 categories:
 
  - Core Datatypes Extensions – for example adding ability store fixed size
    types like complex and datetime in chunks.
    - this seem to split into two categories: Purely declarative, and more complex.
  - Arrays Extensions – Non rectilinear grids, and
    variable length types.
- - There are no group extensions as as Zarr v3.0
 
-  see https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
+There are no group extensions as as Zarr v3.0
+
+See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
 
 References
