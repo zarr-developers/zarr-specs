@@ -1,7 +1,5 @@
 .. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
 
-
-
 ==================================
  Zarr core protocol (version 3.0)
 ==================================
@@ -84,6 +82,7 @@ Questions that still need to be resolved
  - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
  - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions ans
    see how far we can go. List of extensions to implement: 
+   
     - Boolean
     - Complex
     - Datetime
@@ -352,8 +351,6 @@ identify a data type.
 
 Core data types
 ---------------
-
-.. endianess disapear
 
 .. list-table:: Data types
    :header-rows: 1
