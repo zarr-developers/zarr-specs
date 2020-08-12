@@ -464,14 +464,20 @@ For example, here is a array of 5 elements of opaque type ``r3`` will be stored 
 This is meant to help replacing the packbits filter from numcodecs, as well as
 storing categorical data via extension in Zarr v3
 
+.. note::
 
-Note: currently only fixed size elements are supported as a core data type.
-There are many request for variable length element encoding. There are many
-way to encode variable length and we want to keep flexibility. While we seem
-to agree that for random access the most likely contender is to have two
-arrays, one with the actual variable length data and one with fixed size
-(pointer + length) to the variable size data we do not want to commit to such
-a structure.
+    We are explicitely looking for more feedback and prototypes of code using the ``r*``,
+    raw bits, for various endianess and wether the spec coudl be made clearer. 
+
+.. note::
+
+    currently only fixed size elements are supported as a core data type.
+    There are many request for variable length element encoding. There are many
+    way to encode variable length and we want to keep flexibility. While we seem
+    to agree that for random access the most likely contender is to have two
+    arrays, one with the actual variable length data and one with fixed size
+    (pointer + length) to the variable size data we do not want to commit to such
+    a structure.
 
 
 Chunk grids
@@ -763,7 +769,7 @@ containing the following names:
     TODO: can we have must-understand to "true" but limited to a subset of
     datasets / groups using this extension ?  Should we also precise read/writes ? Example checksums ?
 
-    TODO : We seem to agree that "must_understand" is too restrictive,and will need to be relaxed.
+    TODO : We seem to agree that "must_understand" is too restrictive, and will need to be relaxed.
 
 For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
@@ -828,17 +834,6 @@ following names:
     then the implementation may proceed using the ``fallback`` value
     as the data type. For fallback types that do not correspond to base
     known types, extensions can fallback on on a raw number of bytes using
-
-    TODO: should data_type extension be also available in the entry-point
-    metadata ? I'm going to guess a number of things can't won't be able to
-    dynamically load extensions so need to know immediately.
-    That would also allow to define datatypes only once on top-level hierarchy.
-    Do we allow multiple version of the same extensions ?
-
-    Restrict extensions types charset/format to not block the core types to be
-    extended ? Allow different extension to have same named type in multiple
-    context and dispatch depending on extension ?
-
 
 ``chunk_grid``
 
@@ -915,7 +910,7 @@ following names:
 ``extensions``
 
     See the top level metadata extension section for the time being.
-
+    
     TODO: Add the fact that extensions only affects arrays, and expand on the must-understand.
     TODO: Example with named dimensions.
 
@@ -1157,10 +1152,6 @@ operations:
     that stars with prefix.
 
 
-    TODO : Unlike ``list_dir`` all keys in list prefix are (likely?) to end up with no
-    slash as they are all terminal (unless you have a dangling implicit group
-    when a store does not cleanup after itself?); also not this in list.
-
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
 
@@ -1363,14 +1354,11 @@ with grid coordinates (`i`, `j`, ...).
 
 Let "+" be the string concatenation operator.
 
-TODO: This kinda force creating a group or an array to check whether the same
-key is also a group or an array, which may create some latencies. I'm assuming
-we don't wan to allow both groups and array to be at the same path P right ?
-Also have to think about how to handle that for implicit groups, That is to say
-if path /g1/ is a array and we want to create /g1/g2/g3/g4/dataset, we need to check
-all the parents to make sure they are not datasets.
+.. note::
 
-I would suggest to tell store they can assume clients will not try to do the wrong thing.
+   Store and implementation can assume that a client will not try to
+   create both an *array* and *group* at the same path, and thus
+   may skip check of existance of a group/array of the same name.
 
 **Create a group**
 
@@ -1396,11 +1384,17 @@ I would suggest to tell store they can assume clients will not try to do the wro
 
 **Store element values in an array**
 
-    @@TODO
+    To store element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``set(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata that is
+    or will be stored in ``array_meta_key(P)``. 
 
 **Retrieve element values in an array**
 
-    @@TODO
+    To retrieve element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``get(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata stored at
+    ``array_meta_key(P)``. 
 
 **Discover children of a group**
 
@@ -1473,7 +1467,8 @@ I would suggest to tell store they can assume clients will not try to do the wro
     of one of ``get("meta/root"+P+".array")``, ``get("meta/root"+P+".group")``
     or ``get("meta/root"+P+"/")``.
 
-    TODO: this is up to 3 requests, can we decrease this ?
+    .. note::
+       For listable store, ``listdir(parent(P))`` can be an alternative.
 
 
 Protocol extensions
