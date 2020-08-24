@@ -433,7 +433,7 @@ Core data types
      - big-endian
    * - ``r*`` (Optional)
      - raw bits,  use for extension type fallbacks
-     - variable, given by ``*``, is not limited to be a multiple of 8.
+     - variable, given by ``*``, is limited to be a multiple of 8.
      - N/A
 
 
@@ -442,24 +442,12 @@ defined by IEEE 754-2008.
 
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass through type designated by the lowercase letter ``r`` followed
-by the number of bits. For example, ``r3``, ``r11`` should be understood as
-fallback types of respectively 3 and 11 bits longs, and implementation should
-ensure to pass or accept those types unchanged when using extension fallback.
-For array whose total length is not a multiple of 8 bits, Zarr implementation can
-expect a buffer which length is a multiple of 8 bits, padded with
-appropriate value at the end, and will in the same way return buffers padded to
-the next multiple of 8 bits.
+by the number of bits, multiple of 8. For example, ``r8``, ``r16``, ``r24``
+should be understood as fallback types of respectively 1, 2, and 3 bytes long.
 
-For example, here is a array of 5 elements of opaque type ``r3`` will be stored as
+Zarr v3.0 is limited to types lenght that are multiple of 8 bits but may open
+other values in later version of the spec.
 
- - ``AAABBBCC CDDDEEE_``, 3*5 = 15 bits, rounded to 2 bytes, with arbitrary
-   last bit.
-
- - 103*r11 items would take 1136 bits (142 bytes), with the 3 last bits
-   undefined.
-
-This is meant to help replacing the packbits filter from numcodecs, as well as
-storing categorical data via extension in Zarr v3
 
 .. note::
 
