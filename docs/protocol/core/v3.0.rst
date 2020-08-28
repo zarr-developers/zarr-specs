@@ -52,22 +52,22 @@ or by making a pull request against the
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
-Goal of v3 spec and main difference from v2
+Goal of v3 spec and main difference with v2
 ===========================================
 
 Zarr spec v2 was originally designed around local filesystem, but Zarr has
 grown and is now regularly deployed on cloud / object storage. Those kind of
 storage have characteristics, capabilities and usage patterns that can widely
-differ from the assumptions of spec v2. V3 is design to consider online
-stores in particular we want to achieve the following.
+differ from the assumptions of spec v2. V3 is designed to consider online
+stores, in particular we want to achieve the following:
 
- - No assumption that the underlying store have locking ability.
- - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but non atomic.
+ - No assumption that the underlying store has locking ability.
+ - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but not atomic.
 
 
-Unlike Zarr spec version 2, the spec V3 have mainly the following difference:
-  - V3 is a flat key-value store instead of an hierarchical store. Hierarchy is implied.
-  - V3 has an explicit root, while v2 roots and group could not be distinguished.
+Unlike Zarr spec v2, the spec v3 has mainly the following differences:
+  - V3 is a flat key-value store instead of a hierarchical store. Hierarchy is implied.
+  - V3 has an explicit root, while v2 roots and groups could not be distinguished.
   - Separation of the data and  metadata key space.
   - Explicit support for extensions.
   - chunk separator is ``/`` by default.
