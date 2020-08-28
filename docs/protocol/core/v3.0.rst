@@ -392,7 +392,7 @@ Core data types
      - 8
      - big-endian
    * - ``u1``
-     - signed integer
+     - unsigned integer
      - 1
      - None
    * - ``<u2``
