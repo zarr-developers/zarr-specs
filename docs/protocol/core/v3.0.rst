@@ -302,7 +302,7 @@ Node names
 ==========
 
 Except for the root node, each node in a hierarchy must have a name,
-which is a string characters. To ensure consistent behaviour
+which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
 node names:
 
