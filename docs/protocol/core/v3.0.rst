@@ -139,6 +139,9 @@ conceptual model underpinning the Zarr protocol.
     elements_ in an array conform to the same `data type`_. An array
     may not have child nodes.
 
+    TODO: clarify how arrays with 0 dimension are store, and in particular what should be done WRT chunk naming, and how
+    a 1d array of 1 elelement differs from a scalar.
+
 .. _name:
 .. _names:
 
