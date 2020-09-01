@@ -72,8 +72,8 @@ Unlike Zarr spec v2, the spec v3 has mainly the following differences:
   - Explicit support for extensions.
   - chunk separator is ``/`` by default.
 
-This means that a store cannot be opened at an arbitrary point, and need to be
-opened at the root. User facing convenience functions could walk up a given
+This means that a store cannot be opened at an arbitrary point, but needs to be
+opened at the root. User facing convenience functions could walk a given
 hierarchy and return a sub-group, but this is not part of the API.
 
 Questions that still need to be resolved
@@ -305,7 +305,7 @@ Node names
 ==========
 
 Except for the root node, each node in a hierarchy must have a name,
-which is a string characters. To ensure consistent behaviour
+which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
 node names:
 
