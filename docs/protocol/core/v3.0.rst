@@ -80,14 +80,13 @@ Questions that still need to be resolved
 ----------------------------------------
 
  - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
- - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions ans
+ - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions and
    see how far we can go. List of extensions to implement: 
    
     - Boolean
     - Complex
     - Datetime
     - Named dimensions
-    
 
 
 Document conventions
@@ -139,9 +138,6 @@ conceptual model underpinning the Zarr protocol.
     elements_ in an array conform to the same `data type`_. An array
     may not have child nodes.
 
-    TODO: clarify how arrays with 0 dimension are store, and in particular what should be done WRT chunk naming, and how
-    a 1d array of 1 elelement differs from a scalar.
-
 .. _name:
 .. _names:
 
@@ -189,7 +185,8 @@ conceptual model underpinning the Zarr protocol.
     The shape of an array_ is the tuple of dimension_ lengths. For
     example, if an array_ has 2 dimensions_, where the length of the
     first dimension_ is 100 and the length of the second dimension_ is
-    20, then the shape of the array_ is (100, 20).
+    20, then the shape of the array_ is (100, 20). A shape can be the empty
+    tuple in the case of zero-dimension arrays (scalar)
 
 .. _element:
 .. _elements:
@@ -224,7 +221,10 @@ conceptual model underpinning the Zarr protocol.
     hyperrectangle defined by a tuple of intervals, one for each
     dimension_ of the array_. The chunk shape is the tuple of interval
     lengths, and the chunk size (i.e., number of elements_ contained
-    within the chunk) is the product of its interval lengths.
+    within the chunk) is the product of its interval lengths. 
+
+    The chunk shape elements are non-zero when the corresponding dimensions of
+    the arrays are of non-zero length.
 
 .. _grid:
 .. _grids:
@@ -448,8 +448,8 @@ raw/opaque pass through type designated by the lowercase letter ``r`` followed
 by the number of bits, multiple of 8. For example, ``r8``, ``r16``, ``r24``
 should be understood as fallback types of respectively 1, 2, and 3 bytes long.
 
-Zarr v3.0 is limited to types lenght that are multiple of 8 bits but may open
-other values in later version of the spec.
+Zarr v3.0 is limited to types length that are multiple of 8 bits but may open
+other values in later version of this specification.
 
 
 .. note::
@@ -542,13 +542,13 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 
 The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
-using a separator. The default value for the separator is the period
+using a separator and prefixed with the string `'c'`. The default value for the separator is the period
 character ( by default ``/``), but this may be configured by providing a ``separator``
 value within the ``chunk_grid`` metadata object, see the section on
 `Array metadata`_ below.
 
 For example, in a 3 dimensional array, the identifier for the chunk at
-grid index (1, 23, 45) is the string "1/23/45".
+grid index (1, 23, 45) is the string "c1/23/45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
@@ -564,6 +564,9 @@ arbitrary length in a "negative" direction along any dimension.
    decrease the maximum number of items in hierarchical stores like directory
    stores.
 
+.. note:: Arrays may have 0 dimension (when for example representing scalars),
+   in which case the coordinate of a chunk is the empty tuple, and the chunk key
+   will consist of the string `'c'`
 
 Chunk memory layouts
 ====================
@@ -1058,10 +1061,10 @@ protocol implementation MUST pass trailing slashes to underlying stores.
 
 For example, a store containing the following keys:
 
- - ``meta/2018/.group``
- - ``meta/2018-01/.group``
- - ``meta/2018/bar/.array``
- - ``data/2018/bar/0.0``
+ - ``meta/root/2018/.group``
+ - ``meta/root/2018-01/.group``
+ - ``meta/root/2018/bar/.array``
+ - ``data/root/2018/bar/0.0``
 
 The following queries are invalid:
   - ``list_dir('201')`` is invalid as ``"201"`` is not an existing node.
@@ -1072,7 +1075,7 @@ This is valid:
   - ``list_dir('2018-01/')``
 
 This allows store implementation to avoid having to check for trailing slashes,
-and avoid issues like "list_dir('2018')" to return values likes ``-01``
+and avoid issues like "list_dir('2018')" returning values likes ``-01``
 
 
 The store operations are grouped into three sets of capabilities:
@@ -1222,8 +1225,6 @@ create a store implementation spec and contribute it to the `zarr-specs GitHub r
 For an example of a store implementation spec, see the
 :ref:`file-system-store-v1` specification.
 
-@@TODO more info and example.
-
 
 Storage protocol
 ================
@@ -1267,11 +1268,11 @@ To get the path ``P`` from a key, either remove the trailing ``.array`` or
 For example, for an array at hierarchy path "/foo/baz", the
 corresponding metadata key is ``meta/root/foo/baz.array``. If the array
 has two dimensions and a regular chunk grid, the data key for the
-chunk with grid coordinates (0, 0) is "data/foo/baz/0/0".
+chunk with grid coordinates (0, 0) is "data/root/foo/baz/c0/0".
 
 If the root node is a group, the metadata key is ``meta/root.group``. If
 the root node is an array, the metadata key is "meta/root.array", and
-the data keys are formed by concatenating "data/" and the chunk
+the data keys are formed by concatenating "data/root/" and the chunk
 identifier.
 
 
@@ -1315,7 +1316,7 @@ identifier.
       - Data key
     * - `/foo/baz`
       - `(0, 0)`
-      - `data/foo/baz/0/0`
+      - `data/root/foo/baz/c0/0`
 
 
 
@@ -1456,8 +1457,8 @@ Many types of extensions can exists for a Zarr Protocol, they can be regrouped
 in mostly 2 categories:
 
  - Core Datatypes Extensions – for example adding ability store fixed size
-   types like complex and datetime in chunks.
-   - this seem to split into two categories: Purely declarative, and more complex.
+   types like complex and datetime in chunks. These are directly declared in the
+   array metadata ``data_type`` keys.
  - Arrays Extensions – Non rectilinear grids, and
    variable length types.
 
