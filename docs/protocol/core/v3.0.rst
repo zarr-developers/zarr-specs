@@ -542,8 +542,8 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 
 The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
-using a separator and prefixed with the string `'c'`. The default value for the separator is the period
-character ( by default ``/``), but this may be configured by providing a ``separator``
+using a separator and prefixed with the string `'c'`. The default value for the separator is the slash
+character (by default ``/``), but this may be configured by providing a ``separator``
 value within the ``chunk_grid`` metadata object, see the section on
 `Array metadata`_ below.
 
