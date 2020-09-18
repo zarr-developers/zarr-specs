@@ -3,9 +3,9 @@
 ==================================
  Zarr core protocol (version 3.0)
 ==================================
------------------------------
- Editor's draft 25 April 2020
------------------------------
+---------------------------------
+ Editor's draft 18 September 2020
+---------------------------------
 
 Specification URI:
     https://purl.org/zarr/spec/protocol/core/3.0
