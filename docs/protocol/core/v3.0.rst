@@ -52,6 +52,42 @@ or by making a pull request against the
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
+Goal of v3 spec and main difference with v2
+===========================================
+
+Zarr spec v2 was originally designed around local filesystem, but Zarr has
+grown and is now regularly deployed on cloud / object storage. Those kind of
+storage have characteristics, capabilities and usage patterns that can widely
+differ from the assumptions of spec v2. V3 is designed to consider online
+stores, in particular we want to achieve the following:
+
+ - No assumption that the underlying store has locking ability.
+ - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but not atomic.
+
+
+Unlike Zarr spec v2, the spec v3 has mainly the following differences:
+  - V3 is a flat key-value store instead of a hierarchical store. Hierarchy is implied.
+  - V3 has an explicit root, while v2 roots and groups could not be distinguished.
+  - Separation of the data and  metadata key space.
+  - Explicit support for extensions.
+  - chunk separator is ``/`` by default.
+
+This means that a store cannot be opened at an arbitrary point, but needs to be
+opened at the root. User facing convenience functions could walk a given
+hierarchy and return a sub-group, but this is not part of the API.
+
+Questions that still need to be resolved
+----------------------------------------
+
+ - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
+ - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions and
+   see how far we can go. List of extensions to implement: 
+   
+    - Boolean
+    - Complex
+    - Datetime
+    - Named dimensions
+
 
 Document conventions
 ====================
@@ -126,6 +162,11 @@ conceptual model underpinning the Zarr protocol.
     "foo", whose parent is the root of the hierarchy. The path "/"
     identifies the root node.
 
+    A path always starts with ``/``.
+
+    QUESTION: do we want to codify that group ``path`` end, can end, or must end
+    in ``/`` ?
+
 .. _dimension:
 .. _dimensions:
 
@@ -144,7 +185,8 @@ conceptual model underpinning the Zarr protocol.
     The shape of an array_ is the tuple of dimension_ lengths. For
     example, if an array_ has 2 dimensions_, where the length of the
     first dimension_ is 100 and the length of the second dimension_ is
-    20, then the shape of the array_ is (100, 20).
+    20, then the shape of the array_ is (100, 20). A shape can be the empty
+    tuple in the case of zero-dimension arrays (scalar)
 
 .. _element:
 .. _elements:
@@ -179,7 +221,10 @@ conceptual model underpinning the Zarr protocol.
     hyperrectangle defined by a tuple of intervals, one for each
     dimension_ of the array_. The chunk shape is the tuple of interval
     lengths, and the chunk size (i.e., number of elements_ contained
-    within the chunk) is the product of its interval lengths.
+    within the chunk) is the product of its interval lengths. 
+
+    The chunk shape elements are non-zero when the corresponding dimensions of
+    the arrays are of non-zero length.
 
 .. _grid:
 .. _grids:
@@ -234,12 +279,15 @@ conceptual model underpinning the Zarr protocol.
 
 *Metadata document*
 
-    Each node in a hierarchy_ is represented by a metadata document,
+    Each array_ in a hierarchy_ is represented by a metadata document,
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
     metadata document will specify the number of dimensions_, shape_,
     `data type`_, grid_, `memory layout`_ and compressor_ for that
     array_.
+
+    Groups can have a optional metadata document which provide extra
+    information about a group.
 
 .. _store:
 .. _stores:
@@ -257,7 +305,7 @@ Node names
 ==========
 
 Except for the root node, each node in a hierarchy must have a name,
-which is a string characters. To ensure consistent behaviour
+which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
 node names:
 
@@ -314,81 +362,110 @@ Core data types
      - Numerical type
      - Size (no. bytes)
      - Byte order
-   * - `bool`
-     - Boolean, with False encoded as `\\x00` and True encoded as `\\x01`
+   * - ``bool``
+     - Boolean, with False encoded as ``\\x00`` and True encoded as ``\\x01``
      - 1
      - None
-   * - `i1`
-     - signed integer
-     - 1
-     - None
-   * - `<i2`
-     - signed integer
-     - 2
-     - little-endian
-   * - `<i4`
-     - signed integer
-     - 4
-     - little-endian
-   * - `<i8`
-     - signed integer
-     - 8
-     - little-endian
-   * - `>i2`
-     - signed integer
-     - 2
-     - big-endian
-   * - `>i4`
-     - signed integer
-     - 4
-     - big-endian
-   * - `>i8`
-     - signed integer
-     - 8
-     - big-endian
-   * - `u1`
+   * - ``i1``
      - signed integer
      - 1
      - None
-   * - `<u2`
+   * - ``<i2``
+     - signed integer
+     - 2
+     - little-endian
+   * - ``<i4``
+     - signed integer
+     - 4
+     - little-endian
+   * - ``<i8``
+     - signed integer
+     - 8
+     - little-endian
+   * - ``>i2``
+     - signed integer
+     - 2
+     - big-endian
+   * - ``>i4``
+     - signed integer
+     - 4
+     - big-endian
+   * - ``>i8``
+     - signed integer
+     - 8
+     - big-endian
+   * - ``u1``
+     - unsigned integer
+     - 1
+     - None
+   * - ``<u2``
      - unsigned integer
      - 2
      - little-endian
-   * - `<u4`
+   * - ``<u4``
      - unsigned integer
      - 4
      - little-endian
-   * - `<u8`
+   * - ``<u8``
      - unsigned integer
      - 8
      - little-endian
-   * - `<f2`
+   * - ``<f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - little-endian
-   * - `<f4`
+   * - ``<f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - little-endian
-   * - `<f8`
+   * - ``<f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - little-endian
-   * - `>f2`
+   * - ``>f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
      - big-endian
-   * - `>f4`
+   * - ``>f4``
      - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
      - 4
      - big-endian
-   * - `>f8`
+   * - ``>f8``
      - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
      - 8
      - big-endian
+   * - ``r*`` (Optional)
+     - raw bits,  use for extension type fallbacks
+     - variable, given by ``*``, is limited to be a multiple of 8.
+     - N/A
+
 
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
+
+Additionally to these base types, an implementation should also handle the
+raw/opaque pass through type designated by the lowercase letter ``r`` followed
+by the number of bits, multiple of 8. For example, ``r8``, ``r16``, ``r24``
+should be understood as fallback types of respectively 1, 2, and 3 bytes long.
+
+Zarr v3.0 is limited to types length that are multiple of 8 bits but may open
+other values in later version of this specification.
+
+
+.. note::
+
+    We are explicitely looking for more feedback and prototypes of code using the ``r*``,
+    raw bits, for various endianess and wether the spec coudl be made clearer. 
+
+.. note::
+
+    currently only fixed size elements are supported as a core data type.
+    There are many request for variable length element encoding. There are many
+    way to encode variable length and we want to keep flexibility. While we seem
+    to agree that for random access the most likely contender is to have two
+    arrays, one with the actual variable length data and one with fixed size
+    (pointer + length) to the variable size data we do not want to commit to such
+    a structure.
 
 
 Chunk grids
@@ -440,25 +517,38 @@ grid will be (2, 10, 8), meaning that there will be 2 chunks along the
 first dimension, 10 along the second dimension, and 8 along the third
 dimension.
 
+.. list-table:: Regular Grid Example
+    :header-rows: 1
+
+    * - Array Shape
+      - Chunk Shape
+      - Chunk Grid Shape
+      - Notes
+    * - (10, 200, 3000)
+      - (5, 20, 400)
+      - (2, 10, 8)
+      - The grid does overhang the edge of the array on the 3rd dimension.
+
 An element of an array with coordinates (`a`, `b`, `c`, ...) will
 occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
 `dz`, ...), where "//" is the floor division operator. The element
 will have coordinates (`a` % `dx`, `b` % `dy`, `c` % `dz`, ...) within
-that chunk, where "%" is the modulo operator. For example, if a 
+that chunk, where "%" is the modulo operator. For example, if a
 3 dimensional array has shape (10, 200, 3000), and has chunk shape
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
 is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
-The identifier for chunk with grid index (`i`, `j`, `k`, ...) is
+
+The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
-using a separator. The default value for the separator is the period
-character ("."), but this may be configured by providing a ``separator``
+using a separator and prefixed with the string `'c'`. The default value for the separator is the slash
+character (by default ``/``), but this may be configured by providing a ``separator``
 value within the ``chunk_grid`` metadata object, see the section on
 `Array metadata`_ below.
 
 For example, in a 3 dimensional array, the identifier for the chunk at
-grid index (1, 23, 45) is the string "1.23.45".
+grid index (1, 23, 45) is the string "c1/23/45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
@@ -469,6 +559,14 @@ origin vertex of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
 
+.. note:: A main difference with spec v2 is the default chunk separator
+   changed from ``.`` to ``/`` this help with compatibility with N5 as well as
+   decrease the maximum number of items in hierarchical stores like directory
+   stores.
+
+.. note:: Arrays may have 0 dimension (when for example representing scalars),
+   in which case the coordinate of a chunk is the empty tuple, and the chunk key
+   will consist of the string `'c'`
 
 Chunk memory layouts
 ====================
@@ -523,8 +621,6 @@ An array may be configured with a compressor, which a codec used to
 transform the binary representation of each chunk prior to storage,
 and to reverse the transformation during retrieval.
 
-@@TODO better explanation of chunk encoding
-
 A codec is defined as a pair of algorithms named *encode* and
 *decode*. Both of these algorithms transform a sequence of bytes
 (input) into another sequence of bytes (output). The *decode*
@@ -564,8 +660,7 @@ zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
 on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see the Zarr
-community process specification @@TODO Add link once
-https://github.com/zarr-developers/zarr-specs/pull/12 is merged@@.
+community process specification.
 
 Further details of how a compressor is configured for an array are
 given in the section below on `Array metadata`_.
@@ -575,9 +670,10 @@ Metadata
 ========
 
 This section defines the structure of metadata documents for Zarr hierarchies,
-which consists of three types metadata documents: an entry point metadata document,
-array metadata documents, and group metadata documents. Each type of metadata
-document is described in the following subsections.
+which consists of three types metadata documents: an entry point metadata
+document (``zarr.json``), array metadata documents, and group metadata
+documents. Each type of metadata document is described in the following
+subsections.
 
 Metadata documents are defined here using the JSON
 type system defined in [RFC8259]_. In this section, the terms "value",
@@ -587,6 +683,14 @@ defined in [RFC8259]_. The term "array" is also used as defined in
 [RFC8259]_, this section also describes an object as a set of
 name/value pairs. This section also defines how metadata documents are
 encoded for storage.
+
+
+Only the top level metadata document ``zarr.json`` is guarantied to be json, and
+can be used to defined other format to array-level and group-level metadata
+document; in the case where non-json metadata document are use in a zarr
+hierarchy the following sections on group and array level metadata are
+non-normative; but other metadata format as expected to define some equivalence
+relations with the JSON documents.
 
 
 Entry point metadata
@@ -626,9 +730,11 @@ containing the following names:
 
 ``metadata_encoding``
 
-    A string containing the MIME type that has been used for encoding
-    group and array metadata documents. If JSON encoding is used, this
-    value must be "application/json".
+    A string containing the URI pointing to a document describing the method
+    used for encoding group and array metadata documents.
+
+    For document using the default JSON encoding and format describe in this document
+    then the value must be ``"https://purl.org/zarr/spec/protocol/core/3.0``.
 
 ``extensions``
 
@@ -644,9 +750,9 @@ containing the following names:
     extension.
 
     If an implementation of this specification encounters an extension
-    that it does not recognise, but the value of ``must_understand``
+    that it does not recognize, but the value of ``must_understand``
     is ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognised and the value of
+    continue. If the extension is not recognized and the value of
     ``must_understand`` is ``true`` then processing must terminate and
     an appropriate error raised.
 
@@ -655,7 +761,7 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "application/json",
+        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
         "extensions": []
     }
 
@@ -665,7 +771,7 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "application/json",
+        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
@@ -711,17 +817,18 @@ following names:
     identifiers defined in this specification. If an implementation
     does not recognise the extension, but a ``fallback`` is present,
     then the implementation may proceed using the ``fallback`` value
-    as the data type.
+    as the data type. For fallback types that do not correspond to base
+    known types, extensions can fallback on on a raw number of bytes using
 
 ``chunk_grid``
 
     The chunk grid of the Zarr array. If the chunk grid is a regular
     chunk grid as defined in this specification, then the value must
     be an object with the names ``type`` and ``chunk_shape``. The
-    value of ``type`` must be the string "regular", and the value of
+    value of ``type`` must be the string ``"regular"``, and the value of
     ``chunk_shape`` must be an array of integers providing the lengths
     of the chunk along each dimension of the array. For example,
-    ``{"type": "regular", "chunk_shape": [2, 5]}`` means a regular
+    ``{"type": "regular", "chunk_shape": [2, 5], "separator":"/"}`` means a regular
     grid where the chunks have length 2 along the first dimension and
     length 5 along the second dimension.
 
@@ -769,18 +876,26 @@ following names:
     value must be a number with no fraction or exponent part and must
     be within the range of the data type.
 
-    @@TODO what about floating point data types?
-    @@TODO what about nan and inf?
-    @@TODO what about extension data types?
-
     For any data type, if the ``fill_value`` is the literal ``null``
     then the fill value is undefined and the implementation may use
     any arbitrary value that is consistent with the data type as the
     fill value.
 
+    If the ``data_type`` of an array is defined in a ``data_type`` extension,
+    then said extension is responsible for interpreting the value of
+    ``fill_value`` and return a suitable type that can be used.
+
+    For core ``data_type`` which ``fill_value`` are not permitted in JSON or
+    for which decimal representation could be lossy, a string representing of
+    the binary (starting with ``0b``) or hexadecimal value (starting with
+    ``0x``) is accepted. This string must include all leading or trailing
+    zeroes necessary to match the given type size. The string values ``"NaN"``,
+    ``"+Infinity"`` and ``"-Infinity"`` are also understood for floating point datatypes.
+
 ``extensions``
 
-    The value @@TODO
+    See the top level metadata extension section for the time being.
+    
 
 ``attributes``
 
@@ -803,7 +918,8 @@ compressed using gzip compression prior to storage::
         "data_type": "<f8",
         "chunk_grid": {
             "type": "regular",
-            "chunk_shape": [1000, 100]
+            "chunk_shape": [1000, 100],
+            "separator" : "/"
         },
         "chunk_memory_layout": "C",
         "compressor": {
@@ -833,7 +949,8 @@ chunking as above, but using an extension data type::
         },
         "chunk_grid": {
             "type": "regular",
-            "chunk_shape": [1000, 100]
+            "chunk_shape": [1000, 100],
+            "separator" : "/"
         },
         "chunk_memory_layout": "C",
         "compressor": {
@@ -847,36 +964,54 @@ chunking as above, but using an extension data type::
         "attributes": {}
     }
 
+.. note::
+   comparison with spec v2,
+   ``dtype`` have been renamed to ``data_type``,
+   ``chunks`` have been renamed to ``chunk_grid``,
+   ``order`` have been renamed to ``chunk_memory_layout``,
+   ``filters`` have been removed,
+   ``zarr_format`` have been removed,
+
 
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the ``extensions`` and ``attributes``
-names as defined above in the `Array metadata`_ section. All other names
-are reserved for future versions of this specification. See also the section
-on `Protocol extensions`_ below.
+A Zarr group metadata object must contain the
+``attributes`` name as defined above in the `Array metadata`_ section. All
+other names are reserved for future versions of this specification. See also
+the section on `Protocol extensions`_ below.
 
-For example, the JSON document below defines a group::
+For example, the JSON document below defines an explicit group::
 
     {
-        "extensions": [],
         "attributes": {
             "spam": "ham",
             "eggs": 42,
         }
     }
 
+.. note::
+
+   Groups cannot have extensions attached to them as of spec v3.0 Allowing
+   groups to have extensions would force any implementation to sequentially
+   traverse the store hierarchy in order to check for extensions, which would
+   defeat the purpose of a flat namespace and concurrent access.
+
+   For the time being groups can only have attributes.
+
+.. note::
+
+   A group does not need a metadata document to exists, see implicit groups.
+
+
 
 Metadata encoding
 -----------------
 
-The entry point metadata document must be encoded as JSON. The array and
-group metadata documents must be encoded as per the MIME type given in
+The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
+group metadata documents (``*.group`` s) must be encoded as per the type given in
 the ``metadata_encoding`` field in the entry point metadata document
 (described below).
-
-@@TODO more explanation needed?
-
 
 Stores
 ======
@@ -906,6 +1041,43 @@ bytes. It is assumed that the store holds (`key`, `value`) pairs, with
 only one such pair for any given `key`. I.e., a store is a mapping
 from keys to values.
 
+A store can make the following assumption on the structures of the keys it will receive:
+
+- A key always:
+  - start with ``meta/``
+  - start  with ``data/``
+  - is exactly ``zarr.json``.
+
+- Most of the keys:
+  - start with ``meta/root``
+  - start with ``data/root``
+
+
+- List operations ``list_dir`` will always be passed keys ending with a trailing
+  slash, that is to say it will only be asked to work with complete node names.
+
+Store implementation can assume they will only be given trailing slashes, and
+protocol implementation MUST pass trailing slashes to underlying stores.
+
+For example, a store containing the following keys:
+
+ - ``meta/root/2018/.group``
+ - ``meta/root/2018-01/.group``
+ - ``meta/root/2018/bar/.array``
+ - ``data/root/2018/bar/0.0``
+
+The following queries are invalid:
+  - ``list_dir('201')`` is invalid as ``"201"`` is not an existing node.
+  - ``list_dir('2018')`` is invalid queries as ``"2018"`` does not ends with a ``/``,
+
+This is valid:
+  - ``list_dir('2018/')``
+  - ``list_dir('2018-01/')``
+
+This allows store implementation to avoid having to check for trailing slashes,
+and avoid issues like "list_dir('2018')" returning values likes ``-01``
+
+
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
 a store implementation to support all of these capabilities.
@@ -929,6 +1101,16 @@ A **writeable store** supports the following operations:
     | Parameters: `key`
     | Output: none
 
+``delete_prefix`` - Delete all keys with the given prefix from the store, include the prefix itself if it exists as a key:
+
+    | Parameter: `key`
+    | Output: None
+
+
+    Clients of delete_prefix should pay attention to pass a trailing slash on
+    the key to delete a complete dataset or group, otherwise the store may
+    delete similar keys.
+
 A **listable store** supports any one or more of the following
 operations:
 
@@ -937,23 +1119,64 @@ operations:
     | Parameters: none
     | Output: set of `keys`
 
+
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
-    | Output: set of `keys` with the given `prefix`
+    | Output: set of `keys` with the given `prefix`,
 
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
+    Note behavior of ``list_prefix`` is undefined if ``prefix`` does not ends
+    with a trailing slash ``/`` and store can assume there is as least one key
+    that stars with prefix.
+
+
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
 
-    | Parameters: `prefix`
+    | Parameters: `prefix`, ends with a trailing slash ``/``
     | Output: set of `keys` and set of `prefixes`
 
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
     and prefixes "a/d/" and "a/f/".
+
+    On non-existing prefix, store may return the empty set.
+
+
+    Note: The requirement on trailing slashes is to avoid
+    search returning keys in the same hierarchy level but longer name, and
+    potentially expensive logic testing for the present of trailing slash on
+    each query. e.g:
+
+     - /meta/foo
+     - /meta/foo/dataset
+     - /meta/foobar
+
+     list_dir('/meta/foo') == '/meta/foo'&'/meta/foobar'
+     list_dir('/meta/foo/') == '/meta/foo/dataset'
+
+
+    Stores Must return trailing slashes in key responses when those
+    are prefix of other keys.
+
+    Like would ``list_dir('/meta/mydir')`` returns:
+       - ``/meta/path1``
+       - ``/meta/path2``
+       - ``/meta/path3/``
+       - ``/meta/path4/``
+
+    Thus we know that ``path1``, and ``path2`` are terminal objects with data,
+    and that ``/meta/path3`` and ``/meta/path4``.
+
+
+    This is similar to ``ls -p`` on Unix systems.
+
+    Note: In practice this means that this means most returned keys always ends in
+    ``/``, ``.json``, ``.array``, ``.group``, they will otherwise be chunks
+    data.
 
 
 Store implementations
@@ -1002,8 +1225,6 @@ create a store implementation spec and contribute it to the `zarr-specs GitHub r
 For an example of a store implementation spec, see the
 :ref:`file-system-store-v1` specification.
 
-@@TODO more info and example.
-
 
 Storage protocol
 ================
@@ -1026,30 +1247,77 @@ identify ancestor nodes in the hierarchy. For example, the path
 Storage keys
 ------------
 
-The entry point metadata document is stored under the key "zarr.json".
+The entry point metadata document is stored under the key ``zarr.json``.
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating "meta/root", `P`,
-and ".group".
+group metadata document is formed by concatenating ``meta/root``, `P`,
+and ``.group``.
 
-For example, for a group at hierarchy path "/foo/bar", the
-corresponding metadata key is "meta/root/foo/bar.group".
+For example, for a group at hierarchy path ``/foo/bar``, the
+corresponding metadata key is ``meta/root/foo/bar.group``.
 
 For an array at a non-root hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta", `P`,
+the array metadata document is formed by concatenating "meta/root", `P`,
 and ".array". The data key for array chunks is formed by concatenating
 "data", `P`, "/", and the chunk identifier as defined by the chunk
 grid layout.
 
-For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/root/foo/baz.array". If the array
-has two dimensions and a regular chunk grid, the data key for the
-chunk with grid coordinates (0, 0) is "data/foo/baz/0.0".
+To get the path ``P`` from a key, either remove the trailing ``.array`` or
+``.group`` as well as the ``meta/root`` prefix.
 
-If the root node is a group, the metadata key is "meta/root.group". If
+For example, for an array at hierarchy path "/foo/baz", the
+corresponding metadata key is ``meta/root/foo/baz.array``. If the array
+has two dimensions and a regular chunk grid, the data key for the
+chunk with grid coordinates (0, 0) is "data/root/foo/baz/c0/0".
+
+If the root node is a group, the metadata key is ``meta/root.group``. If
 the root node is an array, the metadata key is "meta/root.array", and
-the data keys are formed by concatenating "data/" and the chunk
+the data keys are formed by concatenating "data/root/" and the chunk
 identifier.
+
+
+.. list-table:: Metadata Storage Key example
+    :header-rows: 1
+
+    * - Type
+      - Path "P"
+      - Key for Metadata at path `P`
+    * - Entry-Point metadata (zarr.json)
+      - `n/a`
+      - `zarr.json`
+    * - Array (Root)
+      - `/`
+      - `meta/root.array`
+    * - Group (Root)
+      - `/`
+      - `meta/root.group`
+    * - Group
+      - `/foo`
+      - `meta/root/foo.group`
+    * - Array
+      - `/foo`
+      - `meta/root/foo.array`
+    * - Group
+      - `/foo/bar`
+      - `meta/root/foo/bar.group`
+    * - Array
+      - `/foo/baz`
+      - `meta/root/foo/baz.array`
+
+
+
+
+
+.. list-table:: Data Storage Key example
+    :header-rows: 1
+
+    * - Path `P` of array
+      - Chunk grid indices
+      - Data key
+    * - `/foo/baz`
+      - `(0, 0)`
+      - `data/root/foo/baz/c0/0`
+
 
 
 Protocol operations
@@ -1065,11 +1333,17 @@ with grid coordinates (`i`, `j`, ...).
 
 Let "+" be the string concatenation operator.
 
+.. note::
+
+   Store and implementation can assume that a client will not try to
+   create both an *array* and *group* at the same path, and thus
+   may skip check of existance of a group/array of the same name.
+
 **Create a group**
 
-    To create a group at hierarchy path `P`, perform
+    To create an explicit group at hierarchy path `P`, perform
     ``set(group_meta_key(P), value)``, where `value` is the
-    serialisation of a valid group metadata document.
+    serialization of a valid group metadata document.
 
     If `P` is a non-root path then it is **not** necessary to create
     or check for the existence of metadata documents for groups at any
@@ -1089,11 +1363,17 @@ Let "+" be the string concatenation operator.
 
 **Store element values in an array**
 
-    @@TODO
+    To store element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``set(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata that is
+    or will be stored in ``array_meta_key(P)``. 
 
 **Retrieve element values in an array**
 
-    @@TODO
+    To retrieve element in an array at path `P` and coordinate (`i`, `j`, ...)
+    perform ``get(data_key(P, i, j, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk following the metadata stored at
+    ``array_meta_key(P)``. 
 
 **Discover children of a group**
 
@@ -1120,24 +1400,71 @@ Let "+" be the string concatenation operator.
 
 **Discover all nodes in a hierarchy**
 
-    @@TODO
+    To discover all nodes in a hierarchy, one can call ``list("meta/")``.
+     - all keys represent either explicit group or arrays.
+     - all intermediate prefixes ending in a ``/`` are implicit groups.
 
 **Delete a group or array**
 
-    @@TODO
+    To delete an array it is necessary to
+      - delete the metadata document for the array, (meta/P.array)
+      - delete all keys which prefix have path pointing to this to this array.  (data/P/\*)
+
+    To delete a implicit group.
+      - delete all arrays under this group
+      - it should be sufficient to delete all the keys starting with prefix meta/P/ and data/P/
+
+    To delete an explicit group.
+      - delete all arrays under this group,
+      - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix,
+
+    Note that store implementation may decide to reify implicit groups and thus
+    protocol implementation should attempt to delete the .meta/P/.group file if
+    they really wish to delete an empty implicit group.
+
+    Store implementation are also allowed to delete any implicit parent of a
+    deleted implicit groups, so a protocol implementation should make sure to
+    reify a parent group if they need to keep it. For example assuming the
+    following:
+
+     >>>  z = new_dataset()
+     >>>  z.create_array('/path/to/array')
+
+     >>>  z.delete_array('/path/to/array')
+
+     This may not be sufficient to delete the group ``/path/to/``, as a store
+     implementation, and thus removing ``/path/to/`` may need an implmentation
+     to explicitly call
+
+     >>> z.delete_group('/path/to/')
+
+     Even if an explicit group was not explicitly created.
 
 **Determine if a node exists**
 
-    @@TODO
+    To determine if a node exists at path `P`, you need to check the existence
+    of one of ``get("meta/root"+P+".array")``, ``get("meta/root"+P+".group")``
+    or ``get("meta/root"+P+"/")``.
 
-
-@@TODO need to describe/explain implicit groups more?
+    .. note::
+       For listable store, ``listdir(parent(P))`` can be an alternative.
 
 
 Protocol extensions
 ===================
 
-@@TODO define different types of protocol extension.
+Many types of extensions can exists for a Zarr Protocol, they can be regrouped
+in mostly 2 categories:
+
+ - Core Datatypes Extensions – for example adding ability store fixed size
+   types like complex and datetime in chunks. These are directly declared in the
+   array metadata ``data_type`` keys.
+ - Arrays Extensions – Non rectilinear grids, and
+   variable length types.
+
+There are no group extensions as as Zarr v3.0
+
+See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
 
 References
