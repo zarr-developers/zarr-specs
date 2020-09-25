@@ -789,7 +789,7 @@ Array metadata
 
 Each Zarr array in a hierarchy must have an array metadata
 document. This document must contain a single object with the
-following names:
+following mandatory names:
 
 ``shape``
 
@@ -856,15 +856,6 @@ following names:
     human-readable representation of the specification.  The ``type`` is
     required and the value is defined by the protocol extension.
 
-``compressor``
-
-    Specifies a codec to be used for encoding and decoding chunks. The
-    value must be an object containing the name ``codec`` whose value
-    is a URI that identifies a codec and dereferences to a human
-    readable representation of the codec specification. The codec
-    object may also contain a ``configuration`` name whose value is
-    defined by the corresponding codec specification.
-
 ``fill_value``
 
     Provides an element value to use for uninitialised portions of the
@@ -901,6 +892,19 @@ following names:
 
     The value must be an object. The object may contain any name/value
     pairs.
+
+The following names are optional:
+
+``compressor``
+
+    Specifies a codec to be used for encoding and decoding chunks. The
+    value must be an object containing the name ``codec`` whose value
+    is a URI that identifies a codec and dereferences to a human
+    readable representation of the codec specification. The codec
+    object may also contain a ``configuration`` name whose value is
+    defined by the corresponding codec specification. When the key for this is
+    absent, this signor fies that no compressor has been used.
+
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
