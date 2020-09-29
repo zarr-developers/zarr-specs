@@ -24,7 +24,7 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 Abstract
 ========
 
-This specification defines an codec for chunk compression using Blosc
+This specification defines a codec for chunk compression using Blosc
 
 
 Status of this document
@@ -70,22 +70,23 @@ Chunks are encoded and decoded using the compression algorithm implemented in th
 `C-Blosc library version 2 <https://github.com/Blosc/c-blosc2>`_,
 and encoded data should be stored as it is to file.
 
-The compression level is an integer from 0 to 9 which controls the speed and
-level of compression. A level of 1 is the fastest compression method and
-produces the least compression, while 9 is slowest and produces the most
-compression. Compression is turned off completely when level is 0.
+The compressor can be configured through the following parameters:
 
-The shuffling method is an integer from -1 to 2 which controls the way bytes or
-bits are rearranged, which can lead to a greater compression.
-A value of 1 performs byte-wise shuffling, and a value of 2 performs bit-wise
-shuffling. If a value of -1 is given, then default shuffling is used:
-- bit-wise shuffle will be used for buffers with itemsize 1,
-- byte-wise shuffle will be used otherwise.
-
-Shuffling is turned off completely when the method value is 0.
-
-The size in bytes of the compressed blocks is an integer value which defaults
-to 0, in which case an automatic size will be used.
+- The compression level is an integer from 0 to 9 which controls the speed and
+  level of compression. A level of 1 is the fastest compression method and
+  produces the least compression, while 9 is slowest and produces the most
+  compression. Compression is turned off completely when level is 0.
+- The shuffling method is an integer from -1 to 2 which controls the way bytes or
+  bits are rearranged, which can lead to a greater compression.
+  A value of 1 performs byte-wise shuffling, and a value of 2 performs bit-wise
+  shuffling. If a value of -1 is given, then default shuffling is used: bit-wise
+  shuffling for buffers with item size 1, byte-wise shuffling otherwise.
+  Shuffling is turned off completely when the method value is 0.
+- The size of the compressed blocks is an integer number of bytes. When
+  it is set to 0, an automatic size will be used.
+- The name of the compression algorithm is a string identifier corresponding
+  to one of the algorithms supported by Blosc, e.g. "lz4", "zstd", "blosclz",
+  "zlib" or "snappy".
 
 
 Configuring codec in array metadata
@@ -98,17 +99,18 @@ The Blosc codec can be specified as a compressor for a Zarr array under the
 the Blosc codec defined in this specification is
 https://purl.org/zarr/spec/codecs/blosc/1.0.
 
-Additionally, the compression level and the shuffling method must be specified
+Additionally, the following parameters method must be specified
 in the ``configuration`` metadata name:
 
 - the compression level value is given by the ``clevel`` name.
-- the shuffling method value is given by the ``shuffle`` name (optional).
-- the size of the compressed blocks is given by the ``blocksize`` name
-  (optional).
+- the shuffling method value is given by the ``shuffle`` name.
+- the size of the compressed blocks is given by the ``blocksize`` name.
+- the compression algorithm is given by the ``cname`` name.
 
 For example, the array
 metadata document below specifies a Blosc codec configured with a compression
-level of 1 and a byte-wise shuffling::
+level of 1, a byte-wise shuffling, the ``lz4`` compression algorithm and the
+default block size::
 
 
     {
@@ -116,7 +118,9 @@ level of 1 and a byte-wise shuffling::
             "codec": "https://purl.org/zarr/spec/codecs/blosc/1.0",
             "configuration": {
                 "clevel": 1,
-                "shuffle": 2
+                "shuffle": 1,
+                "cname": "lz4",
+                "blocksize": 0
             }
         },
     }
