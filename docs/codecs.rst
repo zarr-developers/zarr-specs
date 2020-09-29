@@ -9,3 +9,4 @@ Under construction.
    :caption: Contents:
 
    codecs/gzip/v1.0
+   codecs/blosc/v1.0

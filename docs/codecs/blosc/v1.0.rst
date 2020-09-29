@@ -1,0 +1,137 @@
+=========================
+Blosc Codec (version 1.0)
+=========================
+---------------------------------
+ Editor's draft 29 September 2020
+---------------------------------
+
+Specification URI:
+    https://purl.org/zarr/spec/codecs/blosc/1.0
+Issue tracking:
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codecs-blosc-v1.0>`_
+Suggest an edit for this spec:
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/codecs/blosc/v1.0.rst>`_
+
+Copyright 2020 `Zarr core development
+team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
+list institutions?). This work is licensed under a `Creative Commons
+Attribution 3.0 Unported
+License <https://creativecommons.org/licenses/by/3.0/>`_.
+
+----
+
+
+Abstract
+========
+
+This specification defines an codec for chunk compression using Blosc
+
+
+Status of this document
+=======================
+
+This document is a **Work in Progress**. It may be updated, replaced
+or obsoleted by other documents at any time. It is inappapropriate to
+cite this document as other than work in progress.
+
+Comments, questions or contributions to this document are very
+welcome. Comments and questions should be raised via `GitHub issues
+<https://github.com/zarr-developers/zarr-specs/labels/codecs-blosc-v1.0>`_. When
+raising an issue, please add the label "codecs-blosc-v1.0".
+
+This document was produced by the `Zarr core development team
+<https://github.com/orgs/zarr-developers/teams/core-devs>`_.
+
+
+Document conventions
+====================
+
+Conformance requirements are expressed with a combination of
+descriptive assertions and [RFC2119]_ terminology. The key words
+"MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the normative
+parts of this document are to be interpreted as described in
+[RFC2119]_. However, for readability, these words do not appear in all
+uppercase letters in this specification.
+
+All of the text of this specification is normative except sections
+explicitly marked as non-normative, examples, and notes. Examples in
+this specification are introduced with the words "for example".
+
+
+Chunk encoding/decoding with Blosc
+==================================
+
+@@TODO define how chunks are encoded and decoded
+@@TODO be sure to clarify that the encoded data should conform to the Blosc file format
+
+Chunks are encoded and decoded using the compression algorithm implemented in the
+`C-Blosc library version 1 <https://github.com/Blosc/c-blosc>`_ or
+`C-Blosc library version 2 <https://github.com/Blosc/c-blosc2>`_,
+and encoded data should be stored as it is to file.
+
+The compression level is an integer from 0 to 9 which controls the speed and
+level of compression. A level of 1 is the fastest compression method and
+produces the least compression, while 9 is slowest and produces the most
+compression. Compression is turned off completely when level is 0.
+
+The shuffling method is an integer from -1 to 2 which controls the way bytes or
+bits are rearranged, which can lead to a greater compression.
+A value of 1 performs byte-wise shuffling, and a value of 2 performs bit-wise
+shuffling. If a value of -1 is given, then default shuffling is used:
+- bit-wise shuffle will be used for buffers with itemsize 1,
+- byte-wise shuffle will be used otherwise.
+
+Shuffling is turned off completely when the method value is 0.
+
+The size in bytes of the compressed blocks is an integer value which defaults
+to 0, in which case an automatic size will be used.
+
+
+Configuring codec in array metadata
+===================================
+
+@@TODO define how to specify in array metadata documents.
+
+The Blosc codec can be specified as a compressor for a Zarr array under the
+``compressor`` name in the corresponding array metadata document. The URI for
+the Blosc codec defined in this specification is
+https://purl.org/zarr/spec/codecs/blosc/1.0.
+
+Additionally, the compression level and the shuffling method must be specified
+in the ``configuration`` metadata name:
+
+- the compression level value is given by the ``clevel`` name.
+- the shuffling method value is given by the ``shuffle`` name (optional).
+- the size of the compressed blocks is given by the ``blocksize`` name
+  (optional).
+
+For example, the array
+metadata document below specifies a Blosc codec configured with a compression
+level of 1 and a byte-wise shuffling::
+
+
+    {
+        "compressor": {
+            "codec": "https://purl.org/zarr/spec/codecs/blosc/1.0",
+            "configuration": {
+                "clevel": 1,
+                "shuffle": 2
+            }
+        },
+    }
+
+
+References
+==========
+
+.. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
+   Requirement Levels. March 1997. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc2119
+
+
+
+Change log
+==========
+
+@@TODO
