@@ -3,9 +3,9 @@
 ==================================
  Zarr core protocol (version 3.0)
 ==================================
----------------------------------
- Editor's draft 18 September 2020
----------------------------------
+-----------------------------
+ Editor's draft October 2020
+-----------------------------
 
 Specification URI:
     https://purl.org/zarr/spec/protocol/core/3.0
@@ -16,7 +16,7 @@ Issue tracking:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 
-Copyright 2019, 2020 `Zarr core development
+Copyright 2019-Present `Zarr core development
 team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
 list institutions?). This work is licensed under a `Creative Commons
 Attribution 3.0 Unported
