@@ -52,8 +52,8 @@ or by making a pull request against the
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
-Goal of v3 spec and main difference with v2
-===========================================
+Main difference with v2
+=======================
 
 Zarr spec v2 was originally designed around local filesystem, but Zarr has
 grown and is now regularly deployed on cloud / object storage. Those kind of
@@ -64,29 +64,104 @@ stores, in particular we want to achieve the following:
  - No assumption that the underlying store has locking ability.
  - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but not atomic.
 
-
 Unlike Zarr spec v2, the spec v3 has mainly the following differences:
   - V3 is a flat key-value store instead of a hierarchical store. Hierarchy is implied.
   - V3 has an explicit root, while v2 roots and groups could not be distinguished.
   - Separation of the data and  metadata key space.
   - Explicit support for extensions.
   - chunk separator is ``/`` by default.
+  - `".json"` suffix fr the metadata document by default.
 
 This means that a store cannot be opened at an arbitrary point, but needs to be
 opened at the root. User facing convenience functions could walk a given
 hierarchy and return a sub-group, but this is not part of the API.
 
+Goal and Non-Goal of v3 spec with respect to v2 spec
+====================================================
+
+This section is informative and is present to help the reader familiar  with
+previous version of zarr to find and understand the differences and the reasons
+behind them as well as guide the contributor during the draft and review
+period.
+
+Better suitability for HPC file systems and network stores
+----------------------------------------------------------
+
+One goal of the spec v3 is to have a design that minimized the number of
+round-trip operations that must done in order to understand the structure of a
+Zarr store. Especially on highly parallel file system and network stores
+listing keys and accessing metadata can be a expensive – high latency
+– operation. Thus a nested hierarchy listing all available groups, datasets
+and chunks can be a time consuming operation.
+
+The v3 spec tries to separate the metadata, from group and dataset data
+using a prefix, as well as recommend a flatter way of storing keys in order to
+facilitate bulk operations. This should in particular allow to decrease the
+reliance on "metadata consolidation" seen with zarr v2.
+
+Another related changes is the notion of implicit groups created when a dataset
+or chunk can be written via its full path even when the intermediate groups do
+not exists. This allow lock-free write operation for non-contending
+applications without the need for extra operations and round trip to create or
+check existence of intermediate groups.
+
+Consideration of multiple programming languages
+-----------------------------------------------
+
+Zarr spec v3 has an explicit goal of having better compatibility and easier
+implementation with programming languages other then Python. Thus a number of
+core features in previous spec have been relegated to extensions for the time
+being. This include in particular a reduction of the number of datatypes that
+are available in core.
+
+Compatibility with the N5 project
+---------------------------------
+
+The `N5 project <https://github.com/saalfeldlab/n5>`_ and Zarr have similar
+goals. One of the goal of Zarr Spec v3 is to provide compatibility for Most of
+Zarr v2 and N5 users in order to allow consolidation under the v3 spec with the
+end goal of merging the two projects.
+
+Extensibility
+-------------
+
+One of the Non-goal of Zarr Spec V3 is to cover all use cases in the core, and
+to provide a path forward for extensibility and future standardisation of
+extensions without the need to rely on the Zarr core team. A challenge is to
+make sure implementations of the Zarr protocol for which used extension are not
+available can still give user access to data without triggering corruption when
+possible.
+
+
 Questions that still need to be resolved
 ----------------------------------------
+
+We solicit feedback on the following area during the RFC period of this first
+draft.
 
  - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
  - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions and
    see how far we can go. List of extensions to implement: 
    
-    - Boolean
-    - Complex
-    - Datetime
-    - Named dimensions
+      - Boolean
+      - Complex
+      - Datetime
+      - Named dimensions
+      - Awkward arrasy
+        
+   See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
+   the topic. 
+
+  - Node name case sensitivity: The node name is now case sensitive, this may
+    make store implementation more complicated as backed might not be (like some
+    specific filesystem / objet store), and we may want to recommend a standard
+    escaping mechanism in those case.https://github.com/zarr-developers/zarr-specs/issues/57
+
+  - Nodename character set: Same as above but unlike the previous point where we
+    solicit feedback on wither store implementation should support full unicode. 
+    https://github.com/zarr-developers/zarr-specs/issues/56
+
+  - Should named dimensions be part of the core metadata spec ? https://github.com/zarr-developers/zarr-specs/issues/73
 
 
 Document conventions
@@ -299,62 +374,6 @@ conceptual model underpinning the Zarr protocol.
     store types to be used, this specification defines an `Abstract store
     interface`_ which is a common set of operations that stores may
     provide.
-
-
-Goal and Non-Goal of v3 spec with respect to v2 spec
-====================================================
-
-This section is informative and is present to help the reader familiar  with
-previous version of zarr to find and understand the differences and the reasons
-behind them as well as guide the contributor during the draft and review
-period.
-
-Better suitability for HPC file systems and network stores
-----------------------------------------------------------
-
-One goal of the spec v3 is to have a design that minimized the number of
-round-trip operations that must done in order to understand the structure of a
-Zarr store. Especially on highly parallel file system and network stores
-listing keys and accessing metadata can be a expensive – high latency
-– operation. Thus is a nested hierarchy listing all available groups, datasets
-and chunks can be a time consuming operation.
-
-The v3 spec thus tried to separate the metadata, from group and dataset data
-using a prefix, as well as recommend a flatter way of storing keys in order to
-facilitate bulk operations. This should in particular allow to decrease the
-reliance on "metadata consolidation" seen with zarr v2.
-
-Another related changes is the notion of implicit groups created when a dataset
-or chunk can be written via its full path even when the intermediate groups do
-not exists. This allow lock-free write operation for non-contending
-applications without the need for extra operations and round trip to create or
-check existence of intermediate groups.
-
-Consideration of multiple programming languages
------------------------------------------------
-
-Zarr spec v3 has an explicit goal of having better compatibility and easier
-implementation with programming languages other then Python. Thus a number of
-core features in previous spec have been relegated to extensions for the time
-being. This include in particular a reduction of the number of datatypes that
-are available in core.
-
-Compatibility with the N5 project
----------------------------------
-
-The `N5 project <https://github.com/saalfeldlab/n5>`_ and Zarr have similar
-goals. One of the goal of Zarr Spec v3 is to provide compatibility for Most of
-Zarr v2 and N5 users in order to allow consolidation under the v3 spec with the
-end goal of merging the two projects.
-
-Extensibility
--------------
-
-One of the Non-goal of Zarr Spec V3 is to cover all use cases, and to provide a
-path forward for extensibility and future standardisation of extensions without
-the need to rely on the Zarr core team. A challenge is to make sure
-implementations of the Zarr protocol for which used extension are not available
-can still give user access to data without triggering corruption when possible.
 
 
 Node names
