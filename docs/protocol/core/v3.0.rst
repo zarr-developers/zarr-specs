@@ -736,6 +736,16 @@ containing the following names:
     For document using the default JSON encoding and format describe in this document
     then the value must be ``"https://purl.org/zarr/spec/protocol/core/3.0``.
 
+``metadata_key_suffix``
+
+    A string containing a suffix to add to the metadata keys when saving into
+    the store. By default ``".json"``.
+
+    .. note::
+
+      This suffix is used is used to allow non hierarchy
+      browsing and edditign by non-zarr-aware tools.
+
 ``extensions``
 
     An array containing zero or more objects, each of which identifies
@@ -762,6 +772,7 @@ JSON is being used for encoding of group and array metadata::
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
         "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
+        "metadata_key_suffix" : ".json",
         "extensions": []
     }
 
@@ -772,6 +783,7 @@ ignored if not understood::
     {
         "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
         "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
+        "metadata_key_suffix" : ".json",
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
