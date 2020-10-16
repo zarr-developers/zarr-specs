@@ -1137,41 +1137,10 @@ only one such pair for any given `key`. I.e., a store is a mapping
 from keys to values. It is also assumed that keys are case sensitive, 
 i.e., the keys "foo" and "FOO" are different.
 
-A store can make the following assumption on the structures of the keys it will receive:
-
-- A key always:
-  - start with ``meta/``
-  - start  with ``data/``
-  - is exactly ``zarr.json``.
-
-- Most of the keys:
-  - start with ``meta/root``
-  - start with ``data/root``
-
-- List operations ``list_dir`` will always be passed keys ending with a trailing
-  slash, that is to say it will only be asked to work with complete node names.
-
-Store implementation can assume they will only be given trailing slashes, and
-protocol implementation MUST pass trailing slashes to underlying stores.
-
-For example, a store containing the following keys:
-
- - ``meta/root/2018.group.json``
- - ``meta/root/2018-01.group.json``
- - ``meta/root/2018/bar.array.json``
- - ``data/root/2018/bar/0.0``
-
-The following queries are invalid:
-  - ``list_dir('meta/root/201')`` is invalid as ``"201"`` is not an existing node.
-  - ``list_dir('meta/root/2018')`` is invalid as ``"2018"`` does not ends with a ``/``,
-
-These are valid:
-  - ``list_dir('meta/root/2018/')``
-  - ``list_dir('meta/root/2018-01/')``
-
-This allows store implementation to avoid having to check for trailing
-slashes, and avoid issues like "list_dir('meta/root/2018')" returning
-values likes ``-01``
+The store interface also defines some operations involving
+`prefixes`. In the context of this interface, a prefix is a string
+containing only characters that are valid for use in `keys` and ending
+with a trailing ``/`` character.
 
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
@@ -1196,15 +1165,10 @@ A **writeable store** supports the following operations:
     | Parameters: `key`
     | Output: none
 
-``delete_prefix`` - Delete all keys with the given prefix from the store, include the prefix itself if it exists as a key:
+``delete_prefix`` - Delete all keys with the given prefix from the store:
 
-    | Parameter: `key`
-    | Output: None
-
-
-    Clients of delete_prefix should pay attention to pass a trailing slash on
-    the key to delete a complete dataset or group, otherwise the store may
-    delete similar keys.
+    | Parameter: `prefix`
+    | Output: none
 
 A **listable store** supports any one or more of the following
 operations:
@@ -1229,50 +1193,19 @@ operations:
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
 
-    | Parameters: `prefix`, ends with a trailing slash ``/``
+    | Parameters: `prefix`
     | Output: set of `keys` and set of `prefixes`
 
     For example, if a store contains the keys "a/b", "a/c", "a/d/e",
     "a/f/g", then ``list_dir("a/")`` would return keys "a/b" and "a/c"
-    and prefixes "a/d/" and "a/f/".
-
-    On non-existing prefix, store may return the empty set.
-
-    Note: The requirement on trailing slashes is to avoid
-    search returning keys in the same hierarchy level but longer name, and
-    potentially expensive logic testing for the present of trailing slash on
-    each query. e.g:
-
-     - /meta/foo
-     - /meta/foo/dataset
-     - /meta/foobar
-
-     list_dir('/meta/foo') == '/meta/foo'&'/meta/foobar'
-     list_dir('/meta/foo/') == '/meta/foo/dataset'
-
-    Stores must return trailing slashes in key responses when those
-    are prefix of other keys.
-
-    Like would ``list_dir('/meta/mydir')`` returns:
-       - ``/meta/path1``
-       - ``/meta/path2``
-       - ``/meta/path3/``
-       - ``/meta/path4/``
-
-    Thus we know that ``path1``, and ``path2`` are terminal objects with data,
-    and that ``/meta/path3`` and ``/meta/path4``.
+    and prefixes "a/d/" and "a/f/". ``list_dir("b/")`` would return
+    the empty set.
 
 
-    This is similar to ``ls -p`` on Unix systems.
-
-    Note: In practice this means that this means most returned keys always ends in
-    ``/``, ``.json``, ``.array``, ``.group``, they will otherwise be chunks
-    data.
-
-Note that because keys are case sensitive, it is assumed that the operations 
-``set("foo", a)`` and ``set("FOO", b)`` will result in two separate (key, value) 
-pairs being stored. Subsequently ``get("foo")`` will return *a* and ``get("FOO")`` 
-will return *b*. 
+Note that because keys are case sensitive, it is assumed that the
+operations ``set("foo", a)`` and ``set("FOO", b)`` will result in two
+separate (key, value) pairs being stored. Subsequently ``get("foo")``
+will return *a* and ``get("FOO")`` will return *b*.
 
 
 Store implementations
