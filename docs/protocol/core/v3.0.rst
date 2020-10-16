@@ -70,7 +70,7 @@ Unlike Zarr spec v2, the spec v3 has mainly the following differences:
   - Separation of the data and  metadata key space.
   - Explicit support for extensions.
   - chunk separator is ``/`` by default.
-  - `".json"` suffix fr the metadata document by default.
+  - `".json"` suffix for the metadata document by default.
 
 This means that a store cannot be opened at an arbitrary point, but needs to be
 opened at the root. User facing convenience functions could walk a given
@@ -90,7 +90,7 @@ Better suitability for HPC file systems and network stores
 One goal of the spec v3 is to have a design that minimized the number of
 round-trip operations that must done in order to understand the structure of a
 Zarr store. Especially on highly parallel file system and network stores
-listing keys and accessing metadata can be a expensive – high latency
+listing keys and accessing metadata can be an expensive – high latency
 – operation. Thus a nested hierarchy listing all available groups, datasets
 and chunks can be a time consuming operation.
 
@@ -101,7 +101,7 @@ reliance on "metadata consolidation" seen with zarr v2.
 
 Another related changes is the notion of implicit groups created when a dataset
 or chunk can be written via its full path even when the intermediate groups do
-not exists. This allow lock-free write operation for non-contending
+not exist. This allow lock-free write operation for non-contending
 applications without the need for extra operations and round trip to create or
 check existence of intermediate groups.
 
@@ -147,17 +147,17 @@ draft.
       - Complex
       - Datetime
       - Named dimensions
-      - Awkward arrasy
+      - Awkward arrays
         
    See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
    the topic. 
 
   - Node name case sensitivity: The node name is now case sensitive, this may
     make store implementation more complicated as backed might not be (like some
-    specific filesystem / objet store), and we may want to recommend a standard
-    escaping mechanism in those case.https://github.com/zarr-developers/zarr-specs/issues/57
+    specific filesystem / object store), and we may want to recommend a standard
+    escaping mechanism in those case. https://github.com/zarr-developers/zarr-specs/issues/57
 
-  - Nodename character set: Same as above but unlike the previous point where we
+  - Node name character set: Same as above but unlike the previous point where we
     solicit feedback on wither store implementation should support full unicode. 
     https://github.com/zarr-developers/zarr-specs/issues/56
 
