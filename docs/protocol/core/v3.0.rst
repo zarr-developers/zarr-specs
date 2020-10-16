@@ -1129,13 +1129,15 @@ that an implementation of this specification could be modular and
 allow for different store implementations to be used.
 
 The store interface defines a set of operations involving `keys` and
-`values`. In the context of this interface, a `key` is any
-string containing only characters in the ranges ``a-z``, ``A-Z``,
-``0-9``, or in the set ``/.-_``, and a `value` is any sequence of
-bytes. It is assumed that the store holds (`key`, `value`) pairs, with
-only one such pair for any given `key`. I.e., a store is a mapping
-from keys to values. It is also assumed that keys are case sensitive, 
-i.e., the keys "foo" and "FOO" are different.
+`values`. In the context of this interface, a `key` is any string
+containing only characters in the ranges ``a-z``, ``A-Z``, ``0-9``, or
+in the set ``/.-_``, where the final character is **not** a ``/``
+character. A `value` is any sequence of bytes.
+
+It is assumed that the store holds (`key`, `value`) pairs, with only
+one such pair for any given `key`. I.e., a store is a mapping from
+keys to values. It is also assumed that keys are case sensitive, i.e.,
+the keys "foo" and "FOO" are different.
 
 The store interface also defines some operations involving
 `prefixes`. In the context of this interface, a prefix is a string
