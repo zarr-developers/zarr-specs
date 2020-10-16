@@ -46,6 +46,15 @@ This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
 
+Notes about design decisions for the native File System Store 
+=============================================================
+
+The original file system store is designed for simplicity and easy manipulation
+and transfer  by external tools not aware of the store structure. In particular
+tools like ``gsutil`` can be use to transfer a local directory store to cloud
+base storage, hence the keys choices will be conserved.
+
+
 Document conventions
 ====================
 
