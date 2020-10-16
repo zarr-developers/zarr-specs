@@ -1148,7 +1148,6 @@ A store can make the following assumption on the structures of the keys it will 
   - start with ``meta/root``
   - start with ``data/root``
 
-
 - List operations ``list_dir`` will always be passed keys ending with a trailing
   slash, that is to say it will only be asked to work with complete node names.
 
@@ -1157,22 +1156,22 @@ protocol implementation MUST pass trailing slashes to underlying stores.
 
 For example, a store containing the following keys:
 
- - ``meta/root/2018/.group``
- - ``meta/root/2018-01/.group``
- - ``meta/root/2018/bar/.array``
+ - ``meta/root/2018.group.json``
+ - ``meta/root/2018-01.group.json``
+ - ``meta/root/2018/bar.array.json``
  - ``data/root/2018/bar/0.0``
 
 The following queries are invalid:
-  - ``list_dir('201')`` is invalid as ``"201"`` is not an existing node.
-  - ``list_dir('2018')`` is invalid queries as ``"2018"`` does not ends with a ``/``,
+  - ``list_dir('meta/root/201')`` is invalid as ``"201"`` is not an existing node.
+  - ``list_dir('meta/root/2018')`` is invalid as ``"2018"`` does not ends with a ``/``,
 
-This is valid:
-  - ``list_dir('2018/')``
-  - ``list_dir('2018-01/')``
+These are valid:
+  - ``list_dir('meta/root/2018/')``
+  - ``list_dir('meta/root/2018-01/')``
 
-This allows store implementation to avoid having to check for trailing slashes,
-and avoid issues like "list_dir('2018')" returning values likes ``-01``
-
+This allows store implementation to avoid having to check for trailing
+slashes, and avoid issues like "list_dir('meta/root/2018')" returning
+values likes ``-01``
 
 The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
@@ -1215,7 +1214,6 @@ operations:
     | Parameters: none
     | Output: set of `keys`
 
-
 ``list_prefix`` - Retrieve all keys with a given prefix.
 
     | Parameters: `prefix`
@@ -1227,7 +1225,6 @@ operations:
     Note behavior of ``list_prefix`` is undefined if ``prefix`` does not ends
     with a trailing slash ``/`` and store can assume there is as least one key
     that stars with prefix.
-
 
 ``list_dir`` - Retrieve all keys and prefixes with a given prefix and
 which do not contain the character "/" after the given prefix.
@@ -1241,7 +1238,6 @@ which do not contain the character "/" after the given prefix.
 
     On non-existing prefix, store may return the empty set.
 
-
     Note: The requirement on trailing slashes is to avoid
     search returning keys in the same hierarchy level but longer name, and
     potentially expensive logic testing for the present of trailing slash on
@@ -1254,8 +1250,7 @@ which do not contain the character "/" after the given prefix.
      list_dir('/meta/foo') == '/meta/foo'&'/meta/foobar'
      list_dir('/meta/foo/') == '/meta/foo/dataset'
 
-
-    Stores Must return trailing slashes in key responses when those
+    Stores must return trailing slashes in key responses when those
     are prefix of other keys.
 
     Like would ``list_dir('/meta/mydir')`` returns:
@@ -1351,30 +1346,31 @@ Storage keys
 The entry point metadata document is stored under the key ``zarr.json``.
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating ``meta/root``, `P`,
-and ``.group``.
+group metadata document is formed by concatenating "meta/root", `P`,
+".group", and the metadata key suffix (which defaults to ".json").
 
 For example, for a group at hierarchy path ``/foo/bar``, the
-corresponding metadata key is ``meta/root/foo/bar.group``.
+corresponding metadata key is "meta/root/foo/bar.group.json".
 
 For an array at a non-root hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta/root", `P`,
-and ".array". The data key for array chunks is formed by concatenating
-"data", `P`, "/", and the chunk identifier as defined by the chunk
-grid layout.
+the array metadata document is formed by concatenating "meta/root",
+`P`, ".array", and the metadata key suffix.
 
-To get the path ``P`` from a key, either remove the trailing ``.array`` or
-``.group`` as well as the ``meta/root`` prefix.
+The data key for array chunks is formed by concatenating "data", `P`,
+"/", and the chunk identifier as defined by the chunk grid layout.
+
+To get the path ``P`` from a metadata key, remove the trailing
+".array.json" or ".group.json" and the "meta/root" prefix.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is ``meta/root/foo/baz.array``. If the array
-has two dimensions and a regular chunk grid, the data key for the
-chunk with grid coordinates (0, 0) is "data/root/foo/baz/c0/0".
+corresponding metadata key is "meta/root/foo/baz.array.json". If the
+array has two dimensions and a regular chunk grid, the data key for
+the chunk with grid coordinates (0, 0) is "data/root/foo/baz/c0/0".
 
-If the root node is a group, the metadata key is ``meta/root.group``. If
-the root node is an array, the metadata key is "meta/root.array", and
-the data keys are formed by concatenating "data/root/" and the chunk
-identifier.
+If the root node is a group, the metadata key is
+"meta/root.group.json". If the root node is an array, the metadata key
+is "meta/root.array.json", and the data keys are formed by
+concatenating "data/root/" and the chunk identifier.
 
 
 .. list-table:: Metadata Storage Key example
@@ -1388,25 +1384,22 @@ identifier.
       - `zarr.json`
     * - Array (Root)
       - `/`
-      - `meta/root.array`
+      - `meta/root.array.json`
     * - Group (Root)
       - `/`
-      - `meta/root.group`
+      - `meta/root.group.json`
     * - Group
       - `/foo`
-      - `meta/root/foo.group`
+      - `meta/root/foo.group.json`
     * - Array
       - `/foo`
-      - `meta/root/foo.array`
+      - `meta/root/foo.array.json`
     * - Group
       - `/foo/bar`
-      - `meta/root/foo/bar.group`
+      - `meta/root/foo/bar.group.json`
     * - Array
       - `/foo/baz`
-      - `meta/root/foo/baz.array`
-
-
-
+      - `meta/root/foo/baz.array.json`
 
 
 .. list-table:: Data Storage Key example
@@ -1464,35 +1457,37 @@ Let "+" be the string concatenation operator.
 
 **Store element values in an array**
 
-    To store element in an array at path `P` and coordinate (`i`, `j`, ...)
-    perform ``set(data_key(P, i, j, ...), value)``, where `value` is the
-    serialisation of the corresponding chunk following the metadata that is
-    or will be stored in ``array_meta_key(P)``. 
+    To store element in an array at path `P` and coordinate (`i`, `j`,
+    ...)  perform ``set(data_key(P, i, j, ...), value)``, where
+    `value` is the serialisation of the corresponding chunk, encoded
+    according to the information in the array metadata stored under
+    the key ``array_meta_key(P)``.
 
 **Retrieve element values in an array**
 
-    To retrieve element in an array at path `P` and coordinate (`i`, `j`, ...)
-    perform ``get(data_key(P, i, j, ...), value)``, where `value` is the
-    serialisation of the corresponding chunk following the metadata stored at
-    ``array_meta_key(P)``. 
+    To retrieve element in an array at path `P` and coordinate (`i`,
+    `j`, ...)  perform ``get(data_key(P, i, j, ...), value)``, where
+    `value` is the serialisation of the corresponding chunk, encoded
+    according to the array metadata stored at ``array_meta_key(P)``.
 
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
     ``list_dir("meta/root" + P + "/")``. Any returned key ending in
-    ".array" indicates an array. Any returned key ending in
-    ".group" indicates a group. Any returned prefix indicates a
+    ".array.json" indicates an array. Any returned key ending in
+    ".group.json" indicates a group. Any returned prefix indicates a
     child group implied by some descendant.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
-    keys "meta/root/foo/bar.group" and "meta/root/foo/bar/baz/qux.array". Groups
-    at paths "/", "/foo" and "/foo/baz" have not been explicitly
-    created but are implied by their descendants. To list the children
-    of the group at path "/foo", perform ``list_dir("meta/root/foo/")``,
-    which will return the key "meta/root/foo/bar.group" and the prefix
-    "meta/root/foo/baz/". From this it can be inferred that child groups
-    "/foo/bar" and "/foo/baz" are present.
+    keys "meta/root/foo/bar.group.json" and
+    "meta/root/foo/bar/baz/qux.array.json". Groups at paths "/",
+    "/foo" and "/foo/baz" have not been explicitly created but are
+    implied by their descendants. To list the children of the group at
+    path "/foo", perform ``list_dir("meta/root/foo/")``, which will
+    return the key "meta/root/foo/bar.group.json" and the prefix
+    "meta/root/foo/baz/". From this it can be inferred that child
+    groups "/foo/bar" and "/foo/baz" are present.
 
     If a store does not support any of the list operations then
     discovery of group children is not possible, and the contents of
@@ -1501,54 +1496,49 @@ Let "+" be the string concatenation operator.
 
 **Discover all nodes in a hierarchy**
 
-    To discover all nodes in a hierarchy, one can call ``list("meta/")``.
-     - all keys represent either explicit group or arrays.
-     - all intermediate prefixes ending in a ``/`` are implicit groups.
+    To discover all nodes in a hierarchy, one can call
+    ``list("meta/")``. All keys represent either explicit group or
+    arrays. All intermediate prefixes ending in a ``/`` are implicit
+    groups.
 
 **Delete a group or array**
 
-    To delete an array it is necessary to
-      - delete the metadata document for the array, (meta/P.array)
-      - delete all keys which prefix have path pointing to this to this array.  (data/P/\*)
+    To delete an array at path `P`:
+      - delete the metadata document for the array, ``delete(array_meta_key(P))``
+      - delete all data keys which prefix have path pointing to this to this array,
+	``delete_prefix("data/root" + P + "/")``
 
-    To delete a implicit group.
-      - delete all arrays under this group
-      - it should be sufficient to delete all the keys starting with prefix meta/P/ and data/P/
+    To delete an implicit group at path `P`:
+      - delete all nodes under this group - it should be sufficient to
+	perform ``delete_prefix("meta/root" + P + "/")`` and
+	``delete_prefix("data/root" + P + "/")``.
 
-    To delete an explicit group.
-      - delete all arrays under this group,
-      - delete all keys with meta/P/ prefix, meta/P/groups all keys with /data/P prefix,
+    To delete an explicit group at path `P`:
+      - delete the metadata document for the group, ``delete(group_meta_key(P))``
+      - delete all nodes under this group - it should be sufficient to
+	perform ``delete_prefix("meta/root" + P + "/")`` and
+	``delete_prefix("data/root" + P + "/")``.
 
-    Note that store implementation may decide to reify implicit groups and thus
-    protocol implementation should attempt to delete the .meta/P/.group file if
-    they really wish to delete an empty implicit group.
+    Note that store implementation may decide to reify implicit groups
+    and thus protocol implementation should attempt to delete the
+    group metadata file if they really wish to delete an empty
+    implicit group. @@TODO clarify this
 
     Store implementation are also allowed to delete any implicit parent of a
     deleted implicit groups, so a protocol implementation should make sure to
-    reify a parent group if they need to keep it. For example assuming the
-    following:
+    reify a parent group if they need to keep it. @@TODO clarify this
 
-     >>>  z = new_dataset()
-     >>>  z.create_array('/path/to/array')
-
-     >>>  z.delete_array('/path/to/array')
-
-     This may not be sufficient to delete the group ``/path/to/``, as a store
-     implementation, and thus removing ``/path/to/`` may need an implmentation
-     to explicitly call
-
-     >>> z.delete_group('/path/to/')
-
-     Even if an explicit group was not explicitly created.
 
 **Determine if a node exists**
 
-    To determine if a node exists at path `P`, you need to check the existence
-    of one of ``get("meta/root"+P+".array")``, ``get("meta/root"+P+".group")``
-    or ``get("meta/root"+P+"/")``.
+    To determine if a node exists at path ``P``, try in the following
+    order ``get(array_meta_key(P))`` (success implies an array at
+    ``P``); ``get(group_meta_key(P))`` (success implies an explicit
+    group at ``P``); ``list_dir("meta/root" + P + "/")`` (non-empty
+    result set implies an implicit group at ``P``).
 
     .. note::
-       For listable store, ``listdir(parent(P))`` can be an alternative.
+       For listable store, ``list_dir(parent(P))`` can be an alternative.
 
 
 Protocol extensions
