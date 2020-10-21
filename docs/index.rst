@@ -10,8 +10,8 @@ Under construction.
    :caption: Contents:
 
    protocol
-   stores
    codecs
+   stores
 
 
 Indices and tables
