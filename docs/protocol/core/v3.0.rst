@@ -79,88 +79,63 @@ at the intersection of both Zarr v2 and N5, and so aims to provide a
 common target that can be fully implemented across multiple
 programming environments and serve a wide range of applications.
 
+In particular, we highlight the following areas motivating the
+development of this specification.
 
 
+Distributed storage
+-------------------
 
-Main difference with v2
-=======================
+The Zarr v2 specification was originally developed and implemented for
+use with local filesystem storage only. It then became clear that the
+same protocol could also be used with distributed storage systems,
+including cloud object stores such as Amazon S3, Google Cloud Storage
+or Azure Blob Storage. However, distributed storage systems have a
+number of important differences from local file systems, both in terms
+of the features they support and their performance
+characteristics. For example, cloud stores have much greater latency
+per request than local file systems, and this means that certain
+operations such as exploring a hierarchy of arrays using the Zarr v2
+protocol can be unacceptably slow. Workarounds have been developed,
+such as the use of metadata consolidation, but there are opportunities
+for modifications to the core protocol that address these issues
+directly and work more performantly across a range of underlying
+storage systems with varying features and latency characteristics. For
+example, this protocol specification aims to minimise the number of
+storage requests required when opening and exploring a hierarchy of
+arrays.
 
-Zarr spec v2 was originally designed around local filesystem, but Zarr has
-grown and is now regularly deployed on cloud / object storage. Those kind of
-storage have characteristics, capabilities and usage patterns that can widely
-differ from the assumptions of spec v2. V3 is designed to consider online
-stores, in particular we want to achieve the following:
 
- - No assumption that the underlying store has locking ability.
- - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but not atomic.
+Interoperability
+----------------
 
-Unlike Zarr spec v2, the spec v3 has mainly the following differences:
-  - V3 is a flat key-value store instead of a hierarchical store. Hierarchy is implied.
-  - V3 has an explicit root, while v2 roots and groups could not be distinguished.
-  - Separation of the data and  metadata key space.
-  - Explicit support for extensions.
-  - chunk separator is ``/`` by default.
-  - `".json"` suffix for the metadata document by default.
+While the Zarr v2 and N5 specifications have each been implemented in
+multiple programming languages, there is currently not feature parity
+across all implementations. This is in part because the feature set
+includes some features that are not easily translated or supported
+across different programming languages. This specification aims to
+define a set of core features that are useful and sufficient to
+address a significant fraction of use cases, but are also
+straightforward to implement fully across different programming
+languages. Additional functionality can then be layered via
+extensions, some of which may aim for wide adoption, some of which may
+be more specialised and have more limited implementation.
 
-This means that a store cannot be opened at an arbitrary point, but needs to be
-opened at the root. User facing convenience functions could walk a given
-hierarchy and return a sub-group, but this is not part of the API.
-
-Goal and Non-Goal of v3 spec with respect to v2 spec
-====================================================
-
-This section is informative and is present to help the reader familiar  with
-previous version of zarr to find and understand the differences and the reasons
-behind them as well as guide the contributor during the draft and review
-period.
-
-Better suitability for HPC file systems and network stores
-----------------------------------------------------------
-
-One goal of the spec v3 is to have a design that minimized the number of
-round-trip operations that must done in order to understand the structure of a
-Zarr store. Especially on highly parallel file system and network stores
-listing keys and accessing metadata can be an expensive – high latency
-– operation. Thus a nested hierarchy listing all available groups, datasets
-and chunks can be a time consuming operation.
-
-The v3 spec tries to separate the metadata, from group and dataset data
-using a prefix, as well as recommend a flatter way of storing keys in order to
-facilitate bulk operations. This should in particular allow to decrease the
-reliance on "metadata consolidation" seen with zarr v2.
-
-Another related changes is the notion of implicit groups created when a dataset
-or chunk can be written via its full path even when the intermediate groups do
-not exist. This allow lock-free write operation for non-contending
-applications without the need for extra operations and round trip to create or
-check existence of intermediate groups.
-
-Consideration of multiple programming languages
------------------------------------------------
-
-Zarr spec v3 has an explicit goal of having better compatibility and easier
-implementation with programming languages other then Python. Thus a number of
-core features in previous spec have been relegated to extensions for the time
-being. This include in particular a reduction of the number of datatypes that
-are available in core.
-
-Compatibility with the N5 project
----------------------------------
-
-The `N5 project <https://github.com/saalfeldlab/n5>`_ and Zarr have similar
-goals. One of the goal of Zarr Spec v3 is to provide compatibility for Most of
-Zarr v2 and N5 users in order to allow consolidation under the v3 spec with the
-end goal of merging the two projects.
 
 Extensibility
 -------------
 
-One of the Non-goal of Zarr Spec V3 is to cover all use cases in the core, and
-to provide a path forward for extensibility and future standardisation of
-extensions without the need to rely on the Zarr core team. A challenge is to
-make sure implementations of the Zarr protocol for which used extension are not
-available can still give user access to data without triggering corruption when
-possible.
+The development of systems for storage of very large array-like data
+is a very active area of research and development, and there are many
+possibilities that remain to be explored. A goal of this specification
+is to define a protocol with a number of clear extension points and
+mechanisms, in order to provide a framework for freely building on and
+exploring these possibilities. We aim to make this possible, whilst
+also providing pathways for a graceful degradation of functionality
+where possible, in order to retain interoperability. We also aim to
+provide a framework for community-defined extensions, which can be
+developed and published independently without requiring centralised
+coordination of all specifications.
 
 
 Questions that still need to be resolved
@@ -1521,6 +1496,40 @@ in mostly 2 categories:
 There are no group extensions as as Zarr v3.0
 
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
+
+
+Comparison with Zarr v2
+=======================
+
+This section is informative.
+
+Below is a summary of the key differences between this specification
+(v3) and Zarr v2.
+
+- In v3 each hierarchy has an explicit root, and must be opened at the
+  root. In v2 there was no explicit root and a hierarchy could be
+  opened at its original root or at any sub-group.
+
+- In v3 the storage keys have been redesigned to separate the space of
+  keys used for metadata and data, by using different prefixes. This
+  is intended to allow for more performant listing and querying of
+  metadata documents on high latency stores. There are also
+  differences including a change to the default separator used to
+  construct chunk keys, and the addition of a key suffix for metadata
+  keys.
+
+- v3 has explicit support for protocol extensions via defined
+  extension points and mechanisms.
+
+- v3 allows for greater flexibility in how groups and arrays are
+  created. In particular, v3 supports implicit groups, which are
+  groups that do not have a metadata document but whose existence is
+  implied by descendant nodes. This change enables multiple arrays to
+  be created in parallel without generating any race conditions for
+  creating parent groups.
+
+- The set of data types specified in v3 is less than in v2. Additional
+  data types will be defined via protocol extensions.
 
 
 References
