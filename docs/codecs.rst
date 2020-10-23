@@ -147,7 +147,8 @@ shuffle:
 
 blocksize:
     An integer giving the size in bytes of blocks into which a
-    buffer is divided before compression.
+    buffer is divided before compression. A value of 0
+    indicates that an automatic size will be used.
 
 For example, the array metadata document below specifies that the
 compressor is the Blosc codec configured with a compression level of
