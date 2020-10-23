@@ -23,13 +23,11 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 
 ----
 
-
 Abstract
 ========
 
 This specification defines the Zarr core protocol for storage and
 retrieval of N-dimensional typed arrays.
-
 
 Status of this document
 =======================
@@ -45,6 +43,7 @@ This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
 
+<<<<<<< HEAD
 Introduction
 ============
 
@@ -121,10 +120,80 @@ languages. Additional functionality can then be layered via
 extensions, some of which may aim for wide adoption, some of which may
 be more specialised and have more limited implementation.
 
+=======
+Zarr spec v2 was originally designed around local filesystem, but Zarr has
+grown and is now regularly deployed on cloud / object storage. Those kind of
+storage have characteristics, capabilities and usage patterns that can widely
+differ from the assumptions of spec v2. V3 is designed to consider online
+stores, in particular we want to achieve the following:
+
+ - No assumption that the underlying store has locking ability.
+ - Ability to do concurrent writes with the assumption that writes from clients will be consistent, but not atomic.
+
+Unlike Zarr spec v2, the spec v3 has mainly the following differences:
+
+ - V3 is a flat key-value store instead of a hierarchical store. Hierarchy is implied.
+ - V3 has an explicit root, while v2 roots and groups could not be distinguished.
+ - Separation of the data and  metadata key space.
+ - Explicit support for extensions.
+ - chunk separator is ``/`` by default.
+ - `".json"` suffix for the metadata document by default.
+
+This means that a store cannot be opened at an arbitrary point, but needs to be
+opened at the root. User facing convenience functions could walk a given
+hierarchy and return a sub-group, but this is not part of the API.
+
+Goal and non-goal of v3 spec with respect to v2 spec
+====================================================
+
+This section is informative and is present to help the reader familiar  with
+previous version of zarr to find and understand the differences and the reasons
+behind them as well as guide the contributor during the draft and review
+period.
+
+Better suitability for HPC file systems and network stores
+----------------------------------------------------------
+
+One goal of the spec v3 is to have a design that minimizes the number of
+round-trip operations that must be done in order to understand the structure of
+a Zarr store. Especially on highly parallel file systems and network stores,
+listing keys and accessing metadata can be an expensive – high latency
+– operation. Thus a nested hierarchy listing all available groups, datasets
+and chunks can be a time consuming operation.
+
+The v3 spec tries to separate the metadata from group and dataset data
+using a prefix, as well as recommend a flatter way of storing keys in order to
+facilitate bulk operations. This should in particular allow to decrease the
+reliance on "metadata consolidation" seen with Zarr v2.
+
+Another related change is the notion of implicit groups created when a dataset
+or chunk can be written via its full path even when the intermediate groups do
+not exist. This allows lock-free write operations for non-contending
+applications without the need for extra operations and round trips to create or
+check the existence of intermediate groups.
+
+Consideration of multiple programming languages
+-----------------------------------------------
+
+Zarr spec v3 has an explicit goal of having better compatibility and easier
+implementation with programming languages other then Python. Thus a number of
+core features in previous spec have been relegated to extensions for the time
+being. This includes in particular a reduction of the number of data types that
+are available in core.
+
+Compatibility with the N5 project
+---------------------------------
+
+The `N5 project <https://github.com/saalfeldlab/n5>`_ and Zarr have similar
+goals. One of the goal of Zarr spec v3 is to provide compatibility for most of
+Zarr v2 and N5 users in order to allow consolidation under the v3 spec with the
+end goal of merging the two projects.
+>>>>>>> Some changes
 
 Extensibility
 -------------
 
+<<<<<<< HEAD
 The development of systems for storage of very large array-like data
 is a very active area of research and development, and there are many
 possibilities that remain to be explored. A goal of this specification
@@ -136,7 +205,14 @@ where possible, in order to retain interoperability. We also aim to
 provide a framework for community-defined extensions, which can be
 developed and published independently without requiring centralised
 coordination of all specifications.
-
+=======
+One of the non-goal of Zarr spec v3 is to cover all use cases in the core, and
+to provide a path forward for extensibility and future standardisation of
+extensions without the need to rely on the Zarr core team. A challenge is to
+make sure implementations of the Zarr protocol for which used extensions are not
+available can still give user access to data without triggering corruption when
+possible.
+>>>>>>> Some changes
 
 Questions that still need to be resolved
 ----------------------------------------
@@ -144,30 +220,31 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split large metadata documents.
- - extensions and ``must_understand = True`` might be too restrictive. Work a draft implementation with extensions and
-   see how far we can go. List of extensions to implement: 
-   
-      - Boolean
-      - Complex
-      - Datetime
-      - Named dimensions
-      - Awkward arrays
-        
-   See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
-   the topic. 
+ - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split
+   large metadata documents.
+ - extensions and ``must_understand = True`` might be too restrictive. Work a
+   draft implementation with extensions and see how far we can go. List of
+   extensions to implement:
 
-  - Node name case sensitivity: The node name is now case sensitive, this may
-    make store implementation more complicated as backed might not be (like some
-    specific filesystem / object store), and we may want to recommend a standard
-    escaping mechanism in those case. https://github.com/zarr-developers/zarr-specs/issues/57
+    - Boolean
+    - Complex
+    - Datetime
+    - Named dimensions
+    - Awkward arrays
 
-  - Node name character set: Same as above but unlike the previous point where we
-    solicit feedback on wither store implementation should support full unicode. 
-    https://github.com/zarr-developers/zarr-specs/issues/56
+   See https://github.com/zarr-developers/zarr-specs/issues/89 for a discussion
+   on the topic.
 
-  - Should named dimensions be part of the core metadata spec ? https://github.com/zarr-developers/zarr-specs/issues/73
+ - Node name case sensitivity: the node name is now case sensitive, this may
+   make store implementation more complicated as backed might not be (like some
+   specific filesystem / object store), and we may want to recommend a standard
+   escaping mechanism in those cases. https://github.com/zarr-developers/zarr-specs/issues/57
 
+ - Node name character set: same as above but unlike the previous point where we
+   solicit feedback on whether store implementation should support full unicode.
+   https://github.com/zarr-developers/zarr-specs/issues/56
+
+ - Should named dimensions be part of the core metadata spec ? https://github.com/zarr-developers/zarr-specs/issues/73
 
 Document conventions
 ====================
@@ -183,7 +260,6 @@ uppercase letters in this specification.
 All of the text of this specification is normative except sections
 explicitly marked as non-normative, examples, and notes. Examples in
 this specification are introduced with the words "for example".
-
 
 Concepts and terminology
 ========================
@@ -301,7 +377,7 @@ conceptual model underpinning the Zarr protocol.
     hyperrectangle defined by a tuple of intervals, one for each
     dimension_ of the array_. The chunk shape is the tuple of interval
     lengths, and the chunk size (i.e., number of elements_ contained
-    within the chunk) is the product of its interval lengths. 
+    within the chunk) is the product of its interval lengths.
 
     The chunk shape elements are non-zero when the corresponding dimensions of
     the arrays are of non-zero length.
@@ -380,7 +456,6 @@ conceptual model underpinning the Zarr protocol.
     interface`_ which is a common set of operations that stores may
     provide.
 
-
 Node names
 ==========
 
@@ -403,13 +478,12 @@ Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
 .. note: 
-    The Zarr core development team recognises that restricting the set 
+    The Zarr core development team recognises that restricting the set
     of allowed characters creates an impediment and bias against users
     of different languages. We are actively discussing whether the full
-    Unicode character set could be allowed and what technical issues 
+    Unicode character set could be allowed and what technical issues
     this would entail. If you have experience or views please comment on
     `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
-
 
 Data types
 ==========
@@ -434,7 +508,6 @@ metadata documents to refer to the data type. For the data types
 defined in this protocol, the identifier is a simple ASCII
 string. However, protocol extensions may use any JSON value to
 identify a data type.
-
 
 Core data types
 ---------------
@@ -523,7 +596,6 @@ Core data types
      - variable, given by ``*``, is limited to be a multiple of 8.
      - N/A
 
-
 Floating point types correspond to basic binary interchange formats as
 defined by IEEE 754-2008.
 
@@ -535,11 +607,10 @@ should be understood as fallback types of respectively 1, 2, and 3 bytes long.
 Zarr v3.0 is limited to types length that are multiple of 8 bits but may open
 other values in later version of this specification.
 
-
 .. note::
 
     We are explicitely looking for more feedback and prototypes of code using the ``r*``,
-    raw bits, for various endianess and wether the spec coudl be made clearer. 
+    raw bits, for various endianess and wether the spec coudl be made clearer.
 
 .. note::
 
@@ -550,7 +621,6 @@ other values in later version of this specification.
     arrays, one with the actual variable length data and one with fixed size
     (pointer + length) to the variable size data we do not want to commit to such
     a structure.
-
 
 Chunk grids
 ===========
@@ -622,7 +692,6 @@ that chunk, where "%" is the modulo operator. For example, if a
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
 is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
-
 
 The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
@@ -697,7 +766,6 @@ For example, for a two-dimensional array with chunk shape (`dx`,
 elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
 
-
 Chunk encoding
 ==============
 
@@ -749,7 +817,6 @@ community process specification.
 Further details of how a compressor is configured for an array are
 given in the section below on `Array metadata`_.
 
-
 Metadata
 ========
 
@@ -768,14 +835,12 @@ defined in [RFC8259]_. The term "array" is also used as defined in
 name/value pairs. This section also defines how metadata documents are
 encoded for storage.
 
-
 Only the top level metadata document ``zarr.json`` is guarantied to be json, and
 can be used to defined other format to array-level and group-level metadata
-document; in the case where non-json metadata document are use in a zarr
+document; in the case where non-json metadata document are use in a Zarr
 hierarchy the following sections on group and array level metadata are
 non-normative; but other metadata format as expected to define some equivalence
 relations with the JSON documents.
-
 
 Entry point metadata
 --------------------
@@ -879,7 +944,6 @@ ignored if not understood::
         ]
     }
 
-
 Array metadata
 --------------
 
@@ -982,7 +1046,6 @@ following mandatory names:
 ``extensions``
 
     See the top level metadata extension section for the time being.
-    
 
 ``attributes``
 
@@ -1000,7 +1063,6 @@ The following names are optional:
     object may also contain a ``configuration`` name whose value is
     defined by the corresponding codec specification. When the key for this is
     absent, this signor fies that no compressor has been used.
-
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
@@ -1072,7 +1134,6 @@ chunking as above, but using an extension data type::
    ``filters`` have been removed,
    ``zarr_format`` have been removed,
 
-
 Group metadata
 --------------
 
@@ -1102,8 +1163,6 @@ For example, the JSON document below defines an explicit group::
 .. note::
 
    A group does not need a metadata document to exists, see implicit groups.
-
-
 
 Metadata encoding
 -----------------
@@ -1214,7 +1273,6 @@ operations ``set("foo", a)`` and ``set("FOO", b)`` will result in two
 separate (key, value) pairs being stored. Subsequently ``get("foo")``
 will return *a* and ``get("FOO")`` will return *b*.
 
-
 Store implementations
 ---------------------
 
@@ -1260,7 +1318,6 @@ implementation is expected to be widely used then it is recommended to
 create a store implementation spec and contribute it to the `zarr-specs GitHub repository`_.
 For an example of a store implementation spec, see the
 :ref:`file-system-store-v1` specification.
-
 
 Storage protocol
 ================
@@ -1312,7 +1369,6 @@ If the root node is a group, the metadata key is
 is "meta/root.array.json", and the data keys are formed by
 concatenating "data/root/" and the chunk identifier.
 
-
 .. list-table:: Metadata Storage Key example
     :header-rows: 1
 
@@ -1341,7 +1397,6 @@ concatenating "data/root/" and the chunk identifier.
       - `/foo/baz`
       - `meta/root/foo/baz.array.json`
 
-
 .. list-table:: Data Storage Key example
     :header-rows: 1
 
@@ -1351,8 +1406,6 @@ concatenating "data/root/" and the chunk identifier.
     * - `/foo/baz`
       - `(0, 0)`
       - `data/root/foo/baz/c0/0`
-
-
 
 Protocol operations
 -------------------
@@ -1446,18 +1499,18 @@ Let "+" be the string concatenation operator.
     To delete an array at path `P`:
       - delete the metadata document for the array, ``delete(array_meta_key(P))``
       - delete all data keys which prefix have path pointing to this to this array,
-	``delete_prefix("data/root" + P + "/")``
+        ``delete_prefix("data/root" + P + "/")``
 
     To delete an implicit group at path `P`:
       - delete all nodes under this group - it should be sufficient to
-	perform ``delete_prefix("meta/root" + P + "/")`` and
-	``delete_prefix("data/root" + P + "/")``.
+        perform ``delete_prefix("meta/root" + P + "/")`` and
+        ``delete_prefix("data/root" + P + "/")``.
 
     To delete an explicit group at path `P`:
       - delete the metadata document for the group, ``delete(group_meta_key(P))``
       - delete all nodes under this group - it should be sufficient to
-	perform ``delete_prefix("meta/root" + P + "/")`` and
-	``delete_prefix("data/root" + P + "/")``.
+        perform ``delete_prefix("meta/root" + P + "/")`` and
+        ``delete_prefix("data/root" + P + "/")``.
 
     Note that store implementation may decide to reify implicit groups
     and thus protocol implementation should attempt to delete the
@@ -1467,7 +1520,6 @@ Let "+" be the string concatenation operator.
     Store implementation are also allowed to delete any implicit parent of a
     deleted implicit groups, so a protocol implementation should make sure to
     reify a parent group if they need to keep it. @@TODO clarify this
-
 
 **Determine if a node exists**
 
@@ -1479,7 +1531,6 @@ Let "+" be the string concatenation operator.
 
     .. note::
        For listable store, ``list_dir(parent(P))`` can be an alternative.
-
 
 Protocol extensions
 ===================
@@ -1497,6 +1548,7 @@ There are no group extensions as as Zarr v3.0
 
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
+<<<<<<< HEAD
 
 Comparison with Zarr v2
 =======================
@@ -1532,6 +1584,8 @@ Below is a summary of the key differences between this specification
   data types will be defined via protocol extensions.
 
 
+=======
+>>>>>>> Some changes
 References
 ==========
 
@@ -1542,7 +1596,6 @@ References
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc2119
-
 
 Change log
 ==========
