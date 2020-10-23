@@ -45,6 +45,43 @@ This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
 
 
+Introduction
+============
+
+This specification defines a protocol for storage and retrieval of
+data that is organised as one or more multidimensional arrays. This
+type of data is common in scientific and numerical computing
+applications. Many domains are facing computational challenges as
+increasingly large volumes of data are being generated, for example,
+via high resolution microscopy, remote sensing imagery, genome
+sequencing or numerical simulation. The primary motivation for the
+development of Zarr has been to help address this challenge by
+enabling the storage of large multidimensional arrays in a way that is
+compatible with parallel and/or distributed computing applications.
+
+This protocol specification is intended to supersede the `Zarr storage
+specification version 2
+<https://zarr.readthedocs.io/en/stable/spec/v2.html>`_ (Zarr v2). The
+Zarr v2 specification has been implemented in several programming
+languages and has been used successfully to store and analyse large
+scientific datasets from a variety of domains. However, as experience
+has been gained, it has become clear that there are several
+opportunities for modest but useful improvements to be made in the
+protocol, and for establishing a foundation that allows for greater
+interoperability, whilst also enabling a variety of more advanced and
+specialised features to be explored and developed.
+
+This protocol specification also draws heavily on the `N5 API and
+file-system specification <https://github.com/saalfeldlab/n5>`_, which
+was developed in parallel to Zarr v2 and has many of the same design
+goals and features. This specification defines a core set of features
+at the intersection of both Zarr v2 and N5, and so aims to provide a
+common target that can be fully implemented across multiple
+programming environments and serve a wide range of applications.
+
+
+
+
 Main difference with v2
 =======================
 
