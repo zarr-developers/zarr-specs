@@ -128,7 +128,11 @@ cname:
     "snappy", "zlib".
     
 clevel:
-    An integer between 1 and 9 indicating the compression level.
+    An integer from 0 to 9 which controls the speed and level of
+    compression. A level of 1 is the fastest compression method and
+    produces the least compressions, while 9 is slowest and produces
+    the most compression. Compression is turned off completely when
+    level is 0.
 
 shuffle:
     An integer value in the set {0, 1, 2, -1}. A value of 1
