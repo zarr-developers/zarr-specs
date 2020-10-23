@@ -135,10 +135,12 @@ clevel:
     level is 0.
 
 shuffle:
-    An integer value in the set {0, 1, 2, -1}. A value of 1
-    indicates that byte-wise shuffling is performed in addition to
+    An integer value in the set {0, 1, 2, -1} indicating the way
+    bytes or bits are rearranged, which can lead to faster
+    and/or greater compression. A value of 1
+    indicates that byte-wise shuffling is performed prior to
     compression. A value of 2 indicates the bit-wise shuffling is
-    performed in addition to compression. If a value of -1 is given,
+    performed prior to compression. If a value of -1 is given,
     then default shuffling is used: bit-wise shuffling for buffers
     with item size of 1 byte, byte-wise shuffling otherwise.
     Shuffling is turned off completely when the value is 0.
