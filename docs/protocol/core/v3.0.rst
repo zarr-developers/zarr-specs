@@ -332,7 +332,7 @@ conceptual model underpinning the Zarr protocol.
     dimension has an integer length. This specification only considers
     the case where the lengths of all dimensions are finite. However,
     `protocol extensions`_ may be defined which allow a dimension to have
-    infinite or variable length.
+    an infinite or variable length.
 
 .. _shape:
 
@@ -351,7 +351,7 @@ conceptual model underpinning the Zarr protocol.
 
     An array_ contains zero or more elements. Each element can be
     identified by a tuple of integer coordinates, one for each
-    dimension_ of the array_. If all dimensions_ of an array_ have
+    dimension_ of the array_. If all dimensions_ of an array_ have a
     finite length, then the number of elements in the array_ is given
     by the product of the dimension_ lengths. An array_ element may be
     empty, or it may have a value.
@@ -477,7 +477,7 @@ node names:
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
-.. note: 
+.. note:
     The Zarr core development team recognises that restricting the set
     of allowed characters creates an impediment and bias against users
     of different languages. We are actively discussing whether the full
@@ -492,7 +492,7 @@ A data type describes the set of possible binary values that an array
 element may take, along with some information about how the values
 should be interpreted.
 
-This protocol defines a limited set of data types to represent Boolean
+This protocol defines a limited set of data types to represent boolean
 values, integers, and floating point numbers. Protocol
 extensions may define additional data types. All of the data types
 defined here have a fixed size, in the sense that all values require
@@ -567,6 +567,18 @@ Core data types
      - unsigned integer
      - 8
      - little-endian
+   * - ``>u2``
+     - unsigned integer
+     - 2
+     - big-endian
+   * - ``>u4``
+     - unsigned integer
+     - 4
+     - big-endian
+   * - ``>u8``
+     - unsigned integer
+     - 8
+     - big-endian
    * - ``<f2``
      - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
      - 2
