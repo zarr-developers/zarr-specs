@@ -1505,7 +1505,7 @@ Let "+" be the string concatenation operator.
 **Discover all nodes in a hierarchy**
 
     To discover all nodes in a hierarchy, one can call
-    ``list("meta/")``. All keys represent either explicit group or
+    ``list_prefix("meta/root/")``. All keys represent either explicit group or
     arrays. All intermediate prefixes ending in a ``/`` are implicit
     groups.
 
