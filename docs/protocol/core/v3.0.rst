@@ -1466,7 +1466,7 @@ Let "+" be the string concatenation operator.
 **Store element values in an array**
 
     To store element in an array at path `P` and coordinate (`i`, `j`,
-    ...)  perform ``set(data_key(P, i, j, ...), value)``, where
+    ...), perform ``set(data_key(P, i, j, ...), value)``, where
     `value` is the serialisation of the corresponding chunk, encoded
     according to the information in the array metadata stored under
     the key ``array_meta_key(P)``.
@@ -1474,8 +1474,8 @@ Let "+" be the string concatenation operator.
 **Retrieve element values in an array**
 
     To retrieve element in an array at path `P` and coordinate (`i`,
-    `j`, ...)  perform ``get(data_key(P, i, j, ...), value)``, where
-    `value` is the serialisation of the corresponding chunk, encoded
+    `j`, ...), perform ``get(data_key(P, i, j, ...))``. The returned
+    value is the serialisation of the corresponding chunk, encoded
     according to the array metadata stored at ``array_meta_key(P)``.
 
 **Discover children of a group**
