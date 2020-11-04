@@ -787,7 +787,7 @@ Only the top level metadata document ``zarr.json`` is guaranteed to be of JSON
 type, and can be used to define other formats for array-level and group-level
 metadata documents. In the case where non-JSON metadata documents are used in a
 Zarr hierarchy, the following sections on group and array level metadata are
-non-normative; but other metadata formats are expected to define some
+non-normative, but other metadata formats are expected to define some
 equivalence relations with the JSON documents.
 
 
