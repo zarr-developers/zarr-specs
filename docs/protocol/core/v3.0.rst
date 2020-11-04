@@ -144,7 +144,7 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - https://github.com/zarr-developers/zarr-specs/issues/72 to potentially split
+ - Should core metadata and user attributes be stored together or separate documents? ([GH72](https://github.com/zarr-developers/zarr-specs/issues/72)) 
    large metadata documents.
  - extensions and ``must_understand = True`` might be too restrictive. Work a
    draft implementation with extensions and
