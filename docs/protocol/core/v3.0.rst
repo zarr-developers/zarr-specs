@@ -148,7 +148,7 @@ draft.
    large metadata documents.
  - extensions and ``must_understand = True`` might be too restrictive. Work a
    draft implementation with extensions and
-   see how far we can go. List of extensions to implement:
+   see how far we can go. Possible list of extensions to implement:
 
     - Boolean
     - Complex
