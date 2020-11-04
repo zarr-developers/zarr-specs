@@ -1509,7 +1509,7 @@ in mostly two categories:
    array metadata ``data_type`` key.
  - Arrays extensions – non rectilinear grids, and variable length types.
 
-There are no group extensions as in Zarr v3.0.
+There are no group extensions in Zarr v3.0.
 
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
 
