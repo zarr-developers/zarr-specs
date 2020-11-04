@@ -353,8 +353,8 @@ conceptual model underpinning the Zarr protocol.
     identified by a tuple of integer coordinates, one for each
     dimension_ of the array_. If all dimensions_ of an array_ have a
     finite length, then the number of elements in the array_ is given
-    by the product of the dimension_ lengths. An array_ element may be
-    empty, or it may have a value.
+    by the product of the dimension_ lengths. An array_ may not have
+    been fully initialized.
 
 .. _data type:
 
