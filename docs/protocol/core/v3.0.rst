@@ -1184,12 +1184,12 @@ A **writeable store** supports the following operations:
     | Parameters: `key`, `value`
     | Output: none
 
-``delete`` - Delete the given key/value pair from the store.
+``erase`` - Erase the given key/value pair from the store.
 
     | Parameters: `key`
     | Output: none
 
-``delete_prefix`` - Delete all keys with the given prefix from the store:
+``erase_prefix`` - Erase all keys with the given prefix from the store:
 
     | Parameter: `prefix`
     | Output: none
@@ -1283,7 +1283,7 @@ Storage protocol
 ================
 
 This section describes how to translate high level operations to
-create, delete or modify Zarr hierarchies, groups or arrays, into low
+create, erase or modify Zarr hierarchies, groups or arrays, into low
 level operations on the key/value store interface defined above.
 
 In this section a "hierarchy path" is a logical path which identifies
@@ -1458,31 +1458,31 @@ Let "+" be the string concatenation operator.
     arrays. All intermediate prefixes ending in a ``/`` are implicit
     groups.
 
-**Delete a group or array**
+**Erase a group or array**
 
-    To delete an array at path `P`:
-      - delete the metadata document for the array, ``delete(array_meta_key(P))``
-      - delete all data keys which prefix have path pointing to this array,
-        ``delete_prefix("data/root" + P + "/")``
+    To erase an array at path `P`:
+      - erase the metadata document for the array, ``erase(array_meta_key(P))``
+      - erase all data keys which prefix have path pointing to this array,
+        ``erase_prefix("data/root" + P + "/")``
 
-    To delete an implicit group at path `P`:
-      - delete all nodes under this group - it should be sufficient to
-        perform ``delete_prefix("meta/root" + P + "/")`` and
-        ``delete_prefix("data/root" + P + "/")``.
+    To erase an implicit group at path `P`:
+      - erase all nodes under this group - it should be sufficient to
+        perform ``erase_prefix("meta/root" + P + "/")`` and
+        ``erase_prefix("data/root" + P + "/")``.
 
-    To delete an explicit group at path `P`:
-      - delete the metadata document for the group, ``delete(group_meta_key(P))``
-      - delete all nodes under this group - it should be sufficient to
-        perform ``delete_prefix("meta/root" + P + "/")`` and
-        ``delete_prefix("data/root" + P + "/")``.
+    To erase an explicit group at path `P`:
+      - erase the metadata document for the group, ``erase(group_meta_key(P))``
+      - erase all nodes under this group - it should be sufficient to
+        perform ``erase_prefix("meta/root" + P + "/")`` and
+        ``erase_prefix("data/root" + P + "/")``.
 
     Note that store implementation may decide to reify implicit groups
-    and thus protocol implementation should attempt to delete the
-    group metadata file if they really wish to delete an empty
+    and thus protocol implementation should attempt to erase the
+    group metadata file if they really wish to erase an empty
     implicit group. @@TODO clarify this
 
-    Store implementation are also allowed to delete any implicit parent of a
-    deleted implicit groups, so a protocol implementation should make sure to
+    Store implementation are also allowed to erase any implicit parent of an
+    erased implicit group, so a protocol implementation should make sure to
     reify a parent group if they need to keep it. @@TODO clarify this
 
 
