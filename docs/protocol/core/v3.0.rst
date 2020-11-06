@@ -1166,9 +1166,9 @@ The store interface also defines some operations involving
 containing only characters that are valid for use in `keys` and ending
 with a trailing ``/`` character.
 
-The store operations are grouped into three sets of capabilities:
-**readable**, **writeable** and **listable**. It is not necessary for
-a store implementation to support all of these capabilities.
+The store operations are grouped into three sets of capabilities: **readable**,
+**writeable**, **erasable** and **listable**. It is not necessary for a store
+implementation to support all of these capabilities.
 
 A **readable store** supports the following operation:
 
@@ -1184,6 +1184,8 @@ A **writeable store** supports the following operations:
     | Parameters: `key`, `value`
     | Output: none
 
+A **erasable stores** support the following operations:
+
 ``erase`` - Erase the given key/value pair from the store.
 
     | Parameters: `key`
@@ -1193,6 +1195,17 @@ A **writeable store** supports the following operations:
 
     | Parameter: `prefix`
     | Output: none
+
+.. note::
+
+   Some KV stores do allows creations and update of keys, but not deletion.
+   For example Zip archive do not allow removal of content without recreating
+   the full archive.
+
+   Unability to delete can affect ability to rename keys as well, as a ranema as
+   often a succession or an atomic combinaison of deleting data and setting it
+   to a new name.
+
 
 A **listable store** supports any one or more of the following
 operations:
