@@ -1195,6 +1195,15 @@ A **writeable store** supports the following operations:
     | Parameter: `prefix`
     | Output: none
 
+.. note::
+
+   Some KV stores do allow creation and update of keys, but not deletion. For
+   example, Zip archives do not allow removal of content without recreating the
+   full archive.
+
+   Inability to delete can affect ability to rename keys as well, as a rename
+   is often a sequence or atomic combination of a deletion and a creation.
+
 A **listable store** supports any one or more of the following
 operations:
 
@@ -1507,8 +1516,8 @@ See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potent
 Implementation Notes
 ====================
 
-This section is non-normative and is present notes from implementers about case
-that need to be carefully thought about, but do not strictly fall into the spec.
+This section is non-normative and presents notes from implementers about cases
+that need to be carefully considered but do not strictly fall into the spec.
 
 Explicit vs implicit group
 --------------------------
