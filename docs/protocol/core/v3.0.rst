@@ -144,7 +144,8 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - Should core metadata and user attributes be stored together or separate documents? (See https://github.com/zarr-developers/zarr-specs/issues/72)
+ - Should core metadata and user attributes be stored together or separate documents?
+   (See https://github.com/zarr-developers/zarr-specs/issues/72)
  - extensions and ``must_understand = True`` might be too restrictive.
    We propose to develop a draft implementation with extensions and
    see how far we can go. A possible list of extensions to implement includes:
@@ -987,7 +988,7 @@ following mandatory names:
     then said extension is responsible for interpreting the value of
     ``fill_value`` and return a suitable type that can be used.
 
-    For core ``data_type`` which ``fill_value`` are not permitted in JSON or
+    For core data types for which fill values are not permitted in JSON or
     for which decimal representation could be lossy, a string representing of
     the binary (starting with ``0b``) or hexadecimal value (starting with
     ``0x``) is accepted. This string must include all leading or trailing
@@ -1003,7 +1004,13 @@ following mandatory names:
 ``attributes``
 
     The value must be an object. The object may contain any name/value
-    pairs.
+    pairs. Intended to allow storage of arbitrary user metadata
+
+
+.. note:: The question of whether core metadata and user attributes should be
+     stored together or in separate documents is a topic of ongoing discussion.
+     (See https://github.com/zarr-developers/zarr-specs/issues/72.)
+
 
 The following names are optional:
 
@@ -1083,11 +1090,11 @@ chunking as above, but using an extension data type::
 
 .. note::
    comparison with spec v2,
-   ``dtype`` have been renamed to ``data_type``,
-   ``chunks`` have been renamed to ``chunk_grid``,
-   ``order`` have been renamed to ``chunk_memory_layout``,
-   ``filters`` have been removed,
-   ``zarr_format`` have been removed,
+   ``dtype`` has been renamed to ``data_type``,
+   ``chunks`` has been renamed to ``chunk_grid``,
+   ``order`` has been renamed to ``chunk_memory_layout``,
+   ``filters`` has been removed,
+   ``zarr_format`` has been removed,
 
 
 Group metadata
@@ -1109,7 +1116,7 @@ For example, the JSON document below defines an explicit group::
 
 .. note::
 
-   Groups cannot have extensions attached to them as of spec v3.0 Allowing
+   Groups cannot have extensions attached to them as of spec v3.0. Allowing
    groups to have extensions would force any implementation to sequentially
    traverse the store hierarchy in order to check for extensions, which would
    defeat the purpose of a flat namespace and concurrent access.
@@ -1118,7 +1125,7 @@ For example, the JSON document below defines an explicit group::
 
 .. note::
 
-   A group does not need a metadata document to exists, see implicit groups.
+   A group does not need a metadata document to exist. (See implicit groups.)
 
 
 
@@ -1366,8 +1373,8 @@ concatenating "data/root/" and the chunk identifier.
       - Chunk grid indices
       - Data key
     * - `/foo/baz`
-      - `(0, 0)`
-      - `data/root/foo/baz/c0/0`
+      - `(1, 0)`
+      - `data/root/foo/baz/c1/0`
 
 
 
