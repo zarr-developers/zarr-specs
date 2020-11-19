@@ -1386,8 +1386,8 @@ Let `P` be an arbitrary hierarchy path.
 Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
 ``group_meta_key(P)`` be the group metadata key for `P`.
 
-Let ``data_key(P, i, j, ...)`` be the data key for `P` for the chunk
-with grid coordinates (`i`, `j`, ...).
+Let ``data_key(P, j, i ...)`` be the data key for `P` for the chunk
+with grid coordinates (`j`, `i`, ...).
 
 Let "+" be the string concatenation operator.
 
@@ -1421,8 +1421,8 @@ Let "+" be the string concatenation operator.
 
 **Store element values in an array**
 
-    To store element in an array at path `P` and coordinate (`i`, `j`,
-    ...), perform ``set(data_key(P, i, j, ...), value)``, where
+    To store element in an array at path `P` and coordinate (`j`, `i`,
+    ...), perform ``set(data_key(P, j, i, ...), value)``, where
     `value` is the serialisation of the corresponding chunk, encoded
     according to the information in the array metadata stored under
     the key ``array_meta_key(P)``.
@@ -1430,7 +1430,7 @@ Let "+" be the string concatenation operator.
 **Retrieve element values in an array**
 
     To retrieve element in an array at path `P` and coordinate (`i`,
-    `j`, ...), perform ``get(data_key(P, i, j, ...), value)``. The returned
+    `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
     value is the serialisation of the corresponding chunk, encoded
     according to the array metadata stored at ``array_meta_key(P)``.
 
