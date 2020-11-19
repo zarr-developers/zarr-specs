@@ -593,12 +593,12 @@ A regular grid is a type of grid where an array is divided into chunks
 such that each chunk is a hyperrectangle of the same shape. The
 dimensionality of the grid is the same as the dimensionality of the
 array. Each chunk in the grid can be addressed by a tuple of positive
-integers (`i`, `j`, `k`, ...) corresponding to the indices of the
+integers (`k`, `j`, `i`, ...) corresponding to the indices of the
 chunk along each dimension.
 
-The origin vertex of a chunk has coordinates in the array space (`i` *
-`dx`, `j` * `dy`, `k` * `dz`, ...) where (`dx`, `dy`, `dz`, ...) are
-the chunk sizes along each dimension. 
+The origin vertex of a chunk has coordinates in the array space (`k` *
+`dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
+the chunk sizes along each dimension.
 Thus the origin vertex of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
@@ -606,8 +606,8 @@ array dimension is not perfectly divisible by the chunk length along
 the same dimension, then the grid will overhang the edge of the array
 space.
 
-The shape of the chunk grid will be (ceil(`x` / `dx`), ceil(`y` /
-`dy`), ceil(`z` / `dz`), ...)  where (`x`, `y`, `z`, ...) is the array
+The shape of the chunk grid will be (ceil(`z` / `dz`), ceil(`y` /
+`dy`), ceil(`x` / `dx`), ...)  where (`z`, `y`, `x`, ...) is the array
 shape, "/" is the division operator and "ceil" is the ceiling
 function. For example, if a 3 dimensional array has shape (10, 200,
 3000), and has chunk shape (5, 20, 400), then the shape of the chunk
@@ -627,10 +627,10 @@ dimension.
       - (2, 10, 8)
       - The grid does overhang the edge of the array on the 3rd dimension.
 
-An element of an array with coordinates (`a`, `b`, `c`, ...) will
-occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
-`dz`, ...), where "//" is the floor division operator. The element
-will have coordinates (`a` % `dx`, `b` % `dy`, `c` % `dz`, ...) within
+An element of an array with coordinates (`c`, `b`, `a`, ...) will
+occur within the chunk at grid index (`c` // `dz`, `b` // `dy`, `a` //
+`dx`, ...), where "//" is the floor division operator. The element
+will have coordinates (`c` % `dz`, `b` % `dy`, `a` % `dx`, ...) within
 that chunk, where "%" is the modulo operator. For example, if a
 3 dimensional array has shape (10, 200, 3000), and has chunk shape
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
@@ -638,7 +638,7 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
 
-The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
+The identifier for chunk with grid index (``k``, ``j``, ``i``, ...) is
 formed by joining together ASCII string representations of each index
 using a separator and prefixed with the character ``c``. The default value for
 the separator is the slash character lt ``/``, but this may be configured by
@@ -692,10 +692,10 @@ organised into a sequence such that the last dimension of the array is
 the fastest changing dimension, also known as "row-major" order. This
 layout is only applicable to arrays with fixed size data types.
 
-For example, for a two-dimensional array with chunk shape (`dx`, `dy`),
+For example, for a two-dimensional array with chunk shape (`dy`, `dx`),
 the binary values for a given chunk are taken from chunk elements in
-the order (0, 0), (0, 1), (0, 2), ..., (`dx` - 1, `dy` - 3), (`dx` - 1, `dy` -
-2), (`dx` - 1, `dy` - 1).
+the order (0, 0), (0, 1), (0, 2), ..., (`dy` - 1, `dx` - 3), (`dy` - 1, `dx` -
+2), (`dy` - 1, `dx` - 1).
 
 F contiguous memory layout
 --------------------------
@@ -706,10 +706,10 @@ is the fastest changing dimension, also known as "column-major"
 order. This layout is only applicable to arrays with fixed size data
 types.
 
-For example, for a two-dimensional array with chunk shape (`dx`,
-`dy`), the binary values for a given chunk are taken from chunk
-elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
-1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
+For example, for a two-dimensional array with chunk shape (`dy`,
+`dx`), the binary values for a given chunk are taken from chunk
+elements in the order (0, 0), (1, 0), (2, 0), ..., (`dy` - 3, `dx` -
+1), (`dy` - 2, `dx` - 1), (`dy` - 1, `dx` - 1).
 
 
 Chunk encoding
