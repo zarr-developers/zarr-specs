@@ -1514,7 +1514,7 @@ in mostly two categories:
  - Core data type extensions – for example adding the ability to store fixed size
    types such as complex or datetime in chunks. These are directly declared in the
    array metadata ``data_type`` key.
- - Arrays extensions – non rectilinear grids, and variable length types.
+ - Array extensions – non rectilinear grids, and variable length types.
 
 There are no group extensions in Zarr v3.0.
 
