@@ -144,11 +144,10 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - Should core metadata and user attributes be stored together or separate documents? ([GH72](https://github.com/zarr-developers/zarr-specs/issues/72)) 
-   large metadata documents.
- - extensions and ``must_understand = True`` might be too restrictive. Work a
-   draft implementation with extensions and
-   see how far we can go. Possible list of extensions to implement:
+ - Should core metadata and user attributes be stored together or separate documents? (See https://github.com/zarr-developers/zarr-specs/issues/72)
+ - extensions and ``must_understand = True`` might be too restrictive.
+   We propose to develop a draft implementation with extensions and
+   see how far we can go. A possible list of extensions to implement includes:
 
     - Boolean
     - Complex
@@ -159,16 +158,17 @@ draft.
    See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
    the topic.
 
-  - Node name case sensitivity: The node name is now case sensitive, this may
+  - Node name case sensitivity: The node name is now case sensitive. This may
     make store implementation more complicated as backed might not be (like some
     specific filesystem / object store), and we may want to recommend a standard
     escaping mechanism in those case. https://github.com/zarr-developers/zarr-specs/issues/57
 
-  - Node name character set: Same as above but unlike the previous point where we
-    solicit feedback on wither store implementation should support full unicode.
+  - Node name character set: We
+    solicit feedback on whether store implementation should support full unicode.
     https://github.com/zarr-developers/zarr-specs/issues/56
 
-  - Should named dimensions be part of the core metadata spec ? https://github.com/zarr-developers/zarr-specs/issues/73
+  - Should named dimensions be part of the core metadata spec?
+    https://github.com/zarr-developers/zarr-specs/issues/73
 
 
 Document conventions
@@ -393,7 +393,7 @@ node names:
 
 * must not be the empty string ("")
 
-* must consist only of characters in the sets ``a-z``, ``A-Z``, ``0-9``,
+* must use only characters in the sets ``a-z``, ``A-Z``, ``0-9``,
   ``-_.``
 
 * must not be a string composed only of period characters, e.g. "." or
@@ -562,7 +562,7 @@ other type sizes in later versions of this specification.
     ways to encode variable length and we want to keep flexibility. While we seem
     to agree that for random access the most likely contender is to have two
     arrays, one with the actual variable length data and one with fixed size
-    (pointer + length) to the variable size data we do not want to commit to such
+    (pointer + length) to the variable size data, we do not want to commit to such
     a structure.
 
 
@@ -598,8 +598,8 @@ chunk along each dimension.
 
 The origin vertex of a chunk has coordinates in the array space (`i` *
 `dx`, `j` * `dy`, `k` * `dz`, ...) where (`dx`, `dy`, `dz`, ...) are
-the grid spacings along each dimension, also known as the chunk
-shape. Thus the origin vertex of the chunk at grid index (0, 0, 0,
+the chunk sizes along each dimension. 
+Thus the origin vertex of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
 array dimension is not perfectly divisible by the chunk length along
