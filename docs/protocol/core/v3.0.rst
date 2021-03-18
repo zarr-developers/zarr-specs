@@ -160,15 +160,16 @@ draft.
    the topic.
 
   - Node name case sensitivity: The node name is now case sensitive, this may
-    make store implementation more complicated as backed might not be (like some
-    specific filesystem / object store), and we may want to recommend a standard
-    escaping mechanism in those case. https://github.com/zarr-developers/zarr-specs/issues/57
+    make store implementation more complicated as some backends might not be
+    (like some specific filesystem / object store), and we may want to
+    recommend a standard escaping mechanism in those cases.
+    https://github.com/zarr-developers/zarr-specs/issues/57
 
   - Node name character set: Same as above but unlike the previous point where we
-    solicit feedback on wither store implementation should support full unicode.
+    solicit feedback on whether store implementation should support full unicode.
     https://github.com/zarr-developers/zarr-specs/issues/56
 
-  - Should named dimensions be part of the core metadata spec ? https://github.com/zarr-developers/zarr-specs/issues/73
+  - Should named dimensions be part of the core metadata spec? https://github.com/zarr-developers/zarr-specs/issues/73
 
 
 Document conventions
@@ -641,7 +642,7 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
 formed by joining together ASCII string representations of each index
 using a separator and prefixed with the character ``c``. The default value for
-the separator is the slash character lt ``/``, but this may be configured by
+the separator is the slash character, ``/``, but this may be configured by
 providing a ``separator`` value within the ``chunk_grid`` metadata object (see
 the section on `Array metadata`_ below).
 
@@ -715,7 +716,7 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
 Chunk encoding
 ==============
 
-An array may be configured with a compressor, which a codec used to
+An array may be configured with a compressor, which is a codec used to
 transform the binary representation of each chunk prior to storage,
 and to reverse the transformation during retrieval.
 
@@ -768,7 +769,7 @@ Metadata
 ========
 
 This section defines the structure of metadata documents for Zarr hierarchies,
-which consists of three types metadata documents: an entry point metadata
+which consists of three types of metadata documents: an entry point metadata
 document (``zarr.json``), array metadata documents, and group metadata
 documents. Each type of metadata document is described in the following
 subsections.
