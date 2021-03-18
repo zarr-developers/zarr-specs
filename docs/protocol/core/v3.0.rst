@@ -14,7 +14,7 @@ Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/master/docs/protocol/core/v3.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
 
 Copyright 2019-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -144,7 +144,7 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - Should core metadata and user attributes be stored together or separate documents? ([GH72](https://github.com/zarr-developers/zarr-specs/issues/72)) 
+ - Should core metadata and user attributes be stored together or separate documents? ([GH72](https://github.com/zarr-developers/zarr-specs/issues/72))
    large metadata documents.
  - extensions and ``must_understand = True`` might be too restrictive. Work a
    draft implementation with extensions and
