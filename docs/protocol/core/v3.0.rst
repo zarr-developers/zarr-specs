@@ -1041,7 +1041,7 @@ compressed using gzip compression prior to storage::
         },
         "chunk_memory_layout": "C",
         "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
+            "codec": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }
