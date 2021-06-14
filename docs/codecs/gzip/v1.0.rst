@@ -6,7 +6,7 @@ Gzip Codec (version 1.0)
 -----------------------------
 
 Specification URI:
-    https://purl.org/zarr/spec/codecs/gzip/1.0
+    https://purl.org/zarr/spec/codec/gzip/1.0
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codecs-gzip-v1.0>`_
 Suggest an edit for this spec:
@@ -81,7 +81,7 @@ Configuring codec in array metadata
 The Gzip codec can be specified as a compressor for a Zarr array under the
 ``compressor`` name in the corresponding array metadata document. The URI for
 the Gzip codec defined in this specification is
-https://purl.org/zarr/spec/codecs/gzip/1.0.
+https://purl.org/zarr/spec/codec/gzip/1.0.
 
 Additionally, the compression level must be specified as the value of the
 ``level`` name in the ``configuration`` metadata name. For example, the array
@@ -91,7 +91,7 @@ level of 1::
 
     {
         "compressor": {
-            "codec": "https://purl.org/zarr/spec/codecs/gzip/1.0",
+            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
             "configuration": {
                 "level": 1
             }
