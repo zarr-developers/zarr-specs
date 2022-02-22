@@ -1,0 +1,196 @@
+.. _sharding-storage-transformer-v1:
+
+==========================================
+Sharding storage transformer (version 1.0)
+==========================================
+-----------------------------
+ Editor's draft 18 02 2022
+-----------------------------
+
+Specification URI:
+    @@TODO
+    http://purl.org/zarr/spec/storage_transformers/sharding/1.0
+Issue tracking:
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/storage_transformers-sharding-v1.0>`_
+Suggest an edit for this spec:
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/storage_transformers/sharding/v1.0.rst>`_
+
+Copyright 2022 `Zarr core development
+team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
+list institutions?). This work is licensed under a `Creative Commons
+Attribution 3.0 Unported
+License <https://creativecommons.org/licenses/by/3.0/>`_.
+
+----
+
+
+Abstract
+========
+
+This specification defines an implementation of the Zarr abstract
+storage transformer API introducing sharding.
+
+
+Motivation
+==========
+
+Sharding decouples the concept of chunks from storage keys, which become shards.
+This is helpful when the requirements for those don't align:
+
+- Compressible units of chunks often need to be read and written in smaller
+  chunks, whereas
+- storage often is optimized for larger data per entry and fewer entries, e.g.
+  as restricted by the file block size and maximum inode number for typical
+  file systems.
+
+This does not necessarily fit the access patterns of the data, so chunks might
+need to be smaller than one storage key. In those cases sharding decouples those
+entities. One shard corresponds to one storage key, but can contain multiple chunks:
+
+.. image:: sharding.png
+
+
+Document conventions
+====================
+
+Conformance requirements are expressed with a combination of
+descriptive assertions and [RFC2119]_ terminology. The key words
+"MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the normative
+parts of this document are to be interpreted as described in
+[RFC2119]_. However, for readability, these words do not appear in all
+uppercase letters in this specification.
+
+All of the text of this specification is normative except sections
+explicitly marked as non-normative, examples, and notes. Examples in
+this specification are introduced with the words "for example".
+
+
+Configuration
+=============
+
+:ref:`array-metadata`.
+
+.. code-block::
+
+    {
+      storage_transformers: [
+        {
+          "storage_transformer": "https://purl.org/zarr/spec/storage_transformers/sharding/1.0",
+          "configuration": {
+            "format": "indexed",
+            "chunks_per_shard": [
+                2,
+                2
+            ]
+          }
+      ]
+    }
+
+
+Sharding Mechanism
+=========================
+
+@@TODO
+
+
+Binary shard format
+===================
+
+The only binary format is the ``indexed`` format, as specified by the ``format``
+configuration key. Other binary formats might be added in future versions.
+
+In the indexed binary format chunks are written successively in a shard, where
+unused space between them is allowed, followed by an index referencing them.
+The index holds an `offset, length` pair of little-endian uint64 per chunk,
+the chunks-order in the index is row-major (C) order, e.g. for (2, 2) chunks
+per shard an index would look like:
+
+.. code-block::
+
+    | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |
+    | offset | length | offset | length | offset | length | offset | length |
+    | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 |
+
+
+Empty chunks are denoted by setting both offset and length to `2^64 - 1``.
+The index always has the full shape of all possible chunks per shard,
+even if they are outside of the array size.
+
+The actual order of the chunk-content is not fixed and may be chosen by the implementation
+as all possible write orders are valid according to this specification and therefore can
+be read by any other implementation. When writing partial chunks into an existing shard no
+specific order of the existing chunks may be expected. Some writing strategies might be
+
+* **Fixed order**: Specify a fixed order (e.g. row-, column-major or Morton order).
+  When replacing existing chunks larger or equal sized chunks may be replaced in-place,
+  leaving unused space up to an upper limit  which might possibly be specified.
+  Please note that for regular-sized uncompressed data all chunks have the same size and
+  can therefore be replaced in-place.
+* **Append-only**: Any chunk to write is appended to the existing shard, followed by an updated index.
+
+Any configuration parameters for the write strategy must not be part of the metadata document,
+in a shard I'd propose to use Morton order, but this can easily be changed and customized, since any order can be read.
+
+
+Key translation
+===============
+
+The Zarr store interface is defined in terms of `keys` and `values`,
+where a `key` is a sequence of characters and a `value` is a sequence
+of bytes.
+
+@@TODO
+
+
+Store API implementation
+========================
+
+@@TODO
+
+The section below defines an implementation of the Zarr abstract store
+interface (@@TODO link) in terms of the native operations of this
+storage system. Below ``fspath_to_key()`` is a function that
+translates file system paths to store keys, and ``key_to_fspath()`` is
+a function that translates store keys to file system paths, as defined
+in the section above.
+
+* ``get(key) -> value`` : Read and return the contents of the file at
+  file system path ``key_to_fspath(key)``.
+
+* ``set(key, value)`` : Write ``value`` as the contents of the file at
+  file system path ``key_to_fspath(key)``.
+
+* ``delete(key)`` : Delete the file or directory at file system path
+  ``key_to_fspath(key)``.
+
+* ``list()`` : Recursively walk the file system from the base
+  directory, returning an iterator over keys obtained by calling
+  ``fspath_to_key(fp)`` for each descendant file path ``fp``.
+
+* ``list_prefix(prefix)`` : Obtain a file system path by calling
+  ``key_to_fspath(prefix)``. If the result is a directory path,
+  recursively walk the file system from this directory, returning an
+  iterator over keys obtained by calling ``fspath_to_key(fp)`` for
+  each descendant file path ``fp``.
+
+* ``list_dir(prefix)`` : Obtain a file system path by calling
+  ``key_to_fspath(prefix)``. If the result is a director path, list
+  the directory children. Return a set of keys obtained by calling
+  ``fspath_to_key(fp)`` for each child file path ``fp``, and a set of
+  prefixes obtained by calling ``fspath_to_key(dp)`` for each child
+  directory path ``dp``.
+
+
+References
+==========
+
+.. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
+   Requirement Levels. March 1997. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc2119
+
+
+Change log
+==========
+
+@@TODO

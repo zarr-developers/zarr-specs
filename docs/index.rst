@@ -10,8 +10,9 @@ Under construction.
    :caption: Contents:
 
    protocol
-   stores
    codecs
+   stores
+   storage_transformers
 
 
 Indices and tables

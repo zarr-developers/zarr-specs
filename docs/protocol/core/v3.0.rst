@@ -383,6 +383,17 @@ conceptual model underpinning the Zarr protocol.
     interface`_ which is a common set of operations that stores may
     provide.
 
+.. _storage transformer:
+.. _storage transformers:
+
+*Storage transformer*
+
+    To enhance the storage capabilities, storage transformers may
+    change the storage structure and behaviour of data coming from
+    an array_ in the underlying store_. Upon retrival the original data is
+    restored within the transformer. Any number of `predefined storage
+    transformers`_ can be registered and stacked.
+
 
 Node names
 ==========
@@ -895,6 +906,8 @@ ignored if not understood::
     }
 
 
+.. _array-metadata:
+
 Array metadata
 --------------
 
@@ -1009,6 +1022,17 @@ following mandatory names:
 The following names are optional:
 
 ``compressor``
+
+    Specifies a codec to be used for encoding and decoding chunks. The
+    value must be an object containing the name ``codec`` whose value
+    is a URI that identifies a codec and dereferences to a human-readable
+    representation of the codec specification. The codec
+    object may also contain a ``configuration`` object which consists of the
+    parameter names and values as defined by the corresponding codec
+    specification. When the ``compressor`` name is absent, this means that no
+    compressor is used.
+
+``storage_transformers``
 
     Specifies a codec to be used for encoding and decoding chunks. The
     value must be an object containing the name ``codec`` whose value
@@ -1498,6 +1522,39 @@ Let "+" be the string concatenation operator.
     .. note::
        For listable store, ``list_dir(parent(P))`` can be an alternative.
 
+
+Storage transformers
+====================
+
+A Zarr storage transformer allows to change the zarr-compatible data before storing it.
+The stored transformed data is restored to its original state whenever data is requested
+by the Array.
+
+A storage transformer serves the same `Abstract store interface`_ as the store_.
+However, it should not persistently store any information necessary to restore the original data,
+but instead propagates this to the next storage transformer or the final store.
+From the perspective of an Array or a previous stage transformer both store and storage transformer follow the same
+protocol and can be interchanged regarding the protocol. The behaviour can still be different,
+e.g. requests may be cached or the form of the underlying data can change.
+
+Storage Transformers may be stacked to combine different functionalities:
+
+.. mermaid::
+
+    graph LR
+      Array --> t1
+      subgraph stack [Storage transformers]
+        t1[Transformer 1] --> t2[...] --> t3[Transformer N]
+      end
+      t3 --> Store
+
+A fixed set of storage providers is recommended for implementation with this protocol:
+
+
+Predefined storage transformers
+-------------------------------
+
+- :ref:`sharding-storage-transformer-v1`
 
 Protocol extensions
 ===================
