@@ -393,7 +393,9 @@ conceptual model underpinning the Zarr protocol.
     an array_ in the underlying store_. Upon retrival the original data is
     restored within the transformer. Any number of `predefined storage
     transformers`_ can be registered and stacked.
+    See the `storage transformers details`_ below.
 
+.. _`storage transformers details`: #storage-transformers-1
 
 Node names
 ==========
@@ -1034,14 +1036,14 @@ The following names are optional:
 
 ``storage_transformers``
 
-    Specifies a codec to be used for encoding and decoding chunks. The
-    value must be an object containing the name ``codec`` whose value
-    is a URI that identifies a codec and dereferences to a human-readable
-    representation of the codec specification. The codec
+    Specifies a stack of `storage transformers`_. Each value in the list must
+    be an object containing the name ``storage_transformer`` whose value
+    is a URI that identifies a storage transformer and dereferences to a
+    human-readable representation of the codec specification. The
     object may also contain a ``configuration`` object which consists of the
-    parameter names and values as defined by the corresponding codec
-    specification. When the ``compressor`` name is absent, this means that no
-    compressor is used.
+    parameter names and values as defined by the corresponding storage transformer
+    specification. When the ``storage_transformers`` name is absent no storage
+    transformer is used, same for an empty list.
 
 
 All other names within the array metadata object are reserved for
@@ -1196,6 +1198,8 @@ The store operations are grouped into three sets of capabilities:
 a store implementation to support all of these capabilities.
 
 A **readable store** supports the following operation:
+
+@@TODO add bundled & partial access
 
 ``get`` - Retrieve the `value` associated with a given `key`.
 
@@ -1528,7 +1532,8 @@ Storage transformers
 
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
-by the Array.
+by the Array. Storage transformers can be configured per array via the
+``storage_transformers`` name in the `array metadata`_.
 
 A storage transformer serves the same `Abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,

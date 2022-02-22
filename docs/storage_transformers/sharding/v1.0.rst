@@ -27,8 +27,8 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 Abstract
 ========
 
-This specification defines an implementation of the Zarr abstract
-storage transformer API introducing sharding.
+This specification defines an implementation of the Zarr
+storage transformer protocol for sharding.
 
 
 Motivation
@@ -69,7 +69,7 @@ this specification are introduced with the words "for example".
 Configuration
 =============
 
-:ref:`array-metadata`.
+Sharding can be configured per array in the :ref:`array-metadata`:
 
 .. code-block::
 
@@ -87,11 +87,49 @@ Configuration
       ]
     }
 
+``format``
 
-Sharding Mechanism
-=========================
+    Specifies a `Binary shard format`_. In this version, the only binary format is the
+    ``indexed`` format.
 
-@@TODO
+``chunks_per_shard``
+
+    An array of integers providing the number of chunks that are combined in a shard
+    for each dimension of the Zarr array, where each chunk may only start at a position
+    that is divisble by ``chunks_per_shard`` per dimension, e.g. starting at the zero-origin.
+    The length of the array must match the length of the array metadata ``shape`` entry.
+    For example, a value ``[32, 2]`` indicates that 64 chunks are combined in one shard,
+    32 along the first dimension, and for each of those 2 along the second dimension.
+    Valid starting positions for a shard in the chunk-grid are therefore ``[0, 0]``,
+    ``[32, 2]``, ``[32, 4]``, ``[64, 2]`` or ``[96, 18]``.
+
+
+Key & value transformation
+==========================
+
+The storage transformer protocol defines the abstract interface to be the same
+as the `Abstract store interface`_.
+
+The Zarr store interface is defined in terms of `keys` and `values`,
+where a `key` is a sequence of characters and a `value` is a sequence
+of bytes. A key-value pair is called entry in the following part.
+
+This sharding transformer only adapts entries where the key starts
+with `data/root`, as they indicate data keys for array chunks. All other
+entries are simply passed on.
+
+Entries starting with `data/root` are grouped by their common shard, assuming
+`Storage keys` from a regular chunk grid which may use a customly configured
+``chunk separator``:
+For all entries that are part of the same shard the key is changed to the
+shard-key and the values are combined in the `Binary shard format`_ described
+below. The new shard-key is the chunk key divided by ``chunks_per_shard`` and
+floored per dimension. E.g. for ``chunks_per_shard=[32, 2]``, the chunk grid
+position ``[96, 18]`` (e.g. key "data/root/foo/baz/c96/18") is transformed to
+the shard grid position ``[3, 9]`` and reassigned to the respective new key,
+honoring the original chunk separator (e.g. "data/root/foo/baz/c3/9").
+Chunk grid positions ``[96, 19]``, ``[97, 18]``, …, up to ``[127, 19]`` will
+also have the same shard grid position ``[3, 9]``.
 
 
 Binary shard format
@@ -131,55 +169,6 @@ specific order of the existing chunks may be expected. Some writing strategies m
 
 Any configuration parameters for the write strategy must not be part of the metadata document,
 in a shard I'd propose to use Morton order, but this can easily be changed and customized, since any order can be read.
-
-
-Key translation
-===============
-
-The Zarr store interface is defined in terms of `keys` and `values`,
-where a `key` is a sequence of characters and a `value` is a sequence
-of bytes.
-
-@@TODO
-
-
-Store API implementation
-========================
-
-@@TODO
-
-The section below defines an implementation of the Zarr abstract store
-interface (@@TODO link) in terms of the native operations of this
-storage system. Below ``fspath_to_key()`` is a function that
-translates file system paths to store keys, and ``key_to_fspath()`` is
-a function that translates store keys to file system paths, as defined
-in the section above.
-
-* ``get(key) -> value`` : Read and return the contents of the file at
-  file system path ``key_to_fspath(key)``.
-
-* ``set(key, value)`` : Write ``value`` as the contents of the file at
-  file system path ``key_to_fspath(key)``.
-
-* ``delete(key)`` : Delete the file or directory at file system path
-  ``key_to_fspath(key)``.
-
-* ``list()`` : Recursively walk the file system from the base
-  directory, returning an iterator over keys obtained by calling
-  ``fspath_to_key(fp)`` for each descendant file path ``fp``.
-
-* ``list_prefix(prefix)`` : Obtain a file system path by calling
-  ``key_to_fspath(prefix)``. If the result is a directory path,
-  recursively walk the file system from this directory, returning an
-  iterator over keys obtained by calling ``fspath_to_key(fp)`` for
-  each descendant file path ``fp``.
-
-* ``list_dir(prefix)`` : Obtain a file system path by calling
-  ``key_to_fspath(prefix)``. If the result is a director path, list
-  the directory children. Return a set of keys obtained by calling
-  ``fspath_to_key(fp)`` for each child file path ``fp``, and a set of
-  prefixes obtained by calling ``fspath_to_key(dp)`` for each child
-  directory path ``dp``.
 
 
 References
