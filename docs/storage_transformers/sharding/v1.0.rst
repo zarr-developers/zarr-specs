@@ -104,8 +104,11 @@ Sharding can be configured per array in the :ref:`array-metadata`:
     ``[32, 2]``, ``[32, 4]``, ``[64, 2]`` or ``[96, 18]``.
 
 
+Storage transformer implementation
+==================================
+
 Key & value transformation
-==========================
+--------------------------
 
 The storage transformer protocol defines the abstract interface to be the same
 as the :ref:`abstract-store-interface`.
@@ -124,7 +127,7 @@ storage keys from a regular chunk grid which may use a customly configured
 For all entries that are part of the same shard the key is changed to the
 shard-key and the values are combined in the `Binary shard format`_ described
 below. The new shard-key is the chunk key divided by ``chunks_per_shard`` and
-floored per dimension. E.g. for ``chunks_per_shard=[32, 2]``, the chunk grid
+floored per dimension. For example for ``chunks_per_shard=[32, 2]``, the chunk grid
 position ``[96, 18]`` (e.g. key "data/root/foo/baz/c96/18") is transformed to
 the shard grid position ``[3, 9]`` and reassigned to the respective new key,
 honoring the original chunk separator (e.g. "data/root/foo/baz/c3/9").
@@ -133,16 +136,18 @@ also have the same shard grid position ``[3, 9]``.
 
 
 Binary shard format
-===================
+-------------------
 
 The only binary format is the ``indexed`` format, as specified by the ``format``
 configuration key. Other binary formats might be added in future versions.
 
 In the indexed binary format chunks are written successively in a shard, where
 unused space between them is allowed, followed by an index referencing them.
+The index is placed at the end of the file and has a length of 16 bytes per chunk
+in a shard, for example ``16 bytes * 64 = 1014 bytes`` for ``chunks_per_shard=[32, 2]``.
 The index holds an `offset, length` pair of little-endian uint64 per chunk,
-the chunks-order in the index is row-major (C) order, e.g. for (2, 2) chunks
-per shard an index would look like:
+the chunks-order in the index is row-major (C) order, for example for
+``chunks_per_shard=[2, 2]`` an index would look like:
 
 .. code-block::
 
@@ -151,7 +156,7 @@ per shard an index would look like:
     | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 |
 
 
-Empty chunks are denoted by setting both offset and length to `2^64 - 1``.
+Empty chunks are denoted by setting both offset and length to ``2^64 - 1``.
 The index always has the full shape of all possible chunks per shard,
 even if they are outside of the array size.
 
@@ -165,10 +170,11 @@ specific order of the existing chunks may be expected. Some writing strategies m
   leaving unused space up to an upper limit  which might possibly be specified.
   Please note that for regular-sized uncompressed data all chunks have the same size and
   can therefore be replaced in-place.
-* **Append-only**: Any chunk to write is appended to the existing shard, followed by an updated index.
+* **Append-only**: Any chunk to write is appended to the existing shard,
+  followed by an updated index.
 
 Any configuration parameters for the write strategy must not be part of the metadata document,
-in a shard I'd propose to use Morton order, but this can easily be changed and customized, since any order can be read.
+they need to be configured at runtime, as this is implementation specific.
 
 
 References
