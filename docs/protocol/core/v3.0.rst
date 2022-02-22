@@ -1167,6 +1167,9 @@ interface`_ subsection. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
+
+.. _abstract-store-interface:
+
 Abstract store interface
 ------------------------
 

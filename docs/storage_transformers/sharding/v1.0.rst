@@ -108,18 +108,18 @@ Key & value transformation
 ==========================
 
 The storage transformer protocol defines the abstract interface to be the same
-as the `Abstract store interface`_.
+as the :ref:`abstract-store-interface`.
 
 The Zarr store interface is defined in terms of `keys` and `values`,
 where a `key` is a sequence of characters and a `value` is a sequence
-of bytes. A key-value pair is called entry in the following part.
+of bytes. A key-value pair is called `entry` in the following part.
 
 This sharding transformer only adapts entries where the key starts
 with `data/root`, as they indicate data keys for array chunks. All other
 entries are simply passed on.
 
-Entries starting with `data/root` are grouped by their common shard, assuming
-`Storage keys` from a regular chunk grid which may use a customly configured
+Entries starting with ``data/root`` are grouped by their common shard, assuming
+storage keys from a regular chunk grid which may use a customly configured
 ``chunk separator``:
 For all entries that are part of the same shard the key is changed to the
 shard-key and the values are combined in the `Binary shard format`_ described
