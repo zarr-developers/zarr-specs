@@ -1366,6 +1366,8 @@ Note that any non-root hierarchy path will have ancestor paths that
 identify ancestor nodes in the hierarchy. For example, the path
 "/foo/bar" has ancestor paths "/foo" and "/".
 
+.. _storage-keys:
+
 Storage keys
 ------------
 
