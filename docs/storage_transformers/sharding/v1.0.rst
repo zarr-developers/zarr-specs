@@ -37,14 +37,11 @@ Motivation
 Sharding decouples the concept of chunks from storage keys, which become shards.
 This is helpful when the requirements for those don't align:
 
-- Compressible units of chunks often need to be read and written in smaller
-  chunks, whereas
-- storage often is optimized for larger data per entry and fewer entries, e.g.
-  as restricted by the file block size and maximum inode number for typical
-  file systems.
+- Chunk sizes need to be small for read efficiency requirements, e.g. for data streaming in browser-based visualization software, whereas
+- it becomes inefficient or impractical to store a large number of chunks in single files or objects due to the design constraints of the underlying storage, e.g. as restricted by the file block size and maximum inode number for typical file systems.
 
 This does not necessarily fit the access patterns of the data, so chunks might
-need to be smaller than one storage key. In those cases sharding decouples those
+need to be smaller than the minimum size of one storage key. In those cases sharding decouples those
 entities. One shard corresponds to one storage key, but can contain multiple chunks:
 
 .. image:: sharding.png
@@ -113,7 +110,7 @@ Key & value transformation
 The storage transformer protocol defines the abstract interface to be the same
 as the :ref:`abstract-store-interface`.
 
-The Zarr store interface is defined in terms of `keys` and `values`,
+The Zarr store interface is defined as a mapping of `keys` and `values`,
 where a `key` is a sequence of characters and a `value` is a sequence
 of bytes. A key-value pair is called `entry` in the following part.
 
@@ -143,7 +140,7 @@ configuration key. Other binary formats might be added in future versions.
 
 In the indexed binary format chunks are written successively in a shard, where
 unused space between them is allowed, followed by an index referencing them.
-The index is placed at the end of the file and has a length of 16 bytes per chunk
+The index is placed at the end of the file and has a length of 16 bytes multiplied by the number of chunks
 in a shard, for example ``16 bytes * 64 = 1014 bytes`` for ``chunks_per_shard=[32, 2]``.
 The index holds an `offset, length` pair of little-endian uint64 per chunk,
 the chunks-order in the index is row-major (C) order, for example for
