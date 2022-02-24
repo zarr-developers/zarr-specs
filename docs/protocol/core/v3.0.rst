@@ -1199,13 +1199,14 @@ available data until the end of the referenced value. For example
 `range` ``[0, none]`` specifies the full value. Stores that do not
 support partial access can still answer the requests using cutouts
 of full values. It is recommended that the implementation of the
-``get_multi``, ``set_multi`` and ``remove_multi`` methods is made
-optional, providing fallbacks for them by default. However, it is
-recommended to supply those operations where possible for efficiency.
-Also, the ``get``, ``set`` and ``erase`` can easily be mapped onto
-their `multi` counterparts. Therefore, it is also recommended to
-supply fallbacks for those if the `multi` operations can be implemented.
-An entity containing those fallbacks could be named ``MultiStore``.
+``get_partial_values``, ``set_partial_values`` and
+``remove_partial_values`` methods is made optional, providing fallbacks
+for them by default. However, it is recommended to supply those operations
+where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
+can easily be mapped onto their `partial_values` counterparts.
+Therefore, it is also recommended to supply fallbacks for those if the
+`partial_values` operations can be implemented.
+An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
 
 The store interface also defines some operations involving
 `prefixes`. In the context of this interface, a prefix is a string
@@ -1225,7 +1226,7 @@ A **readable store** supports the following operation:
     | Parameters: `key`
     | Output: `value`
 
-``get_multi`` - Retrieve possibly partial `values` from given `key_ranges`.
+``get_partial_values`` - Retrieve possibly partial `values` from given `key_ranges`.
 
     | Parameters: `key_ranges`: ordered set of `key`, `range` pairs,
     |   a `key` may occur multiple times with different `ranges`
@@ -1238,7 +1239,7 @@ A **writeable store** supports the following operations:
     | Parameters: `key`, `value`
     | Output: none
 
-``set_multi`` - Store `values` at a given `key`, starting at byte `range_start`.
+``set_partial_values`` - Store `values` at a given `key`, starting at byte `range_start`.
 
     | Parameters: `key_start_values`: set of `key`,
     |   `range_start`, `value` triples, a `key` may occur multiple
@@ -1252,7 +1253,7 @@ A **writeable store** supports the following operations:
     | Parameters: `key`
     | Output: none
 
-``erase_multi`` - Erase the given key/value pair from the store.
+``remove_partial_values`` - Erase the given key/value pair from the store.
 
     | Parameters: `keys`: set of `keys`
     | Output: none
