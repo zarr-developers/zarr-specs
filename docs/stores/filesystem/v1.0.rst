@@ -149,8 +149,8 @@ directory path is "C:\\data", then the file system path
 Store API implementation
 ========================
 
-The section below defines an implementation of the Zarr abstract store
-interface (@@TODO link) in terms of the native operations of this
+The section below defines an implementation of the Zarr
+:ref:`abstract-store-interface` in terms of the native operations of this
 storage system. Below ``fspath_to_key()`` is a function that
 translates file system paths to store keys, and ``key_to_fspath()`` is
 a function that translates store keys to file system paths, as defined

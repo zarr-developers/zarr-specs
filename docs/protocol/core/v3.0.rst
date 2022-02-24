@@ -1200,7 +1200,7 @@ available data until the end of the referenced value. For example
 support partial access can still answer the requests using cutouts
 of full values. It is recommended that the implementation of the
 ``get_partial_values``, ``set_partial_values`` and
-``remove_partial_values`` methods is made optional, providing fallbacks
+``erase_values`` methods is made optional, providing fallbacks
 for them by default. However, it is recommended to supply those operations
 where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
 can easily be mapped onto their `partial_values` counterparts.
@@ -1230,7 +1230,8 @@ A **readable store** supports the following operation:
 
     | Parameters: `key_ranges`: ordered set of `key`, `range` pairs,
     |   a `key` may occur multiple times with different `ranges`
-    | Output: list of `values`, in the order of the `key_ranges`
+    | Output: list of `values`, in the order of the `key_ranges`, may contain none
+    |   for missing keys
 
 A **writeable store** supports the following operations:
 
@@ -1253,7 +1254,7 @@ A **writeable store** supports the following operations:
     | Parameters: `key`
     | Output: none
 
-``remove_partial_values`` - Erase the given key/value pair from the store.
+``erase_values`` - Erase the given key/value pairs from the store.
 
     | Parameters: `keys`: set of `keys`
     | Output: none

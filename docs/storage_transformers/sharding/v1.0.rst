@@ -177,6 +177,94 @@ Any configuration parameters for the write strategy must not be part of the meta
 they need to be configured at runtime, as this is implementation specific.
 
 
+API implementation
+------------------
+
+The section below defines an implementation of the
+:ref:`abstract-store-interface` in terms of the operations of this
+storage transformer as a ``StoreWithPartialAccess``.
+The term `underlying store` references either the next storage transformer
+in the stack or the actual store if this transformer is the last one in the
+stack. Any operations with keys not starting with ``data/root`` are simply
+relayed to the underlying store and not described explicitly.
+
+* ``get_partial_values(key_ranges) -> values``:
+  For each referenced key, request the indices from the underlying store using
+  ``get_partial_values``. For each `key`, `range` pair in in `key_ranges`,
+  check if the chunk exists by checking if the index offset and length
+  are both ``2^64 - 1``. For existing keys, request the actual chunks by
+  their ranges as read from the index using ``get_partial_values``.
+  This operation should be implemented using two ``get_partial_values``
+  operations on the underlying store, one for retrieving the indices and
+  one for retrieving existing chunks.
+
+* ``set_partial_values(key_start_values)`` :
+  For each referenced key, check if all available chunks in a shard are
+  referenced. In this case a shard can be constructed according to the
+  `Binary shard format`_ directly.
+  For all other keys, request the indices from the underlying store using
+  ``get_partial_values``. All chunks that are not updated completely and
+  exist according to the index (index offset and length are both
+  ``2^64 - 1``) need to be read via ``get_partial_values`` from the
+  underlying store. For simplification purposes a shard may also be read
+  completely, combining the previous two `get` operations into one.
+  Based on the existing chunks and value ranges that need to be updated
+  new shards are constructed according to the `Binary shard format`_.
+  All shards that need to be updated must now be set via ``set`` or
+  ``set_partial_values(key_start_values)``, depending one the chosen
+  writing strategy provided by the implementation.
+  Specialized store implementations that allow appending to a storage
+  object may only need to read the index to update it.
+
+* ``erase_values(keys)`` :
+  For each referenced key, check if all available chunks in a shard are
+  referenced. In this case the full shard is removed using ``erase_values``
+  on the underlying store.
+  For all other keys, request the indices from the underlying
+  store using ``get_partial_values``. Update the index using and offset and
+  length of ``2^64 - 1`` to mark missing chunks. The updated index may be
+  be written in-place using ``set_partial_values(key_start_values)``,
+  or a larger rewrite of the shard may be done including the index update,
+  but also removing value ranges corresponding to the erased chunks.
+
+* ``erase_prefix()`` : If the prefix contains a part of the chunk-grid
+  key, this part is translated to the referenced shard and contained chunks.
+  For affected shards where all contained chunks are erased the prefix is
+  rewritten to the corresponding shard key and the operation is relayed to
+  the underlying store.
+  For all shards where only some chunks are erased the affected chunks
+  are removed by invoking the operation ``erase_values`` on this
+  storage transformer with the respective chunk keys.
+
+* ``list()``: See ``list_prefix`` with the prefix ``/``.
+
+* ``list_prefix(prefix)`` : If the prefix contains a part of the chunk-grid
+  key, this part is translated to the referenced shard and contained chunks.
+  Then, ``list_prefix`` is called on the underlying store with the translated
+  prefix. For all listed shards request the indices from the underlying store
+  using ``get_partial_values``. Existing chunks, where the index offset or
+  length are not ``2^64 - 1`` are then listed by their original key.
+
+* ``list_dir(prefix)`` : If the prefix contains a part of the chunk-grid
+  key, this part is translated to the referenced shard and contained chunks.
+  Then, ``list_dir`` is called on the underlying store with the translated
+  prefix. For all *retrieved prefixes* (not full keys) with partial shard keys,
+  the corresponding original prefixes covering all possible chunks in the shard
+  are listed. For *retrieved full keys* the the indices from the underlying store
+  are requested using ``get_partial_values``. Existing chunks, where the index
+  offset or length are not ``2^64 - 1`` are then listed by their original key.
+
+  .. note::
+    Not all listed prefixes must necessarily contain keys, as shard prefixes with
+    partially available chunks return prefixes for all possible chunks without
+    verifying their exisence for performance reasons. Listing those prefixes
+    is still safe as some chunks in their corresponding shard exist, but not
+    necessarily in the requested prefix, possibly leading to empty responses.
+    Please note, this only applies for returned prefixes, *not* for full keys
+    referencing storage objects. Returned full keys always reflect the actually
+    available chunks and are safe to request.
+
+
 References
 ==========
 
