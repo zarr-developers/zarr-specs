@@ -44,7 +44,7 @@ Increasing the chunk size works only up to a certain point, as chunk sizes need 
 read efficiency requirements, for example to stream data in browser-based visualization software.
 
 Therefore, chunks may need to be smaller than the minimum size of one storage key.
-In those cases it is required to store objects at a more coarse granularity than reading chunks.
+In those cases it is efficient to store objects at a more coarse granularity than reading chunks.
 Sharding solves this by allowing to store multiple chunks in one storage key, which is called a shard:
 
 .. image:: sharding.png
