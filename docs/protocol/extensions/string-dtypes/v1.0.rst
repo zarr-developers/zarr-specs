@@ -94,8 +94,8 @@ These are zero-terminated bytes and correspond to
 For example ``a = np.array(["a", "bcd", "efgh"], dtype="U4")`` creates an array where ``a.dtype.kind`` is 'U' and each element is a sequence of 4 characters where each character occupies 4 bytes (UTF-32).
 
 
-Units
-=====
+Data Types added by this extension
+==================================
 
 .. list-table:: Data types
    :header-rows: 1
