@@ -143,20 +143,20 @@ configuration key. Other binary formats might be added in future versions.
 
 In the indexed binary format chunks are written successively in a shard, where
 unused space between them is allowed, followed by an index referencing them.
-The index is placed at the end of the file and has a length of 16 bytes multiplied by the number of chunks
+The index is placed at the end of the file and has a size of 16 bytes multiplied by the number of chunks
 in a shard, for example ``16 bytes * 64 = 1014 bytes`` for ``chunks_per_shard=[32, 2]``.
-The index holds an `offset, length` pair of little-endian uint64 per chunk,
+The index holds an `offset, nbytes` pair of little-endian uint64 per chunk,
 the chunks-order in the index is row-major (C) order, for example for
 ``chunks_per_shard=[2, 2]`` an index would look like:
 
 .. code-block::
 
     | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |
-    | offset | length | offset | length | offset | length | offset | length |
+    | offset | nbytes | offset | nbytes | offset | nbytes | offset | nbytes |
     | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 |
 
 
-Empty chunks are denoted by setting both offset and length to ``2^64 - 1``.
+Empty chunks are denoted by setting both offset and nbytes to ``2^64 - 1``.
 The index always has the full shape of all possible chunks per shard,
 even if they are outside of the array size.
 
@@ -191,7 +191,7 @@ relayed to the underlying store and not described explicitly.
 * ``get_partial_values(key_ranges) -> values``:
   For each referenced key, request the indices from the underlying store using
   ``get_partial_values``. For each `key`, `range` pair in in `key_ranges`,
-  check if the chunk exists by checking if the index offset and length
+  check if the chunk exists by checking if the index offset and nbytes
   are both ``2^64 - 1``. For existing keys, request the actual chunks by
   their ranges as read from the index using ``get_partial_values``.
   This operation should be implemented using two ``get_partial_values``
@@ -204,7 +204,7 @@ relayed to the underlying store and not described explicitly.
   `Binary shard format`_ directly.
   For all other keys, request the indices from the underlying store using
   ``get_partial_values``. All chunks that are not updated completely and
-  exist according to the index (index offset and length are both
+  exist according to the index (index offset and nbytes are both
   ``2^64 - 1``) need to be read via ``get_partial_values`` from the
   underlying store. For simplification purposes a shard may also be read
   completely, combining the previous two `get` operations into one.
@@ -222,7 +222,7 @@ relayed to the underlying store and not described explicitly.
   on the underlying store.
   For all other keys, request the indices from the underlying
   store using ``get_partial_values``. Update the index using and offset and
-  length of ``2^64 - 1`` to mark missing chunks. The updated index may be
+  nbytes of ``2^64 - 1`` to mark missing chunks. The updated index may be
   be written in-place using ``set_partial_values(key_start_values)``,
   or a larger rewrite of the shard may be done including the index update,
   but also removing value ranges corresponding to the erased chunks.
@@ -243,7 +243,7 @@ relayed to the underlying store and not described explicitly.
   Then, ``list_prefix`` is called on the underlying store with the translated
   prefix. For all listed shards request the indices from the underlying store
   using ``get_partial_values``. Existing chunks, where the index offset or
-  length are not ``2^64 - 1`` are then listed by their original key.
+  nbytes are not ``2^64 - 1`` are then listed by their original key.
 
 * ``list_dir(prefix)`` : If the prefix contains a part of the chunk-grid
   key, this part is translated to the referenced shard and contained chunks.
@@ -252,7 +252,7 @@ relayed to the underlying store and not described explicitly.
   the corresponding original prefixes covering all possible chunks in the shard
   are listed. For *retrieved full keys* the the indices from the underlying store
   are requested using ``get_partial_values``. Existing chunks, where the index
-  offset or length are not ``2^64 - 1`` are then listed by their original key.
+  offset or nbytes are not ``2^64 - 1`` are then listed by their original key.
 
   .. note::
     Not all listed prefixes must necessarily contain keys, as shard prefixes with
