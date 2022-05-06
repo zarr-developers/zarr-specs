@@ -11,6 +11,9 @@ Under construction.
    extensions/filters/v1.0
    extensions/complex-dtypes/v1.0
    extensions/datetime-dtypes/v1.0
+   extensions/object-dtypes/v1.0
+   extensions/string-dtypes/v1.0
+   extensions/struct-dtypes/v1.0
 
 
 A number of other features might be included in the core protocol v3, but are currently considered as extensions. 
