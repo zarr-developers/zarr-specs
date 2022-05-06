@@ -384,6 +384,19 @@ conceptual model underpinning the Zarr protocol.
     interface`_ which is a common set of operations that stores may
     provide.
 
+.. _storage transformer:
+.. _storage transformers:
+
+*Storage transformer*
+
+    To enhance the storage capabilities, storage transformers may
+    change the storage structure and behaviour of data coming from
+    an array_ in the underlying store_. Upon retrival the original data is
+    restored within the transformer. Any number of `predefined storage
+    transformers`_ can be registered and stacked.
+    See the `storage transformers details`_ below.
+
+.. _`storage transformers details`: #storage-transformers-1
 
 Node names
 ==========
@@ -896,6 +909,8 @@ ignored if not understood::
     }
 
 
+.. _array-metadata:
+
 Array metadata
 --------------
 
@@ -1026,6 +1041,17 @@ The following names are optional:
     specification. When the ``compressor`` name is absent, this means that no
     compressor is used.
 
+``storage_transformers``
+
+    Specifies a stack of `storage transformers`_. Each value in the list must
+    be an object containing the name ``storage_transformer`` whose value
+    is a URI that identifies a storage transformer and dereferences to a
+    human-readable representation of the codec specification. The
+    object may also contain a ``configuration`` object which consists of the
+    parameter names and values as defined by the corresponding storage transformer
+    specification. When the ``storage_transformers`` name is absent no storage
+    transformer is used, same for an empty list.
+
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
@@ -1148,6 +1174,9 @@ interface`_ subsection. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
+
+.. _abstract-store-interface:
+
 Abstract store interface
 ------------------------
 
@@ -1169,6 +1198,23 @@ one such pair for any given `key`. I.e., a store is a mapping from
 keys to values. It is also assumed that keys are case sensitive, i.e.,
 the keys "foo" and "FOO" are different.
 
+To read and write partial values, a `range` specifies two integers
+`range_start` and `range_length`, that specify a part of the value
+starting at byte `range_start` (inclusive) and having a length of
+`range_length` bytes. `range_length` may be none, indicating all
+available data until the end of the referenced value. For example
+`range` ``[0, none]`` specifies the full value. Stores that do not
+support partial access can still answer the requests using cutouts
+of full values. It is recommended that the implementation of the
+``get_partial_values``, ``set_partial_values`` and
+``erase_values`` methods is made optional, providing fallbacks
+for them by default. However, it is recommended to supply those operations
+where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
+can easily be mapped onto their `partial_values` counterparts.
+Therefore, it is also recommended to supply fallbacks for those if the
+`partial_values` operations can be implemented.
+An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
+
 The store interface also defines some operations involving
 `prefixes`. In the context of this interface, a prefix is a string
 containing only characters that are valid for use in `keys` and ending
@@ -1180,10 +1226,19 @@ a store implementation to support all of these capabilities.
 
 A **readable store** supports the following operation:
 
+@@TODO add bundled & partial access
+
 ``get`` - Retrieve the `value` associated with a given `key`.
 
     | Parameters: `key`
     | Output: `value`
+
+``get_partial_values`` - Retrieve possibly partial `values` from given `key_ranges`.
+
+    | Parameters: `key_ranges`: ordered set of `key`, `range` pairs,
+    |   a `key` may occur multiple times with different `ranges`
+    | Output: list of `values`, in the order of the `key_ranges`, may contain none
+    |   for missing keys
 
 A **writeable store** supports the following operations:
 
@@ -1192,9 +1247,23 @@ A **writeable store** supports the following operations:
     | Parameters: `key`, `value`
     | Output: none
 
+``set_partial_values`` - Store `values` at a given `key`, starting at byte `range_start`.
+
+    | Parameters: `key_start_values`: set of `key`,
+    |   `range_start`, `value` triples, a `key` may occur multiple
+    |   times with different `range_starts`, `range_starts` with
+    |   length of the respective `value` must not specify overlapping
+    |   ranges for the same `key`
+    | Output: none
+
 ``erase`` - Erase the given key/value pair from the store.
 
     | Parameters: `key`
+    | Output: none
+
+``erase_values`` - Erase the given key/value pairs from the store.
+
+    | Parameters: `keys`: set of `keys`
     | Output: none
 
 ``erase_prefix`` - Erase all keys with the given prefix from the store:
@@ -1313,6 +1382,8 @@ storage keys used to store encoded chunks.
 Note that any non-root hierarchy path will have ancestor paths that
 identify ancestor nodes in the hierarchy. For example, the path
 "/foo/bar" has ancestor paths "/foo" and "/".
+
+.. _storage-keys:
 
 Storage keys
 ------------
@@ -1504,6 +1575,42 @@ Let "+" be the string concatenation operator.
     .. note::
        For listable store, ``list_dir(parent(P))`` can be an alternative.
 
+
+Storage transformers
+====================
+
+A Zarr storage transformer allows to change the zarr-compatible data before storing it.
+The stored transformed data is restored to its original state whenever data is requested
+by the Array. Storage transformers can be configured per array via the
+``storage_transformers`` name in the `array metadata`_. Storage transformers which do
+not change the storage layout (e.g. for caching) may be specified at runtime without
+adding them to the array metadata.
+
+A storage transformer serves the same `Abstract store interface`_ as the store_.
+However, it should not persistently store any information necessary to restore the original data,
+but instead propagates this to the next storage transformer or the final store.
+From the perspective of an Array or a previous stage transformer both store and storage transformer follow the same
+protocol and can be interchanged regarding the protocol. The behaviour can still be different,
+e.g. requests may be cached or the form of the underlying data can change.
+
+Storage transformers may be stacked to combine different functionalities:
+
+.. mermaid::
+
+    graph LR
+      Array --> t1
+      subgraph stack [Storage transformers]
+        t1[Transformer 1] --> t2[...] --> t3[Transformer N]
+      end
+      t3 --> Store
+
+A fixed set of storage providers is recommended for implementation with this protocol:
+
+
+Predefined storage transformers
+-------------------------------
+
+- :ref:`sharding-storage-transformer-v1`
 
 Protocol extensions
 ===================

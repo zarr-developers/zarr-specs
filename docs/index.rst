@@ -12,6 +12,7 @@ Under construction.
    protocol
    codecs
    stores
+   storage_transformers
 
 
 Indices and tables
