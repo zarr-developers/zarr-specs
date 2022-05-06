@@ -6,7 +6,7 @@ Editor's Draft 21 October 2020
 ------------------------------
 
 Specification URI:
-    https://purl.org/zarr/specs/codecs
+    https://purl.org/zarr/specs/codec
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
@@ -76,7 +76,7 @@ Gzip
 ----
 
 Codec URI:
-    https://purl.org/zarr/spec/codecs/gzip
+    https://purl.org/zarr/spec/codec/gzip
 
     
 Configuration parameters
@@ -94,7 +94,7 @@ the Gzip codec configured with a compression level of 1::
 
     {
         "compressor": {
-            "codec": "https://purl.org/zarr/spec/codecs/gzip",
+            "codec": "https://purl.org/zarr/spec/codec/gzip",
             "configuration": {                                                                                
                 "level": 1                                                                                    
             }
@@ -115,7 +115,7 @@ Blosc
 -----
 
 Codec URI:
-    https://purl.org/zarr/spec/codecs/blosc
+    https://purl.org/zarr/spec/codec/blosc
 
     
 Configuration parameters
@@ -157,7 +157,7 @@ default block size::
 
     {
         "compressor": {
-            "codec": "https://purl.org/zarr/spec/codecs/blosc",
+            "codec": "https://purl.org/zarr/spec/codec/blosc",
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,
