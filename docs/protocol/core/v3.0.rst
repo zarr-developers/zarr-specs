@@ -1477,16 +1477,6 @@ Let "+" be the string concatenation operator.
         perform ``erase_prefix("meta/root" + P + "/")`` and
         ``erase_prefix("data/root" + P + "/")``.
 
-    Note that store implementation may decide to reify implicit groups
-    and thus protocol implementation should attempt to erase the
-    group metadata file if they really wish to erase an empty
-    implicit group. @@TODO clarify this
-
-    Store implementation are also allowed to erase any implicit parent of an
-    erased implicit group, so a protocol implementation should make sure to
-    reify a parent group if they need to keep it. @@TODO clarify this
-
-
 **Determine if a node exists**
 
     To determine if a node exists at path ``P``, try in the following
@@ -1513,6 +1503,26 @@ in mostly two categories:
 There are no group extensions in Zarr v3.0.
 
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
+
+Implementation Notes
+====================
+
+This section is non-normative and is present notes from implementers about case
+that need to be carefully thought about, but do not strictly fall into the spec.
+
+Explicit vs implicit group
+--------------------------
+
+While the zarr spec v3 defined implicit and explicit group, implementation may
+decide to create an explicit group for all implicit group they encounter; in
+particular when using a hierarchical storage.
+
+Erasure of an implicit group may automatically erase any empty parent. For
+example on a S3 store where the namespace is flat, erasure of the last key with
+a prefix will erase all the implicit group in the prefix.
+
+Care must thus be taken when erasing a array or a group if the parent needs to
+be converted into an explicit group.
 
 
 Comparison with Zarr v2
