@@ -144,11 +144,11 @@ Questions that still need to be resolved
 We solicit feedback on the following area during the RFC period of this first
 draft.
 
- - Should core metadata and user attributes be stored together or separate documents? ([GH72](https://github.com/zarr-developers/zarr-specs/issues/72))
-   large metadata documents.
+ - Should core metadata and user attributes be stored together or separate documents?
+   (See https://github.com/zarr-developers/zarr-specs/issues/72)
  - extensions and ``must_understand = True`` might be too restrictive. Work a
-   draft implementation with extensions and
-   see how far we can go. Possible list of extensions to implement:
+   We propose to develop a draft implementation with extensions and
+   see how far we can go. A possible list of extensions to include:
 
     - Boolean
     - Complex
@@ -159,17 +159,18 @@ draft.
    See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
    the topic.
 
-  - Node name case sensitivity: The node name is now case sensitive, this may
+  - Node name case sensitivity: The node name is now case sensitive. This may
     make store implementation more complicated as some backends might not be
     (like some specific filesystem / object store), and we may want to
     recommend a standard escaping mechanism in those cases.
     https://github.com/zarr-developers/zarr-specs/issues/57
 
-  - Node name character set: Same as above but unlike the previous point where we
+  - Node name character set: We
     solicit feedback on whether store implementation should support full unicode.
     https://github.com/zarr-developers/zarr-specs/issues/56
 
-  - Should named dimensions be part of the core metadata spec? https://github.com/zarr-developers/zarr-specs/issues/73
+  - Should named dimensions be part of the core metadata spec?
+    https://github.com/zarr-developers/zarr-specs/issues/73
 
 
 Document conventions
@@ -394,7 +395,7 @@ node names:
 
 * must not be the empty string ("")
 
-* must consist only of characters in the sets ``a-z``, ``A-Z``, ``0-9``,
+* must use only characters in the sets ``a-z``, ``A-Z``, ``0-9``,
   ``-_.``
 
 * must not be a string composed only of period characters, e.g. "." or
@@ -563,7 +564,7 @@ other type sizes in later versions of this specification.
     ways to encode variable length and we want to keep flexibility. While we seem
     to agree that for random access the most likely contender is to have two
     arrays, one with the actual variable length data and one with fixed size
-    (pointer + length) to the variable size data we do not want to commit to such
+    (pointer + length) to the variable size data, we do not want to commit to such
     a structure.
 
 
@@ -594,21 +595,21 @@ A regular grid is a type of grid where an array is divided into chunks
 such that each chunk is a hyperrectangle of the same shape. The
 dimensionality of the grid is the same as the dimensionality of the
 array. Each chunk in the grid can be addressed by a tuple of positive
-integers (`i`, `j`, `k`, ...) corresponding to the indices of the
+integers (`k`, `j`, `i`, ...) corresponding to the indices of the
 chunk along each dimension.
 
-The origin vertex of a chunk has coordinates in the array space (`i` *
-`dx`, `j` * `dy`, `k` * `dz`, ...) where (`dx`, `dy`, `dz`, ...) are
-the grid spacings along each dimension, also known as the chunk
-shape. Thus the origin vertex of the chunk at grid index (0, 0, 0,
+The origin vertex of a chunk has coordinates in the array space (`k` *
+`dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
+the chunk sizes along each dimension.
+Thus the origin vertex of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
 array dimension is not perfectly divisible by the chunk length along
 the same dimension, then the grid will overhang the edge of the array
 space.
 
-The shape of the chunk grid will be (ceil(`x` / `dx`), ceil(`y` /
-`dy`), ceil(`z` / `dz`), ...)  where (`x`, `y`, `z`, ...) is the array
+The shape of the chunk grid will be (ceil(`z` / `dz`), ceil(`y` /
+`dy`), ceil(`x` / `dx`), ...)  where (`z`, `y`, `x`, ...) is the array
 shape, "/" is the division operator and "ceil" is the ceiling
 function. For example, if a 3 dimensional array has shape (10, 200,
 3000), and has chunk shape (5, 20, 400), then the shape of the chunk
@@ -628,10 +629,10 @@ dimension.
       - (2, 10, 8)
       - The grid does overhang the edge of the array on the 3rd dimension.
 
-An element of an array with coordinates (`a`, `b`, `c`, ...) will
-occur within the chunk at grid index (`a` // `dx`, `b` // `dy`, `c` //
-`dz`, ...), where "//" is the floor division operator. The element
-will have coordinates (`a` % `dx`, `b` % `dy`, `c` % `dz`, ...) within
+An element of an array with coordinates (`c`, `b`, `a`, ...) will
+occur within the chunk at grid index (`c` // `dz`, `b` // `dy`, `a` //
+`dx`, ...), where "//" is the floor division operator. The element
+will have coordinates (`c` % `dz`, `b` % `dy`, `a` % `dx`, ...) within
 that chunk, where "%" is the modulo operator. For example, if a
 3 dimensional array has shape (10, 200, 3000), and has chunk shape
 (5, 20, 400), then the element of the array with coordinates (7, 150, 900)
@@ -639,7 +640,7 @@ is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
 
-The identifier for chunk with grid index (``i``, ``j``, ``k``, ...) is
+The identifier for chunk with grid index (``k``, ``j``, ``i``, ...) is
 formed by joining together ASCII string representations of each index
 using a separator and prefixed with the character ``c``. The default value for
 the separator is the slash character, ``/``, but this may be configured by
@@ -693,10 +694,10 @@ organised into a sequence such that the last dimension of the array is
 the fastest changing dimension, also known as "row-major" order. This
 layout is only applicable to arrays with fixed size data types.
 
-For example, for a two-dimensional array with chunk shape (`dx`, `dy`),
+For example, for a two-dimensional array with chunk shape (`dy`, `dx`),
 the binary values for a given chunk are taken from chunk elements in
-the order (0, 0), (0, 1), (0, 2), ..., (`dx` - 1, `dy` - 3), (`dx` - 1, `dy` -
-2), (`dx` - 1, `dy` - 1).
+the order (0, 0), (0, 1), (0, 2), ..., (`dy` - 1, `dx` - 3), (`dy` - 1, `dx` -
+2), (`dy` - 1, `dx` - 1).
 
 F contiguous memory layout
 --------------------------
@@ -707,10 +708,10 @@ is the fastest changing dimension, also known as "column-major"
 order. This layout is only applicable to arrays with fixed size data
 types.
 
-For example, for a two-dimensional array with chunk shape (`dx`,
-`dy`), the binary values for a given chunk are taken from chunk
-elements in the order (0, 0), (1, 0), (2, 0), ..., (`dx` - 3, `dy` -
-1), (`dx` - 2, `dy` - 1), (`dx` - 1, `dy` - 1).
+For example, for a two-dimensional array with chunk shape (`dy`,
+`dx`), the binary values for a given chunk are taken from chunk
+elements in the order (0, 0), (1, 0), (2, 0), ..., (`dy` - 3, `dx` -
+1), (`dy` - 2, `dx` - 1), (`dy` - 1, `dx` - 1).
 
 
 Chunk encoding
@@ -988,7 +989,7 @@ following mandatory names:
     then said extension is responsible for interpreting the value of
     ``fill_value`` and return a suitable type that can be used.
 
-    For core ``data_type`` which ``fill_value`` are not permitted in JSON or
+    For core data types for which fill values are not permitted in JSON or
     for which decimal representation could be lossy, a string representing of
     the binary (starting with ``0b``) or hexadecimal value (starting with
     ``0x``) is accepted. This string must include all leading or trailing
@@ -1004,7 +1005,13 @@ following mandatory names:
 ``attributes``
 
     The value must be an object. The object may contain any name/value
-    pairs.
+    pairs. Intended to allow storage of arbitrary user metadata
+
+
+.. note:: The question of whether core metadata and user attributes should be
+     stored together or in separate documents is a topic of ongoing discussion.
+     (See https://github.com/zarr-developers/zarr-specs/issues/72.)
+
 
 The following names are optional:
 
@@ -1084,11 +1091,11 @@ chunking as above, but using an extension data type::
 
 .. note::
    comparison with spec v2,
-   ``dtype`` have been renamed to ``data_type``,
-   ``chunks`` have been renamed to ``chunk_grid``,
-   ``order`` have been renamed to ``chunk_memory_layout``,
-   ``filters`` have been removed,
-   ``zarr_format`` have been removed,
+   ``dtype`` has been renamed to ``data_type``,
+   ``chunks`` has been renamed to ``chunk_grid``,
+   ``order`` has been renamed to ``chunk_memory_layout``,
+   ``filters`` has been removed,
+   ``zarr_format`` has been removed,
 
 
 Group metadata
@@ -1110,7 +1117,7 @@ For example, the JSON document below defines an explicit group::
 
 .. note::
 
-   Groups cannot have extensions attached to them as of spec v3.0 Allowing
+   Groups cannot have extensions attached to them as of spec v3.0. Allowing
    groups to have extensions would force any implementation to sequentially
    traverse the store hierarchy in order to check for extensions, which would
    defeat the purpose of a flat namespace and concurrent access.
@@ -1119,7 +1126,7 @@ For example, the JSON document below defines an explicit group::
 
 .. note::
 
-   A group does not need a metadata document to exists, see implicit groups.
+   A group does not need a metadata document to exist. (See implicit groups.)
 
 
 
@@ -1376,8 +1383,8 @@ concatenating "data/root/" and the chunk identifier.
       - Chunk grid indices
       - Data key
     * - `/foo/baz`
-      - `(0, 0)`
-      - `data/root/foo/baz/c0/0`
+      - `(1, 0)`
+      - `data/root/foo/baz/c1/0`
 
 
 
@@ -1389,8 +1396,8 @@ Let `P` be an arbitrary hierarchy path.
 Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
 ``group_meta_key(P)`` be the group metadata key for `P`.
 
-Let ``data_key(P, i, j, ...)`` be the data key for `P` for the chunk
-with grid coordinates (`i`, `j`, ...).
+Let ``data_key(P, j, i ...)`` be the data key for `P` for the chunk
+with grid coordinates (`j`, `i`, ...).
 
 Let "+" be the string concatenation operator.
 
@@ -1424,8 +1431,8 @@ Let "+" be the string concatenation operator.
 
 **Store element values in an array**
 
-    To store element in an array at path `P` and coordinate (`i`, `j`,
-    ...), perform ``set(data_key(P, i, j, ...), value)``, where
+    To store element in an array at path `P` and coordinate (`j`, `i`,
+    ...), perform ``set(data_key(P, j, i, ...), value)``, where
     `value` is the serialisation of the corresponding chunk, encoded
     according to the information in the array metadata stored under
     the key ``array_meta_key(P)``.
@@ -1433,7 +1440,7 @@ Let "+" be the string concatenation operator.
 **Retrieve element values in an array**
 
     To retrieve element in an array at path `P` and coordinate (`i`,
-    `j`, ...), perform ``get(data_key(P, i, j, ...), value)``. The returned
+    `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
     value is the serialisation of the corresponding chunk, encoded
     according to the array metadata stored at ``array_meta_key(P)``.
 
@@ -1507,7 +1514,7 @@ in mostly two categories:
  - Core data type extensions – for example adding the ability to store fixed size
    types such as complex or datetime in chunks. These are directly declared in the
    array metadata ``data_type`` key.
- - Arrays extensions – non rectilinear grids, and variable length types.
+ - Array extensions – non rectilinear grids, and variable length types.
 
 There are no group extensions in Zarr v3.0.
 
