@@ -1,6 +1,6 @@
-==============
-Codec registry
-==============
+======
+Codecs
+======
 ------------------------------
 Editor's Draft 21 October 2020
 ------------------------------
@@ -27,8 +27,8 @@ This document defines codecs for use as compressors and/or filters as
 part of a Zarr implementation.
 
 
-Status of this documents
-========================
+Status of this document
+=======================
 
 This document is a **Work in Progress**. It may be updated, replaced
 or obsoleted by other documents at any time. It is inappapropriate to

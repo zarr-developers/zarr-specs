@@ -5,15 +5,12 @@
 Under construction.
 
 .. toctree::
-   :maxdepth: 1
+   :glob:
+   :maxdepth: 2
+   :titlesonly:
    :caption: Contents:
 
-   extensions/filters/v1.0
-   extensions/complex-dtypes/v1.0
-   extensions/datetime-dtypes/v1.0
-   extensions/object-dtypes/v1.0
-   extensions/string-dtypes/v1.0
-   extensions/struct-dtypes/v1.0
+   extensions/*
 
 
 A number of other features might be included in the core protocol v3, but are currently considered as extensions. 

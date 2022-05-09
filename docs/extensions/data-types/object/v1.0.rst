@@ -1,5 +1,5 @@
 ===================================
- String data types (version 1.0)
+ Object data types (version 1.0)
 ===================================
 -----------------------------
  Editor's draft 2 March 2022

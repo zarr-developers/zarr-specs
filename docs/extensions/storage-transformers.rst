@@ -5,7 +5,9 @@ Storage Transformers
 Under construction.
 
 .. toctree::
+   :glob:
    :maxdepth: 1
+   :titlesonly:
    :caption: Contents:
 
-   storage_transformers/sharding/v1.0
+   storage-transformers/*/*

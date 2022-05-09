@@ -1,6 +1,6 @@
-======
-Stores
-======
+============
+ Data Types
+============
 
 Under construction.
 
@@ -10,4 +10,4 @@ Under construction.
    :titlesonly:
    :caption: Contents:
 
-   stores/*/*
+   data-types/*/*

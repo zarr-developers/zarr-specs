@@ -9,11 +9,11 @@ Sharding storage transformer (version 1.0)
 
 Specification URI:
     @@TODO
-    http://purl.org/zarr/spec/storage_transformers/sharding/1.0
+    http://purl.org/zarr/spec/storage-transformers/sharding/1.0
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/storage_transformers-sharding-v1.0>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/storage-transformers-sharding-v1.0>`-
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/storage_transformers/sharding/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/storage-transformers/sharding/v1.0.rst>`_
 
 Copyright 2022 `Zarr core development
 team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
@@ -69,16 +69,16 @@ this specification are introduced with the words "for example".
 Configuration
 =============
 
-Sharding can be configured per array in the :ref:`array-metadata`:
+Sharding can be configured per array in the :ref:`array-metadata` as follows:
 
 .. code-block::
 
     {
       storage_transformers: [
         {
-          "storage_transformer": "https://purl.org/zarr/spec/storage_transformers/sharding/1.0",
+          "extension": "https://purl.org/zarr/spec/storage_transformers/sharding/1.0",
+          "type": "indexed",
           "configuration": {
-            "format": "indexed",
             "chunks_per_shard": [
                 2,
                 2
@@ -87,7 +87,7 @@ Sharding can be configured per array in the :ref:`array-metadata`:
       ]
     }
 
-``format``
+``type``
 
     Specifies a `Binary shard format`_. In this version, the only binary format is the
     ``indexed`` format.
@@ -138,7 +138,7 @@ also have the same shard grid position ``[3, 9]``.
 Binary shard format
 -------------------
 
-The only binary format is the ``indexed`` format, as specified by the ``format``
+The only binary format is the ``indexed`` format, as specified by the ``type``
 configuration key. Other binary formats might be added in future versions.
 
 In the indexed binary format chunks are written successively in a shard, where
