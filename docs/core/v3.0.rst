@@ -149,7 +149,9 @@ number format, where the patch number is optional and implicitly ``0``.
 A zarr implementation provides the read and write API by implementing
 this specification, the datasets are considered consumers in this case.
 
-Notably, this excludes extensions, codecs and stores.
+Notably, this excludes extensions, codecs and stores from the compatibility
+of the core protocol. However, versioned extensions and stores are also
+expected to follow this stability policy.
 
 This means that implementations based on a ``3.X`` specification will be
 able to read and write to datasets that follow a ``3.Y`` specification
