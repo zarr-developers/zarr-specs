@@ -143,23 +143,24 @@ See `protocol extensions`_ below.
 Stability Policy
 ----------------
 
-This core protocol specification adheres to adapted Semantic Versioning regarding
-read and write compatibility using the ``MAJOR.MINOR[.PATCH]?`` version
-number format, where the patch number is optional and implicitly ``0``.
-A zarr implementation provides the read and write API by implementing
-this specification, the datasets are considered consumers in this case.
+This core protocol specification adheres to a ``MAJOR.MINOR`` version
+number format. A zarr implementation provides the read and write API by
+implementing this specification can be considered compatible with all
+datasets following the specification with the same major version number.
 
 Notably, this excludes extensions, codecs and stores from the compatibility
 of the core protocol. However, versioned extensions and stores are also
 expected to follow this stability policy.
 
 This means that implementations based on a ``3.X`` specification will be
-able to read and write to datasets that follow a ``3.Y`` specification
-where ``Y <= X``, as long as it only uses
+able to read and write to datasets that follow any ``3.Y`` specification,
+as long as it only uses
 
 - optional extensions or those supported by the implementation,
 - no codec or one supported by the implementation, and
 - the used store must be supported by the implementation.
+
+For details, please see the `zarr_format`_ metadata entry.
 
 
 Questions that still need to be resolved
@@ -860,7 +861,7 @@ containing the following names:
     ignored. In other words, if the major version number is "3",
     implementations of this protocol may read and interpret metadata
     as defined in this specification, ignoring any name/value pairs
-    where the name is not defined here.
+    where the name is not defined here. See also the `stability policy`_.
 
     Note that this value is given as a URI rather than as a simple
     version number string to help with discovery of this
