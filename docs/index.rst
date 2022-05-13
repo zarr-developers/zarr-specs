@@ -2,17 +2,18 @@
  Zarr specifications
 =====================
 
-Under construction.
+A good starting point is the :ref:`zarr-core-protocol-v3.0` specification.
 
 .. toctree::
+   :glob:
    :maxdepth: 3
    :titlesonly:
    :caption: Contents:
 
-   protocol
+   core
+   extensions
    codecs
    stores
-   storage_transformers
 
 
 Indices and tables

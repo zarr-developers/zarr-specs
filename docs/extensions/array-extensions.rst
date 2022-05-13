@@ -1,6 +1,6 @@
-======
-Stores
-======
+==================
+ Array Extensions
+==================
 
 Under construction.
 
@@ -10,4 +10,4 @@ Under construction.
    :titlesonly:
    :caption: Contents:
 
-   stores/*/*
+   array-extensions/*/*
