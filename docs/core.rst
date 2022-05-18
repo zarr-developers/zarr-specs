@@ -1,6 +1,6 @@
-===============
- Core protocol
-===============
+===================
+ Core specification
+===================
 
 Under construction.
 

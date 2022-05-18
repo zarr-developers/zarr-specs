@@ -1,21 +1,21 @@
 .. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
-.. _zarr-core-protocol-v3.0:
+.. _zarr-core-specification-v3.0:
 
-==================================
- Zarr core protocol (version 3.0)
-==================================
+======================================
+ Zarr core specification (version 3.0)
+======================================
 -------------------------------
  Editor's draft 16 October 2020
 -------------------------------
 
 Specification URI:
-    https://purl.org/zarr/spec/protocol/core/3.0
+    https://purl.org/zarr/spec/core/3.0
 
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/core/v3.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/core/v3.0.rst>`_
 
 Copyright 2019-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -28,8 +28,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This specification defines the Zarr core protocol for storage and
-retrieval of N-dimensional typed arrays.
+This specification defines the Zarr format for N-dimensional typed arrays.
 
 
 Status of this document
@@ -40,7 +39,7 @@ or obsoleted by other documents at any time.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
-<https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_.
+<https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_.
 
 This document was produced by the `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_.
@@ -49,8 +48,7 @@ This document was produced by the `Zarr core development team
 Introduction
 ============
 
-This specification defines a protocol for storage and retrieval of
-data that is organised as one or more multidimensional arrays. This
+This specification defines a format for multidimensional array data. This
 type of data is common in scientific and numerical computing
 applications. Many domains are facing computational challenges as
 increasingly large volumes of data are being generated, for example,
@@ -60,7 +58,7 @@ development of Zarr has been to help address this challenge by
 enabling the storage of large multidimensional arrays in a way that is
 compatible with parallel and/or distributed computing applications.
 
-This protocol specification is intended to supersede the `Zarr storage
+This specification is intended to supersede the `Zarr storage
 specification version 2
 <https://zarr.readthedocs.io/en/stable/spec/v2.html>`_ (Zarr v2). The
 Zarr v2 specification has been implemented in several programming
@@ -68,11 +66,11 @@ languages and has been used successfully to store and analyse large
 scientific datasets from a variety of domains. However, as experience
 has been gained, it has become clear that there are several
 opportunities for modest but useful improvements to be made in the
-protocol, and for establishing a foundation that allows for greater
+format, and for establishing a foundation that allows for greater
 interoperability, whilst also enabling a variety of more advanced and
 specialised features to be explored and developed.
 
-This protocol specification also draws heavily on the `N5 API and
+This specification also draws heavily on the `N5 API and
 file-system specification <https://github.com/saalfeldlab/n5>`_, which
 was developed in parallel to Zarr v2 and has many of the same design
 goals and features. This specification defines a core set of features
@@ -89,7 +87,7 @@ Distributed storage
 
 The Zarr v2 specification was originally developed and implemented for
 use with local filesystem storage only. It then became clear that the
-same protocol could also be used with distributed storage systems,
+same format could also be used with distributed storage systems,
 including cloud object stores such as Amazon S3, Google Cloud Storage
 or Azure Blob Storage. However, distributed storage systems have a
 number of important differences from local file systems, both in terms
@@ -97,12 +95,12 @@ of the features they support and their performance
 characteristics. For example, cloud stores have much greater latency
 per request than local file systems, and this means that certain
 operations such as exploring a hierarchy of arrays using the Zarr v2
-protocol can be unacceptably slow. Workarounds have been developed,
+format can be unacceptably slow. Workarounds have been developed,
 such as the use of metadata consolidation, but there are opportunities
-for modifications to the core protocol that address these issues
+for modifications to the core format that address these issues
 directly and work more performantly across a range of underlying
 storage systems with varying features and latency characteristics. For
-example, this protocol specification aims to minimise the number of
+example, this specification aims to minimise the number of
 storage requests required when opening and exploring a hierarchy of
 arrays.
 
@@ -129,7 +127,7 @@ Extensibility
 The development of systems for storage of very large array-like data
 is a very active area of research and development, and there are many
 possibilities that remain to be explored. A goal of this specification
-is to define a protocol with a number of clear extension points and
+is to define a format with a number of clear extension points and
 mechanisms, in order to provide a framework for freely building on and
 exploring these possibilities. We aim to make this possible, whilst
 also providing pathways for a graceful degradation of functionality
@@ -138,18 +136,18 @@ provide a framework for community-defined extensions, which can be
 developed and published independently without requiring centralised
 coordination of all specifications.
 
-See `protocol extensions`_ below.
+See `extensions`_ below.
 
 Stability Policy
 ----------------
 
-This core protocol specification adheres to a ``MAJOR.MINOR`` version
+This core specification adheres to a ``MAJOR.MINOR`` version
 number format. A zarr implementation provides the read and write API by
 implementing this specification can be considered compatible with all
 datasets following the specification with the same major version number.
 
 Notably, this excludes extensions, codecs and stores from the compatibility
-of the core protocol. However, versioned extensions and stores are also
+of the core specification. However, versioned extensions and stores are also
 expected to follow this stability policy.
 
 This means that implementations based on a ``3.X`` specification will be
@@ -218,7 +216,7 @@ Concepts and terminology
 ========================
 
 This section introduces and defines some key terms and explains the
-conceptual model underpinning the Zarr protocol.
+conceptual model underpinning the Zarr format.
 
 .. _hierarchy:
 
@@ -284,7 +282,7 @@ conceptual model underpinning the Zarr protocol.
     An array_ has a fixed number of zero or more dimensions. Each
     dimension has an integer length. This specification only considers
     the case where the lengths of all dimensions are finite. However,
-    `protocol extensions`_ may be defined which allow a dimension to have
+    `extensions`_ may be defined which allow a dimension to have
     an infinite or variable length.
 
 .. _shape:
@@ -318,7 +316,7 @@ conceptual model underpinning the Zarr protocol.
     each possible value. For example, the little-endian 32-bit signed
     integer data type defines binary representations for all integers
     in the range −2,147,483,648 to 2,147,483,647. This specification
-    only defines a limited set of data types, but protocol extensions
+    only defines a limited set of data types, but extensions
     may define other data types.
 
 .. _chunk:
@@ -343,7 +341,7 @@ conceptual model underpinning the Zarr protocol.
     The chunks_ of an array_ are organised into a grid. This
     specification only considers the case where all chunks_ have the
     same chunk shape and the chunks form a regular grid. However,
-    protocol extensions may define other grid types such as
+    extensions may define other grid types such as
     rectilinear grids.
 
 .. _memory layout:
@@ -356,7 +354,7 @@ conceptual model underpinning the Zarr protocol.
     the binary values of the elements_ within the chunk_ into a single
     contiguous sequence of bytes. This specification defines two types
     of memory layout based on "C" (row-major) and "F" (column-major)
-    ordering of elements_, but protocol extensions may define other
+    ordering of elements_, but extensions may define other
     memory layouts.
 
 .. _compressor:
@@ -379,7 +377,7 @@ conceptual model underpinning the Zarr protocol.
     a pair of operations, one to perform the transformation (encode),
     the other to reverse the transformation (decode). This
     specification only considers the case where a codec is used as a
-    compressor_, but protocol extensions may extend the chunk encoding
+    compressor_, but extensions may extend the chunk encoding
     process, for example, to add support for one or more filter codecs
     to be applied prior to compression.
 
@@ -460,22 +458,22 @@ A data type describes the set of possible binary values that an array
 element may take, along with some information about how the values
 should be interpreted.
 
-This protocol defines a limited set of data types to represent boolean
-values, integers, and floating point numbers. Protocol
-extensions may define additional data types. All of the data types
-defined here have a fixed size, in the sense that all values require
-the same number of bytes. However, protocol extensions may define
+This core specification defines a limited set of data types to
+represent boolean values, integers, and floating point
+numbers. Extensions may define additional data types. All of the data
+types defined here have a fixed size, in the sense that all values
+require the same number of bytes. However, extensions may define
 variable sized data types.
 
-Note that the Zarr protocol is intended to enable communication of
-data between a variety of computing environments. The native byte
+Note that the Zarr specification is intended to enable communication
+of data between a variety of computing environments. The native byte
 order may differ between machines used to write and read the data.
 
 Each data type is associated with an identifier, which can be used in
 metadata documents to refer to the data type. For the data types
-defined in this protocol, the identifier is a simple ASCII
-string. However, protocol extensions may use any JSON value to
-identify a data type.
+defined in this specification, the identifier is a simple ASCII
+string. However, extensions may use any JSON value to identify a data
+type.
 
 
 Core data types
@@ -616,15 +614,15 @@ array. This means that every element of the array is a member of one
 chunk, and there are no gaps or overlaps between chunks.
 
 In general there are different possible types of grids. The core
-protocol defines the regular grid type, where all chunks are
-hyperrectangles of the same shape. Protocol extensions may define
-other grid types, such as rectilinear grids where chunks are still
+specification defines the regular grid type, where all chunks are
+hyperrectangles of the same shape. Extensions may define other grid
+types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
 
 A grid type must also define rules for constructing an identifier for
 each chunk that is unique within the grid, which is a string of ASCII
 characters that can be used to construct keys to save and retrieve
-chunk data in a store, see also the `Storage protocol`_ section.
+chunk data in a store, see also the `Storage`_ section.
 
 Regular grids
 -------------
@@ -691,7 +689,7 @@ grid index (1, 23, 45) is the string "c1/23/45".
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
 of the array and the chunk at grid index (0, 0, 0, ...). However,
-protocol extensions may define variations on the regular grid type
+extensions may define variations on the regular grid type
 such that the grid indices may include negative integers, and the
 origin vertex of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
@@ -718,8 +716,8 @@ implementation will load this binary representation into a contiguous
 memory buffer to allow direct access to array elements without having
 to copy data.
 
-The core protocol defines two types of contiguous memory
-layout. However, protocol extensions may define other memory
+The core specification defines two types of contiguous memory
+layout. However, extensions may define other memory
 layouts. Note that there may be an interdependency between memory
 layouts and data types, such that certain memory layouts may only be
 applicable to arrays with certain data types.
@@ -835,9 +833,9 @@ Entry point metadata
 --------------------
 
 Each Zarr hierarchy must have an entry point metadata document, which
-provides essential information regarding the protocol version being
+provides essential information regarding the format version being
 used, the encoding being used for group and array metadata, and any
-protocol extensions that affect the layout or interpretation of data
+extensions that affect the layout or interpretation of data
 in the store.
 
 The entry point metadata document must contain a single object
@@ -846,20 +844,20 @@ containing the following names:
 ``zarr_format``
 ^^^^^^^^^^^^^^^
 
-    A string containing the URI of the Zarr core protocol
+    A string containing the URI of the Zarr core
     specification that defines the metadata format. For Zarr
     hierarchies conforming to this specification, the value must be
-    the string "https://purl.org/zarr/spec/protocol/core/3.0".
+    the string "https://purl.org/zarr/spec/core/3.0".
 
-    Implementations of this protocol may assume that the final path
-    segment of this URI ("3.0") represents the core protocol version
+    Implementations of this specification may assume that the final path
+    segment of this URI ("3.0") represents the core specification version
     number, where "3" is the major version number and "0" is the minor
-    version number. Implementations of this protocol may also assume
-    that future versions of this protocol that retain the same major
+    version number. Implementations of this specification may also assume
+    that future versions of this specification that retain the same major
     versioning number ("3") will be backwards-compatible, in the sense
-    that any new features added to the protocol can be safely
+    that any new features added to the specification can be safely
     ignored. In other words, if the major version number is "3",
-    implementations of this protocol may read and interpret metadata
+    implementations of this specification may read and interpret metadata
     as defined in this specification, ignoring any name/value pairs
     where the name is not defined here. See also the `stability policy`_.
 
@@ -874,7 +872,7 @@ containing the following names:
     used for encoding group and array metadata documents.
 
     For document using the default JSON encoding and format describe in this document
-    then the value must be ``"https://purl.org/zarr/spec/protocol/core/3.0``.
+    then the value must be ``"https://purl.org/zarr/spec/core/3.0``.
 
 ``metadata_key_suffix``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -891,14 +889,14 @@ containing the following names:
 ^^^^^^^^^^^^^^
 
     An array containing zero or more objects, each of which identifies
-    a protocol extension and provides any additional extension
+    an extension and provides any additional extension
     configuration metadata. Each object must contain the name
-    ``extension`` whose value is a URI that identifies a Zarr protocol
+    ``extension`` whose value is a URI that identifies a Zarr
     extension and dereferences to a human readable representation of
     the extension specification. Each object must also contain the
     name ``must_understand`` whose value is either the literal
     ``true`` or ``false``. Each object may also contain the name
-    ``configuration`` whose value is defined by the protocol
+    ``configuration`` whose value is defined by the
     extension.
 
     If an implementation of this specification encounters an extension
@@ -912,19 +910,19 @@ For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
+        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
+        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": []
     }
 
 For example, below is an entry point metadata document as above, but also
-specifying that a protocol extension is being used which may be
+specifying that an extension is being used which may be
 ignored if not understood::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/protocol/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/protocol/core/3.0",
+        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
+        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": [
             {
@@ -964,13 +962,13 @@ following mandatory names:
     little-endian 64-bit floating point number.
 
     The ``data_type`` value is an extension point and may be defined
-    by a protocol extension. If the data type is defined by a protocol
+    by an extension. If the data type is defined by an
     extension, then the value must be an object containing the names
     ``extension``, ``type`` and ``fallback``. The ``extension`` is
-    required and its value must be a URI that identifies the protocol
+    required and its value must be a URI that identifies the
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and its value is
-    defined by the protocol extension. The ``fallback`` is optional
+    defined by the extension. The ``fallback`` is optional
     and, if provided, its value must be one of the data type
     identifiers defined in this specification. If an implementation
     does not recognise the extension, but a ``fallback`` is present,
@@ -993,13 +991,13 @@ following mandatory names:
     length 5 along the second dimension.
 
     The ``chunk_grid`` value is an extension point and may be defined
-    by a protocol extension. If the chunk grid type is defined by a
-    protocol extension, then the value must be an object containing
+    by an extension. If the chunk grid type is defined by an
+    extension, then the value must be an object containing
     the names ``extension`` and ``type``. The ``extension`` is
-    required and the value must be a URI that identifies the protocol
+    required and the value must be a URI that identifies the
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and the value is
-    defined by the protocol extension.
+    defined by the extension.
 
 ``chunk_memory_layout``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -1009,13 +1007,13 @@ following mandatory names:
     `F contiguous memory layout`_ as defined in this specification.
 
     The ``chunk_memory_layout`` value is an extension point and may be
-    defined by a protocol extension. If the chunk memory layout type
-    is defined by a protocol extension, then the value must be an
+    defined by an extension. If the chunk memory layout type
+    is defined by an extension, then the value must be an
     object containing the names ``extension`` and ``type``. The
     ``extension`` is required and the value must be a URI that
-    identifies the protocol extension and dereferences to a
+    identifies the extension and dereferences to a
     human-readable representation of the specification.  The ``type`` is
-    required and the value is defined by the protocol extension.
+    required and the value is defined by the extension.
 
 ``fill_value``
 ^^^^^^^^^^^^^^
@@ -1085,9 +1083,9 @@ The following names are optional:
     Specifies a stack of `storage transformers`_. Each value in the list must
     be an object containing the names ``extension`` and ``type``.
     The ``extension`` is required and the value must be a URI that identifies
-    the protocol extension and dereferences to a human-readable representation
+    the extension and dereferences to a human-readable representation
     of the specification.  The ``type`` is required and the value is
-    defined by the protocol extension. The
+    defined by the extension. The
     object may also contain a ``configuration`` object which consists of the
     parameter names and values as defined by the corresponding storage transformer
     specification. When the ``storage_transformers`` name is absent no storage
@@ -1135,7 +1133,7 @@ chunking as above, but using an extension data type::
     {
         "shape": [10000, 1000],
         "data_type": {
-            "extension": "https://purl.org/zarr/spec/protocol/extensions/datetime-dtypes/1.0",
+            "extension": "https://purl.org/zarr/spec/extensions/datetime-dtypes/1.0",
             "type": "<M8[ns]",
             "fallback": "<i8"
         },
@@ -1171,7 +1169,7 @@ Group metadata
 A Zarr group metadata object must contain the
 ``attributes`` name as defined above in the `Array metadata`_ section. All
 other names are reserved for future versions of this specification. See also
-the section on `Protocol extensions`_ below.
+the section on `Extensions`_ below.
 
 For example, the JSON document below defines an explicit group::
 
@@ -1210,7 +1208,7 @@ Stores
 
 A Zarr store is a system that can be used to store and retrieve data
 from a Zarr hierarchy. For a store to be compatible with this
-protocol, it must support a set of operations defined in the `Abstract store
+specification, it must support a set of operations defined in the `Abstract store
 interface`_ subsection. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
@@ -1406,8 +1404,8 @@ For an example of a store implementation spec, see the
 :ref:`file-system-store-v1` specification.
 
 
-Storage protocol
-================
+Storage
+=======
 
 This section describes how to translate high level operations to
 create, erase or modify Zarr hierarchies, groups or arrays, into low
@@ -1500,8 +1498,8 @@ concatenating "data/root/" and the chunk identifier.
 
 
 
-Protocol operations
--------------------
+Operations
+----------
 
 Let `P` be an arbitrary hierarchy path.
 
@@ -1578,7 +1576,7 @@ Let "+" be the string concatenation operator.
     If a store does not support any of the list operations then
     discovery of group children is not possible, and the contents of
     the hierarchy must be communicated by some other means, such as
-    via a protocol extension, or via some out of band communication.
+    via an extension, or via some out of band communication.
 
 **Discover all nodes in a hierarchy**
 
@@ -1645,7 +1643,7 @@ Storage transformers may be stacked to combine different functionalities:
       end
       t3 --> Store
 
-A fixed set of storage providers is recommended for implementation with this protocol:
+A fixed set of storage providers is recommended for implementation with this specification:
 
 
 Predefined storage transformers
@@ -1653,12 +1651,12 @@ Predefined storage transformers
 
 - :ref:`sharding-storage-transformer-v1`
 
-Protocol extensions
-===================
+Extensions
+==========
 
 
-Many types of extensions can exist for a Zarr protocol, they can be grouped
-as following:
+Many types of extensions can exist and they can be grouped as
+following:
 
 ======================= ========================================= =====================
 extension               metadata                                  is extension required
@@ -1716,7 +1714,7 @@ Below is a summary of the key differences between this specification
   construct chunk keys, and the addition of a key suffix for metadata
   keys.
 
-- v3 has explicit support for protocol extensions via defined
+- v3 has explicit support for extensions via defined
   extension points and mechanisms.
 
 - v3 allows for greater flexibility in how groups and arrays are
@@ -1727,7 +1725,7 @@ Below is a summary of the key differences between this specification
   creating parent groups.
 
 - The set of data types specified in v3 is less than in v2. Additional
-  data types will be defined via protocol extensions.
+  data types will be defined via extensions.
 
 
 References
@@ -1752,9 +1750,9 @@ this document that are tagged in GitHub and what changed between them.
 -------
 
 Links: `view spec
-<https://zarr-specs.readthedocs.io/en/@@tag@@/protocol/core/v3.0.html>`_;
+<https://zarr-specs.readthedocs.io/en/@@tag@@/core/v3.0.html>`_;
 `view source
-<https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/protocol/core/v3.0.rst>`_
+<https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/core/v3.0.rst>`_
 
 @@TODO summary of changes since previous tag.
 

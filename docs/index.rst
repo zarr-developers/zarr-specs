@@ -2,7 +2,7 @@
  Zarr specifications
 =====================
 
-A good starting point is the :ref:`zarr-core-protocol-v3.0` specification.
+A good starting point is the :ref:`zarr-core-specification-v3.0`.
 
 .. toctree::
    :glob:

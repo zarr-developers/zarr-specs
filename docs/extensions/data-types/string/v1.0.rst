@@ -6,11 +6,11 @@
 -----------------------------
 
 Specification URI:
-    http://purl.org/zarr/spec/protocol/extensions/string-dtypes/1.0
+    http://purl.org/zarr/spec/extensions/string-dtypes/1.0
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/string-dtypes-v1.0>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/protocol/extension/string-dtypes/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/extension/string-dtypes/v1.0.rst>`_
 
 Copyright 2022 `Zarr core development
 team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
@@ -24,7 +24,7 @@ License <https://creativecommons.org/licenses/by/3.0/>`_.
 Abstract
 ========
 
-This specification is a Zarr protocol extension defining data types
+This specification is a Zarr extension defining data types
 for strings. It is an early draft and currently just describes existing support
 for NumPy string types that have already worked with zarr-python, but are not
 part of the core v3 spec.
