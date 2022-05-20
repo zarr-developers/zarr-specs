@@ -10,7 +10,7 @@ Specification URI:
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/master/docs/codecs.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/HEAD/docs/codecs.rst>`_
 
 Copyright 2020 `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -201,7 +201,7 @@ References
    https://tools.ietf.org/html/rfc1952
 
 .. [BLOSC] F. Alted. Blosc Chunk Format. URL:
-   https://github.com/Blosc/c-blosc/blob/master/README_CHUNK_FORMAT.rst
+   https://github.com/Blosc/c-blosc/blob/HEAD/README_CHUNK_FORMAT.rst
 
 
 Change log
