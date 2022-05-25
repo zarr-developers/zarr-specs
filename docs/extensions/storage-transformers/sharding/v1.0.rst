@@ -28,7 +28,7 @@ Abstract
 ========
 
 This specification defines an implementation of the Zarr
-storage transformer protocol for sharding.
+storage transformer specification for sharding.
 
 Sharding co-locates multiple chunks within a storage object, bundling them in shards.
 
@@ -110,7 +110,7 @@ Storage transformer implementation
 Key & value transformation
 --------------------------
 
-The storage transformer protocol defines the abstract interface to be the same
+The storage transformer specification defines the abstract interface to be the same
 as the :ref:`abstract-store-interface`.
 
 The Zarr store interface is defined as a mapping of `keys` and `values`,
