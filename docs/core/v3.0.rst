@@ -5,11 +5,15 @@
  Zarr core specification (version 3.0)
 ======================================
 -------------------------------
- Editor's draft 16 October 2020
+ Editor's draft 25 May 2022
 -------------------------------
 
 Specification URI:
     https://purl.org/zarr/spec/core/3.0
+    
+Editors:
+    * Alistair Miles ([@alimanfoo](https://github.com/alimanfoo)), Wellcome Sanger Institute
+    * Jonathan Striebel ([@jstriebel](https://github.com/jstriebel), Scalable Minds
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_
