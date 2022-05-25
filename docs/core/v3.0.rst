@@ -12,8 +12,8 @@ Specification URI:
     https://purl.org/zarr/spec/core/3.0
     
 Editors:
-    * Alistair Miles ([@alimanfoo](https://github.com/alimanfoo)), Wellcome Sanger Institute
-    * Jonathan Striebel ([@jstriebel](https://github.com/jstriebel), Scalable Minds
+    * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
+    * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_
