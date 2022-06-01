@@ -970,7 +970,7 @@ following mandatory members:
        [{"inclusive_min": -5, "exclusive_max": 10, "name": "x"},
         {"inclusive_min": 7, "exclusive_max": 20, "name": "y"}]
 
-    specifiesa 2-dimensional domain where the first dimension (named ``"x"``) is
+    specifies a 2-dimensional domain where the first dimension (named ``"x"``) is
     indexed by ``-5, -4, ..., 9`` and the second dimension (named ``"y"``) is
     indexed by ``7, 8, ..., 19``.
 
