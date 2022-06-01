@@ -1033,7 +1033,9 @@ following mandatory names:
 
     For any data type, the ``fill_value`` is required. The literal
     ``null`` is not permitted. The fill value needs to be defined
-    so that the data is independent of implementation details.
+    so that the data is independent of implementation details. Internally
+    implementations may provide a default ``fill_value``, but that must
+    be converted to a fixed value in the stored metadata.
 
     If the ``data_type`` of an array is defined in a ``data_type`` extension,
     then said extension is responsible for interpreting the value of
