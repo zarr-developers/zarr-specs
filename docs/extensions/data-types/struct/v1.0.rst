@@ -66,7 +66,7 @@ Extension data types
 
 NumPy allows representation of `Structured Arrays`_ where each element of the
 array is actually some combination of fields, each of which may have its own
-unique data type. NumPy's Record Arrays (``numpy.recarray``) also use this data type. The actual data is stored as an opaque seqeuence of bytes
+unique data type. NumPy's Record Arrays (``numpy.recarray``) also use this data type. The actual data is stored as an opaque sequence of bytes
 (i.e. a structure) as represented by (``numpy.void``) and thus the string
 representation of this dtype in NumPy is ``'|Vn'`` where ``n`` is some integer
 number of bytes. In order to be able to properly interpret data of this type
