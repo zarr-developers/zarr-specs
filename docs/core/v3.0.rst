@@ -418,8 +418,8 @@ conceptual model underpinning the Zarr format.
 
     To enhance the storage capabilities, storage transformers may
     change the storage structure and behaviour of data coming from
-    an array_ in the underlying store_. Upon retrival the original data is
-    restored within the transformer. Any number of `predefined storage
+    an array_ in the underlying store_. Upon retrieval the original data
+    is restored within the transformer. Any number of `predefined storage
     transformers`_ can be registered and stacked.
     See the `storage transformers details`_ below.
 
@@ -594,7 +594,7 @@ other type sizes in later versions of this specification.
 
 .. note::
 
-    We are explicitely looking for more feedback and prototypes of code using the ``r*``,
+    We are explicitly looking for more feedback and prototypes of code using the ``r*``,
     raw bits, for various endianness and whether the spec could be made clearer.
 
 .. note::
@@ -1519,7 +1519,7 @@ Let "+" be the string concatenation operator.
 
    Store and implementation can assume that a client will not try to
    create both an *array* and *group* at the same path, and thus
-   may skip check of existance of a group/array of the same name.
+   may skip check of existence of a group/array of the same name.
 
 **Create a group**
 
