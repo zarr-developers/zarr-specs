@@ -38,8 +38,7 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-This document is a **Work in Progress**. It may be updated, replaced
-or obsoleted by other documents at any time.
+This document is a draft for review. See `ZEP0001 <https://zarr.dev/zeps/draft/ZEP0001.html>`_ for further information.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
