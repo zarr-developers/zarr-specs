@@ -1266,7 +1266,7 @@ The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
 a store implementation to support all of these capabilities.
 
-A **readable store** supports the following operation:
+A **readable store** supports the following operations:
 
 
 ``get`` - Retrieve the `value` associated with a given `key`.
