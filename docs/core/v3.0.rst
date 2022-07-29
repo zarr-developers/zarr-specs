@@ -1268,7 +1268,6 @@ a store implementation to support all of these capabilities.
 
 A **readable store** supports the following operation:
 
-@@TODO add bundled & partial access
 
 ``get`` - Retrieve the `value` associated with a given `key`.
 
