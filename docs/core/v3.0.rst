@@ -172,7 +172,7 @@ draft.
 
  - Should core metadata and user attributes be stored together or separate documents?
    (See https://github.com/zarr-developers/zarr-specs/issues/72)
- - extensions and ``must_understand = True`` might be too restrictive. Work a
+ - extensions and ``must_understand = True`` might be too restrictive.
    We propose to develop a draft implementation with extensions and
    see how far we can go. A possible list of extensions to include:
 
