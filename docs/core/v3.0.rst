@@ -177,8 +177,6 @@ draft.
    We propose to develop a draft implementation with extensions and
    see how far we can go. A possible list of extensions to include:
 
-    - Boolean
-    - Complex
     - Datetime
     - Named dimensions
     - Awkward arrays
@@ -316,8 +314,8 @@ conceptual model underpinning the Zarr format.
 *Data type*
 
     A data type defines the set of possible values that an array_ may
-    contain, and a binary representation (i.e., sequence of bytes) for
-    each possible value. For example, the little-endian 32-bit signed
+    contain, and a default binary representation (i.e., sequence of bytes) for
+    each possible value. For example, the 32-bit signed
     integer data type defines binary representations for all integers
     in the range −2,147,483,648 to 2,147,483,647. This specification
     only defines a limited set of data types, but extensions
@@ -488,100 +486,47 @@ Core data types
 
    * - Identifier
      - Numerical type
-     - Size (no. bytes)
-     - Byte order
+     - Default binary representation
    * - ``bool``
-     - Boolean, with False encoded as ``\\x00`` and True encoded as ``\\x01``
-     - 1
-     - None
-   * - ``i1``
-     - signed integer
-     - 1
-     - None
-   * - ``<i2``
-     - signed integer
-     - 2
-     - little-endian
-   * - ``<i4``
-     - signed integer
-     - 4
-     - little-endian
-   * - ``<i8``
-     - signed integer
-     - 8
-     - little-endian
-   * - ``>i2``
-     - signed integer
-     - 2
-     - big-endian
-   * - ``>i4``
-     - signed integer
-     - 4
-     - big-endian
-   * - ``>i8``
-     - signed integer
-     - 8
-     - big-endian
-   * - ``u1``
-     - unsigned integer
-     - 1
-     - None
-   * - ``<u2``
-     - unsigned integer
-     - 2
-     - little-endian
-   * - ``<u4``
-     - unsigned integer
-     - 4
-     - little-endian
-   * - ``<u8``
-     - unsigned integer
-     - 8
-     - little-endian
-   * - ``>u2``
-     - unsigned integer
-     - 2
-     - big-endian
-   * - ``>u4``
-     - unsigned integer
-     - 4
-     - big-endian
-   * - ``>u8``
-     - unsigned integer
-     - 8
-     - big-endian
-   * - ``<f2``
-     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
-     - 2
-     - little-endian
-   * - ``<f4``
-     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
-     - 4
-     - little-endian
-   * - ``<f8``
-     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
-     - 8
-     - little-endian
-   * - ``>f2``
-     - half precision float: sign bit, 5 bits exponent, 10 bits mantissa
-     - 2
-     - big-endian
-   * - ``>f4``
-     - single precision float: sign bit, 8 bits exponent, 23 bits mantissa
-     - 4
-     - big-endian
-   * - ``>f8``
-     - double precision float: sign bit, 11 bits exponent, 52 bits mantissa
-     - 8
-     - big-endian
+     - Boolean
+     - Single byte, with false encoded as ``\\x00`` and true encoded as ``\\x01``.
+   * - int8
+     - Integer in ``[-2^7, 2^7-1]``
+     - 1 byte two's complement
+   * - int16
+     - Integer in ``[-2^15, 2^15-1]``
+     - 2-byte little endian two's complement
+   * - int32
+     - Integer in ``[-2^31, 2^31-1]``
+     - 4-byte little endian two's complement
+   * - uint8
+     - Integer in ``[0, 2^8-1]``
+     - 1 byte
+   * - uint16
+     - Integer in ``[0, 2^16-1]``
+     - 2-byte little endian
+   * - uint32
+     - Integer in ``[0, 2^32-1]``
+     - 4-byte little endian
+   * - float16 (optionally supported)
+     - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2-byte little endian IEEE 754 binary16 
+   * - float32
+     - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4-byte little endian IEEE 754 binary32 
+   * - float64
+     - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8-byte little endian IEEE 754 binary64
+   * - complex64
+     - real and complex components are each IEEE 754 single-precision floating point
+     - 2 consecutive 4-byte little endian IEEE 754 binary32 values
+   * - complex128
+     - real and complex components are each IEEE 754 double-precision floating point
+     - 2 consecutive 8-byte little endian IEEE 754 binary64 values
    * - ``r*`` (Optional)
      - raw bits,  use for extension type fallbacks
      - variable, given by ``*``, is limited to be a multiple of 8.
      - N/A
-
-
-Floating point types correspond to basic binary interchange formats as
-defined by IEEE 754-2008.
 
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass-through type designated by the lower-case letter ``r`` followed
