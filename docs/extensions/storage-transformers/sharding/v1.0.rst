@@ -109,7 +109,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
     of the array metadata ``shape`` entry. For example, a value ``[32, 2]``
     indicates that 64 chunks are combined in one shard, 32 along the first
     dimension, and for each of those 2 along the second dimension. Some valid
-    starting positions for a shard in the chunk-grid are therefore `[0, 0]`,
+    starting positions for a shard in the chunk-grid therefore are `[0, 0]`,
     `[32, 2]`, `[32, 4]`, `[64, 2]` or `[96, 18]`.
 
 
@@ -197,7 +197,7 @@ implementation specific.
 API implementation
 ------------------
 
-The section below defines an implementation of the
+The section below defines a non-normative implementation of the
 :ref:`abstract-store-interface` in terms of the operations of this storage
 transformer as a ``StoreWithPartialAccess``. The term `underlying store`
 references either the next storage transformer in the stack or the actual store
@@ -262,20 +262,20 @@ described explicitly.
   ``list_dir`` is called on the underlying store with the translated prefix. For
   all *retrieved prefixes* (not full keys) with partial shard keys, the
   corresponding original prefixes covering all possible chunks in the shard are
-  listed. For *retrieved full keys* the indices from the underlying store are
-  requested using ``get_partial_values``. Existing chunks, where the index
-  offset or nbytes are not ``2^64 - 1`` are then listed by their original key.
+  listed, which might include non-existing prefixes. For *retrieved full keys*
+  the indices from the underlying store are requested using
+  ``get_partial_values``. Existing chunks, where the index offset or nbytes are
+  not ``2^64 - 1`` are then listed by their original key.
 
   .. note::
 
-    Not all listed prefixes must necessarily contain keys, as shard prefixes
-    with partially available chunks return prefixes for all possible chunks
-    without verifying their existence for performance reasons. Listing those
-    prefixes is still safe as some chunks in their corresponding shard exist,
-    but not necessarily in the requested prefix, possibly leading to empty
-    responses. Please note that this only applies to returned prefixes, *not*
-    for full keys referencing storage objects. Returned full keys always reflect
-    the available chunks and are safe to request.
+    For performance reasons, one might also implement ``list_prefix`` and
+    ``list_dir`` without any index lookups, always assuming that all possible
+    chunks in a shard are available. Alternatively, for many use-cases,
+    implementations of these operations might also be omitted with sharding,
+    since array access does not use them. Global operations like copying can
+    operate directly on the underlying store, not on the sharded transformed
+    store.
 
 
 References
