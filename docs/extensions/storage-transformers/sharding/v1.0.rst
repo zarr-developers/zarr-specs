@@ -153,7 +153,7 @@ configuration key. Other binary formats might be added in future versions.
 In the indexed binary format, chunks are written successively in a shard, where
 unused space between them is allowed, followed by an index referencing them. The
 index is placed at the end of the file and has a size of 16 bytes multiplied by
-the number of chunks in a shard, for example ``16 bytes * 64 = 1014 bytes`` for
+the number of chunks in a shard, for example ``16 bytes * 64 = 1024 bytes`` for
 ``chunks_per_shard=[32, 2]``. The index holds an `offset, nbytes` pair of
 little-endian uint64 per chunk, the chunks-order in the index is row-major (C)
 order, for example for ``chunks_per_shard=[2, 2]`` an index would look like:
@@ -170,15 +170,15 @@ index always has the full shape of all possible chunks per shard, even if they
 are outside of the array size.
 
 The actual order of the chunk content is not fixed and may be chosen by the
-implementation as all possible write orders are valid according to this
+implementation. All possible write orders are valid according to this
 specification and therefore can be read by any other implementation. When
-writing partial chunks into an existing shard no specific order of the existing
+writing partial chunks into an existing shard, no specific order of the existing
 chunks may be expected. Some writing strategies might be
 
 * **Fixed order**: Specify a fixed order (e.g. row-, column-major, or Morton
   order). When replacing existing chunks larger or equal-sized chunks may be
   replaced in-place, leaving unused space up to an upper limit that might
-  possibly be specified. Please note that for regular-sized uncompressed data
+  possibly be specified. Please note that, for regular-sized uncompressed data,
   all chunks have the same size and can therefore be replaced in-place. > *
 * **Append-only**: Any chunk to write is appended to the existing shard,
   followed by an updated index. If previous chunks are updated, their storage
@@ -190,7 +190,7 @@ chunks may be expected. Some writing strategies might be
   the byte offsets and lengths at the end of the file.
 
 Any configuration parameters for the write strategy must not be part of the
-metadata document, they need to be configured at runtime, as this is
+metadata document; instead they need to be configured at runtime, as this is
 implementation specific.
 
 
