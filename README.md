@@ -1,6 +1,6 @@
 # Zarr Specs
 
-![](https://raw.githubusercontent.com/zarr-developers/community/main/logos/logo2.png)
+![](https://github.com/zarr-developers/zarr-logo/releases/download/2022-04-28/zarr-pink-horizontal-transparent.png)
 
 **Zarr core protocol for storage and retrieval of N-dimensional typed arrays**
 
