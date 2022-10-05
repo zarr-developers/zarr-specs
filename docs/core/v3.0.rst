@@ -38,8 +38,7 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-This document is a **Work in Progress**. It may be updated, replaced
-or obsoleted by other documents at any time.
+This document is a draft for review. See `ZEP0001 <https://zarr.dev/zeps/draft/ZEP0001.html>`_ for further information.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
@@ -173,7 +172,7 @@ draft.
 
  - Should core metadata and user attributes be stored together or separate documents?
    (See https://github.com/zarr-developers/zarr-specs/issues/72)
- - extensions and ``must_understand = True`` might be too restrictive. Work a
+ - extensions and ``must_understand = True`` might be too restrictive.
    We propose to develop a draft implementation with extensions and
    see how far we can go. A possible list of extensions to include:
 
@@ -1267,9 +1266,8 @@ The store operations are grouped into three sets of capabilities:
 **readable**, **writeable** and **listable**. It is not necessary for
 a store implementation to support all of these capabilities.
 
-A **readable store** supports the following operation:
+A **readable store** supports the following operations:
 
-@@TODO add bundled & partial access
 
 ``get`` - Retrieve the `value` associated with a given `key`.
 
