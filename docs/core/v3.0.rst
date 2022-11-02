@@ -180,7 +180,6 @@ draft.
     - Boolean
     - Complex
     - Datetime
-    - Named dimensions
     - Awkward arrays
 
    See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
@@ -195,9 +194,6 @@ draft.
   - Node name character set: We
     solicit feedback on whether store implementation should support full unicode.
     https://github.com/zarr-developers/zarr-specs/issues/56
-
-  - Should named dimensions be part of the core metadata spec?
-    https://github.com/zarr-developers/zarr-specs/issues/73
 
 
 Document conventions
@@ -1095,6 +1091,18 @@ The following names are optional:
     specification. When the ``storage_transformers`` name is absent no storage
     transformer is used, same for an empty list.
 
+``dimension_names``
+^^^^^^^^^^^^^^^^^^^
+
+    Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
+    an array of strings with the same length as ``shape``.  An unnamed dimension
+    is indicated by an empty string, ``""``.  Within a single zarr array, all
+    non-empty dimension names must be distinct (no two dimensions may have the
+    same non-empty name), but more than one dimension may have an empty name.
+    This specification does not place any restrictions on the use of the same
+    dimension name across multiple arrays within the same zarr hierarchy, but
+    extensions or specific applications may do so.  If ``dimension_names`` is
+    not specified, all dimensions are unnamed.
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
@@ -1109,6 +1117,7 @@ compressed using gzip compression prior to storage::
 
     {
         "shape": [10000, 1000],
+        "dimension_names": ["rows", "columns"],
         "data_type": "<f8",
         "chunk_grid": {
             "type": "regular",
