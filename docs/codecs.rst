@@ -178,6 +178,8 @@ header. The format of the encoded buffer is defined in [BLOSC]_. The
 reference implementation is provided by the `c-blosc library
 <https://github.com/Blosc/c-blosc>`_.
 
+.. _endian-codec:
+
 Endian
 ------
 

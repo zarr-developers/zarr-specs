@@ -536,6 +536,11 @@ should be understood as fall-back types of respectively 1, 2, and 3 byte length.
 Zarr v3 is limited to type sizes that are a multiple of 8 bits but may support
 other type sizes in later versions of this specification.
 
+.. note::
+
+   While the default binary representation is little endian, the :ref:`endian
+   codec<endian-codec>` may specified to use big endian encoding instead.
+
 
 .. note::
 
