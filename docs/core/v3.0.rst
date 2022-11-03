@@ -539,7 +539,7 @@ other type sizes in later versions of this specification.
 .. note::
 
    While the default binary representation is little endian, the :ref:`endian
-   codec<endian-codec>` may specified to use big endian encoding instead.
+   codec<endian-codec>` may be specified to use big endian encoding instead.
 
 
 .. note::
