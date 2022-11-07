@@ -360,29 +360,41 @@ conceptual model underpinning the Zarr format.
     ordering of elements_, but extensions may define other
     memory layouts.
 
-.. _compressor:
-.. _compressors:
-
-*Compressor*
-
-    An array_ may be associated with a compressor, which is a codec_
-    that transforms the binary representation of a chunk_ in some way,
-    usually to reduce data size.
-
 .. _codec:
 .. _codecs:
 
 *Codec*
 
-    A codec is a pair of algorithms which transform binary data in
-    some way and are used to encode and decode chunks_. This
-    specification defines a codec interface which comprises
-    a pair of operations, one to perform the transformation (encode),
-    the other to reverse the transformation (decode). This
-    specification only considers the case where a codec is used as a
-    compressor_, but extensions may extend the chunk encoding
-    process, for example, to add support for one or more filter codecs
-    to be applied prior to compression.
+    An array_ may be associated with a list of *codecs*.  Each codec specifies a
+    bidirectional transform (an *encode* transform and a *decode* transform).
+
+    Each codec has an *encoded representation* and a *decoded representation*;
+    each of these two representations are defined to be either:
+
+    - a multi-dimensional array of some shape and data type, or
+    - a byte string.
+
+    Logically, a codec ``c`` must define three properties:
+
+    - ``c.compute_encoded_representation_type(decoded_representation_type)``, a
+      procedure that determines the encoded representation based on the decoded
+      representation and any codec parameters.  In the case of a decoded
+      representation that is a multi-dimensional array, the shape and data type
+      of the encoded representation must be computable based only on the shape
+      and data type, but not the actual element values, of the encoded
+      representation.  If the ``decoded_representation_type`` is not supported,
+      this algorithm must fail with an error.
+
+    - ``c.encode(decoded_value)``, a procedure that computes the encoded
+      representation, and is used when writing an array.
+
+    - ``c.decode(encoded_value, decoded_representation_type)``, a procedure that
+      computes the decoded representation, and is used when reading an array.
+
+    If more than one codec is specified for an array, each codec is applied
+    sequentially; when encoding, the encoded output of codec ``i`` serves as the
+    decoded input of codec ``i+1``, and similarly when decoding, the decoded
+    output of codec ``i+1`` serves as the encoded input to codec ``i``.
 
 .. _metadata document:
 .. _metadata documents:
@@ -393,7 +405,7 @@ conceptual model underpinning the Zarr format.
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
     metadata document will specify the number of dimensions_, shape_,
-    `data type`_, grid_, `memory layout`_ and compressor_ for that
+    `data type`_, grid_, `memory layout`_ and codec_ for that
     array_.
 
     Groups can have a optional metadata document which provide extra
@@ -756,21 +768,104 @@ elements in the order (0, 0), (1, 0), (2, 0), ..., (`dy` - 3, `dx` -
 Chunk encoding
 ==============
 
-An array may be configured with a compressor, which is a codec used to
-transform the binary representation of each chunk prior to storage,
-and to reverse the transformation during retrieval.
+Chunks are encoded into a binary representation for storage in a store_, using
+the chain of codecs_ specified by the ``codecs`` metadata field.
 
-A codec is defined as a pair of algorithms named *encode* and
-*decode*. Both of these algorithms transform a sequence of bytes
-(input) into another sequence of bytes (output). The *decode*
-algorithm is the reverse of the *encode* algorithm, but it is not
-required that the reversal is perfect. For example, a codec may be a
-lossy compressor for floating point data, which will lose some
-numerical precision during encoding and thus not reproduce exactly the
-original byte sequence after subsequent decoding. However, if *a* is
-the binary representation of a chunk with data type *d* and internal
-memory layout *m*, then the result *b = decode(encode(a))* must be
-consistent with the data type and memory layout of *a*.
+Determination of encoded representations
+----------------------------------------
+
+To encode or decode a chunk, the encoded and decoded representations for each
+codec in the chain must first be determined as follows:
+
+1. The initial decoded representation, ``decoded_representation[0]`` is
+   multi-dimensional array with the same data type as the zarr array, and a
+   shape determined according to the value of ``chunk_memory_layout`` as
+   follows:
+
+   - If ``chunk_memory_layout`` is equal to ``"C"``, the shape is equal to the
+     chunk shape.
+   - If ``chunk_memory_layout`` is equal to ``"F"``, the shape is equal to the
+     chunk shape, with the dimension order reversed.
+   - If ``chunk_memory_layout`` is defined by an extension, the extension
+     defines the shape.
+
+2. For each codec ``i``, the encoded representation is equal to the decoded
+   representation ``decoded_representation[i+1]`` of the next codec, and is
+   computed from
+   ``codecs[i].compute_encoded_representation_type(decoded_representation[i])``.
+   If ``compute_encoded_representation_type`` fails because of an incompatible
+   decoded representation, an implementation should indicate an error.
+
+.. _default-array-byte-string-conversion:
+
+Conversion between multi-dimensional array and byte string representations
+--------------------------------------------------------------------------
+
+Some codecs operate directly on multi-dimensional arrays of elements,
+e.g. encoding a 3-d array as a multi-channel jpeg image.  Other codecs operate
+at the byte level, e.g. gzip compression.  If a codec that operates at the byte
+level receives as input an array that is not a 1-dimensional uint8 array, it may
+convert the input array to a byte string by concatenating the default binary
+representations of each element in lexicographical order (C order).  Similarly,
+if a codec that expects a multi-dimensional array as input instead receives a
+byte string, it may decode each element in lexicographical order according to
+the default binary representation of each element.
+
+Encoding procedure
+------------------
+
+Based on the computed ``decoded_representations`` list, a chunk is encoded using
+the following procedure:
+
+1. The chunk array ``A`` (with a shape equal to the chunk shape, and data type
+   equal to the zarr array data type) is logically transformed into the initial
+   *encoded chunk* ``EC[0]`` of the type specified by
+   ``decoded_representation[0]`` according to the ``chunk_memory_layout`` as
+   follows:
+   
+   - If ``chunk_memory_layout`` is equal to ``"C"``, ``EC[0]`` equals ``A`` (no
+     transformation).
+   - If ``chunk_memory_layout`` is equal to ``"F"``, the dimension order is reversed.
+   - If ``chunk_memory_layout`` is defined by an extension, the extension
+     defines the transformation to perform.
+
+2. For each codec ``codecs[i]`` in ``codecs``, ``EC[i+1] :=
+   codecs[i].encode(EC[i])``.
+
+3. The final encoded chunk representation ``EC_final`` is always a byte string.
+   If ``EC[codecs.length]`` is a byte string, then ``EC_final :=
+   EC[codecs.length]``.  Otherwise, ``EC_final`` is
+   :ref:`converted<default-array-byte-string-conversion>` from
+   ``EC[codecs.length]``.
+
+4. ``EC_final`` is written to the store_.
+
+Decoding procedure
+------------------
+
+Based on the computed ``decoded_representations`` list, a chunk is encoded using
+the following procedure:
+
+1. The encoded chunk representation ``EC_final`` is read from the store_.
+
+2. If ``codecs[codecs.length]`` is a byte string, ``EC[codecs.length] :=
+   EC_final``.  Otherwise, ``EC[codecs.length]`` is
+   :ref:`converted<default-array-byte-string-conversion>` from ``EC_final``.
+
+3. For each codec ``codecs[i]`` in ``codecs``, iterating in reverse order,
+   ``EC[i] := codecs[i].decode(EC[i+1], decoded_representation[i])``.
+
+4. The chunk array ``A`` is computed from ``EC[0]`` according to the
+   ``chunk_memory_layout`` as follows:
+   
+   - If ``chunk_memory_layout`` is equal to ``"C"``, ``A`` equals ``EC[0]`` (no
+     transformation).
+   - If ``chunk_memory_layout`` is equal to ``"F"``, the dimension order is reversed.
+   - If ``chunk_memory_layout`` is defined by an extension, the extension
+     defines the transformation to perform.
+
+Specifying codecs
+-----------------
 
 To allow for flexibility to define and implement new codecs, this
 specification does not define any codecs, nor restrict the set of
@@ -801,9 +896,8 @@ on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see the Zarr
 community process specification.
 
-Further details of how a compressor is configured for an array are
-given in the section below on `Array metadata`_.
-
+Further details of how codecs are configured for an array are given in the
+section below on `Array metadata`_.
 
 Metadata
 ========
@@ -1067,19 +1161,19 @@ following mandatory names:
     (See https://github.com/zarr-developers/zarr-specs/issues/72.)
 
 
-The following names are optional:
+The following members are optional:
 
-``compressor``
-^^^^^^^^^^^^^^
+``codecs``
+^^^^^^^^^^
 
-    Specifies a codec to be used for encoding and decoding chunks. The
-    value must be an object containing the name ``codec`` whose value
-    is a URI that identifies a codec and dereferences to a human-readable
-    representation of the codec specification. The codec
-    object may also contain a ``configuration`` object which consists of the
-    parameter names and values as defined by the corresponding codec
-    specification. When the ``compressor`` name is absent, this means that no
-    compressor is used.
+    Specifies a list of codecs to be used for encoding and decoding chunks. The
+    value must be an array of objects, each object containing a member with
+    ``type`` whose value is a URI that identifies a codec and dereferences to a
+    human-readable representation of the codec specification. The codec object
+    may also contain a ``configuration`` object which consists of the parameter
+    names and values as defined by the corresponding codec specification. An
+    absent ``codecs`` member is equivalent to specifying an empty list of
+    codecs.
 
 ``storage_transformers``
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1116,12 +1210,12 @@ compressed using gzip compression prior to storage::
             "separator" : "/"
         },
         "chunk_memory_layout": "C",
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
             "configuration": {
                 "level": 1
             }
-        },
+        }],
         "fill_value": "NaN",
         "extensions": [],
         "attributes": {
@@ -1147,12 +1241,12 @@ chunking as above, but using an extension data type::
             "separator" : "/"
         },
         "chunk_memory_layout": "C",
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/gzip/1.0",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
             "configuration": {
                 "level": 1
             }
-        },
+        }],
         "fill_value": null,
         "extensions": [],
         "attributes": {}
@@ -1163,7 +1257,7 @@ chunking as above, but using an extension data type::
    ``dtype`` has been renamed to ``data_type``,
    ``chunks`` has been renamed to ``chunk_grid``,
    ``order`` has been renamed to ``chunk_memory_layout``,
-   ``filters`` has been removed,
+   the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field,
    ``zarr_format`` has been removed,
 
 

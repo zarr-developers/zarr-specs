@@ -23,8 +23,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This document defines codecs for use as compressors and/or filters as
-part of a Zarr implementation.
+This document defines codecs for Zarr implementations.
 
 
 Status of this document
@@ -93,12 +92,12 @@ For example, the array metadata below specifies that the compressor is
 the Gzip codec configured with a compression level of 1::
 
     {
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/gzip",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/gzip",
             "configuration": {                                                                                
                 "level": 1                                                                                    
             }
-        },
+        }],
     }
 
     
@@ -156,15 +155,15 @@ compressor is the Blosc codec configured with a compression level of
 default block size::
 
     {
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/blosc",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/blosc",
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,
                 "shuffle": 1,
                 "blocksize": 0
             }
-        },
+        }],
     }
 
 
