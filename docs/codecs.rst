@@ -177,6 +177,39 @@ header. The format of the encoded buffer is defined in [BLOSC]_. The
 reference implementation is provided by the `c-blosc library
 <https://github.com/Blosc/c-blosc>`_.
 
+.. _endian-codec:
+
+Endian
+------
+
+Codec URI:
+    https://purl.org/zarr/spec/codec/endian
+
+Encodes array elements using the specified endianness.
+
+Configuration parameters
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+endian:
+    Required.  A string equal to either ``"big"`` or ``"little"``.
+
+Format and algorithm
+~~~~~~~~~~~~~~~~~~~~
+
+Each element of the array is encoded using the specified endian variant of its
+default binary representation.  Array elements are encoded in lexicographical
+order.  For example, with ``endian`` specified as ``big``, the ``int32`` data
+type is encoded as a 4-byte big endian two's complement integer, and the
+``complex128`` data type is encoded as two consecutive 8-byte big endian IEEE
+754 binary64 values.
+
+.. note::
+
+   Single the default binary representation of all data types is little endian,
+   specifying this codec with ``endian`` equal to ``"little"`` is equivalent to
+   omitting this codec, because if this codec is omitted, the default binary
+   representation of the data type, which is always little endian, is used
+   instead.
 
 Deprecated codecs
 =================
