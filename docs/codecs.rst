@@ -205,7 +205,7 @@ type is encoded as a 4-byte big endian two's complement integer, and the
 
 .. note::
 
-   Single the default binary representation of all data types is little endian,
+   Since the default binary representation of all data types is little endian,
    specifying this codec with ``endian`` equal to ``"little"`` is equivalent to
    omitting this codec, because if this codec is omitted, the default binary
    representation of the data type, which is always little endian, is used
