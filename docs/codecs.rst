@@ -23,8 +23,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This document defines codecs for use as compressors and/or filters as
-part of a Zarr implementation.
+This document defines codecs for Zarr implementations.
 
 
 Status of this document
@@ -93,12 +92,12 @@ For example, the array metadata below specifies that the compressor is
 the Gzip codec configured with a compression level of 1::
 
     {
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/gzip",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/gzip",
             "configuration": {                                                                                
                 "level": 1                                                                                    
             }
-        },
+        }],
     }
 
     
@@ -156,15 +155,15 @@ compressor is the Blosc codec configured with a compression level of
 default block size::
 
     {
-        "compressor": {
-            "codec": "https://purl.org/zarr/spec/codec/blosc",
+        "codecs": [{
+            "type": "https://purl.org/zarr/spec/codec/blosc",
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,
                 "shuffle": 1,
                 "blocksize": 0
             }
-        },
+        }],
     }
 
 
@@ -178,6 +177,39 @@ header. The format of the encoded buffer is defined in [BLOSC]_. The
 reference implementation is provided by the `c-blosc library
 <https://github.com/Blosc/c-blosc>`_.
 
+.. _endian-codec:
+
+Endian
+------
+
+Codec URI:
+    https://purl.org/zarr/spec/codec/endian
+
+Encodes array elements using the specified endianness.
+
+Configuration parameters
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+endian:
+    Required.  A string equal to either ``"big"`` or ``"little"``.
+
+Format and algorithm
+~~~~~~~~~~~~~~~~~~~~
+
+Each element of the array is encoded using the specified endian variant of its
+default binary representation.  Array elements are encoded in lexicographical
+order.  For example, with ``endian`` specified as ``big``, the ``int32`` data
+type is encoded as a 4-byte big endian two's complement integer, and the
+``complex128`` data type is encoded as two consecutive 8-byte big endian IEEE
+754 binary64 values.
+
+.. note::
+
+   Since the default binary representation of all data types is little endian,
+   specifying this codec with ``endian`` equal to ``"little"`` is equivalent to
+   omitting this codec, because if this codec is omitted, the default binary
+   representation of the data type, which is always little endian, is used
+   instead.
 
 Deprecated codecs
 =================
