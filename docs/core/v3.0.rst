@@ -501,43 +501,42 @@ Core data types
    * - ``bool``
      - Boolean
      - Single byte, with false encoded as ``\\x00`` and true encoded as ``\\x01``.
-   * - int8
+   * - ``int8``
      - Integer in ``[-2^7, 2^7-1]``
      - 1 byte two's complement
-   * - int16
+   * - ``int16``
      - Integer in ``[-2^15, 2^15-1]``
      - 2-byte little endian two's complement
-   * - int32
+   * - ``int32``
      - Integer in ``[-2^31, 2^31-1]``
      - 4-byte little endian two's complement
-   * - uint8
+   * - ``uint8``
      - Integer in ``[0, 2^8-1]``
      - 1 byte
-   * - uint16
+   * - ``uint16``
      - Integer in ``[0, 2^16-1]``
      - 2-byte little endian
-   * - uint32
+   * - ``uint32``
      - Integer in ``[0, 2^32-1]``
      - 4-byte little endian
-   * - float16 (optionally supported)
+   * - ``float16`` (optionally supported)
      - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
      - 2-byte little endian IEEE 754 binary16 
-   * - float32
+   * - ``float32``
      - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
      - 4-byte little endian IEEE 754 binary32 
-   * - float64
+   * - ``float64``
      - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
      - 8-byte little endian IEEE 754 binary64
-   * - complex64
+   * - ``complex64``
      - real and complex components are each IEEE 754 single-precision floating point
      - 2 consecutive 4-byte little endian IEEE 754 binary32 values
-   * - complex128
+   * - ``complex128``
      - real and complex components are each IEEE 754 double-precision floating point
      - 2 consecutive 8-byte little endian IEEE 754 binary64 values
    * - ``r*`` (Optional)
      - raw bits,  use for extension type fallbacks
      - variable, given by ``*``, is limited to be a multiple of 8.
-     - N/A
 
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass-through type designated by the lower-case letter ``r`` followed
