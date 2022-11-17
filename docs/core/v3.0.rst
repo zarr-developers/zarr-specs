@@ -219,6 +219,13 @@ Concepts and terminology
 This section introduces and defines some key terms and explains the
 conceptual model underpinning the Zarr format.
 
+The following figure illustrates the first part of the terminology:
+
+..
+   The following image was produced with https://excalidraw.com/
+   and can be loaded there, as the source is embedded in the png.
+.. image:: terminology-hierarchy.excalidraw.png
+
 .. _hierarchy:
 
 *Hierarchy*
@@ -358,6 +365,44 @@ conceptual model underpinning the Zarr format.
     ordering of elements_, but extensions may define other
     memory layouts.
 
+.. _metadata document:
+.. _metadata documents:
+
+*Metadata document*
+
+    Each array_ in a hierarchy_ is represented by a metadata document,
+    which is a machine-readable document containing essential
+    processing information about the node. For example, an array_
+    metadata document will specify the number of dimensions_, shape_,
+    `data type`_, grid_, `memory layout`_ and codec_ for that
+    array_.
+
+    Groups can have an optional metadata document which provides extra
+    information about a group.
+
+.. _store:
+.. _stores:
+
+*Store*
+
+    The `metadata documents`_ and encoded chunk_ data for all nodes in a
+    hierarchy_ are held in a store as raw bytes. To enable a variety
+    of different store types to be used, this specification defines an
+    `Abstract store interface`_ which is a common set of operations that stores
+    may provide. For example, a directory in a file system can be a zarr store,
+    where keys are file names, values are file contents, and files can be read,
+    written, listed or deleted via the operating system. Equally, an S3 bucket
+    can provide this interface, where keys are resource names, values are
+    resource contents, and resources can be read, written or deleted via HTTP.
+
+The following figure illustrates the codec, store and storage transformer
+terminology for a use case of reading from an array:
+
+..
+   The following image was produced with https://excalidraw.com/
+   and can be loaded there, as the source is embedded in the png.
+.. image:: terminology-read.excalidraw.png
+
 .. _codec:
 .. _codecs:
 
@@ -394,43 +439,19 @@ conceptual model underpinning the Zarr format.
     decoded input of codec ``i+1``, and similarly when decoding, the decoded
     output of codec ``i+1`` serves as the encoded input to codec ``i``.
 
-.. _metadata document:
-.. _metadata documents:
-
-*Metadata document*
-
-    Each array_ in a hierarchy_ is represented by a metadata document,
-    which is a machine-readable document containing essential
-    processing information about the node. For example, an array_
-    metadata document will specify the number of dimensions_, shape_,
-    `data type`_, grid_, `memory layout`_ and codec_ for that
-    array_.
-
-    Groups can have a optional metadata document which provide extra
-    information about a group.
-
-.. _store:
-.. _stores:
-
-*Store*
-
-    The `metadata documents`_ and encoded chunk_ data for all nodes in
-    a hierarchy_ are held in a store. To enable a variety of different
-    store types to be used, this specification defines an `Abstract store
-    interface`_ which is a common set of operations that stores may
-    provide.
-
 .. _storage transformer:
 .. _storage transformers:
 
 *Storage transformer*
 
-    To enhance the storage capabilities, storage transformers may
-    change the storage structure and behaviour of data coming from
-    an array_ in the underlying store_. Upon retrieval the original data
-    is restored within the transformer. Any number of `predefined storage
-    transformers`_ can be registered and stacked.
-    See the `storage transformers details`_ below.
+    To provide performance enhancements or other optimizations,
+    storage transformers may intercept and alter the storage keys and bytes
+    of an array_ before they reach the underlying physical storage.
+    Upon retrieval, the original keys and bytes are restored within the
+    transformer. Any number of `predefined storage transformers`_ can be
+    registered and stacked. In contrast to codecs, strorage transformers can
+    act on the a complete array, rather than individual chunks. See the
+    `storage transformers details`_ below.
 
 .. _`storage transformers details`: #storage-transformers-1
 
