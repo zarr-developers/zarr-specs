@@ -1810,8 +1810,25 @@ References
 Change log
 ==========
 
-This section is a placeholder for keeping a log of the snapshots of
-this document that are tagged in GitHub and what changed between them.
+All notable possibly implementation-affecting changes to this specification
+are documented in this section, grouped by the specification status and ordered
+by time.
+
+Draft Changes
+--------------------------
+
+- Changed data type names and changed endianness to be handled by a codec.
+  `PR #155 <https://github.com/zarr-developers/zarr-specs/pull/155>`_
+- Replaced the ``compressor`` field in the array metadata with a ``codecs``
+  field that can specify a list of codecs. `PR #153
+  <https://github.com/zarr-developers/zarr-specs/pull/153>`_
+- Required ``fill_value`` in the array metadata to be defined.
+  `PR #145 <https://github.com/zarr-developers/zarr-specs/pull/145>`_
+- Added array storage transformers which can be configured per array via the
+  storage_transformers name in the array metadata.
+  `PR #134 <https://github.com/zarr-developers/zarr-specs/pull/134>`_
+- The changelog is incomplete before 2022, please refer to the commits on
+  GitHub.
 
 @@tag@@
 -------
