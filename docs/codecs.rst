@@ -29,9 +29,10 @@ This document defines codecs for Zarr implementations.
 Status of this document
 =======================
 
-This document is a **Work in Progress**. It may be updated, replaced
-or obsoleted by other documents at any time. It is inappapropriate to
-cite this document as other than work in progress.
+.. warning::
+    This document is a **Work in Progress**. It may be updated, replaced
+    or obsoleted by other documents at any time. It is inappapropriate to
+    cite this document as other than work in progress.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues                                           

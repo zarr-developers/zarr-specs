@@ -15,11 +15,17 @@ Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
 
-Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_
+Corresponding ZEP:
+    `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+
+Issue tracking and discussion overview:
+    `GitHub project board <https://github.com/orgs/zarr-developers/projects/2>`_
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/core/v3.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/core/v3.0.rst>`_
+
+Suggest extensions or other changes as a Zarr Enhancement Proposal (ZEP):
+    `ZEP 0 — Purpose and process <https://zarr.dev/zeps/active/ZEP0000.html>`_
 
 Copyright 2019-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -38,14 +44,10 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-This document is a draft for review. See `ZEP0001 <https://zarr.dev/zeps/draft/ZEP0001.html>`_ for further information.
-
-Comments, questions or contributions to this document are very
-welcome. Comments and questions should be raised via `GitHub issues
-<https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_.
-
-This document was produced by the `Zarr core development team
-<https://github.com/orgs/zarr-developers/teams/core-devs>`_.
+.. warning::
+    This document is a draft for review and subject to changes.
+    It will become final when the `Zarr Enhancement Proposal (ZEP) 1 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
 
 
 Introduction
