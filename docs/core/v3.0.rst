@@ -936,25 +936,19 @@ containing the following names:
     version number string to help with discovery of this
     specification.
 
-``metadata_encoding``
-^^^^^^^^^^^^^^^^^^^^^
-
-    A string containing the URI pointing to a document describing the method
-    used for encoding group and array metadata documents.
-
-    For document using the default JSON encoding and format describe in this document
-    then the value must be ``"https://purl.org/zarr/spec/core/3.0``.
-
 ``metadata_key_suffix``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-    A string containing a suffix to add to the metadata keys when saving into
-    the store. By default ``".json"``.
+    A string containing a suffix to add to the array and group metadata keys
+    when saving into the store, associated with a single encoding. By default
+    only ``".json"`` is allowed and used with JSON encoding.
 
-    .. note::
+    .. note:: This suffix is used to allow non hierarchy browsing and editing by
+     non-zarr-aware tools.
 
-      This suffix is used to allow non hierarchy
-      browsing and editing by non-zarr-aware tools.
+    .. note:: This is a possible extension point, where an extension which is
+    listed in ``extensions`` (see below) may add new valid suffixes with their
+    associated encodings.
 
 ``extensions``
 ^^^^^^^^^^^^^^
@@ -982,7 +976,6 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": []
     }
@@ -993,7 +986,6 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": [
             {
@@ -1271,9 +1263,8 @@ Metadata encoding
 -----------------
 
 The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
-group metadata documents (``*.group`` s) must be encoded as per the type given in
-the ``metadata_encoding`` field in the entry point metadata document
-(described below).
+group metadata documents (``*.group`` s) must be encoded as per the type associated with
+the ``metadata_key_suffix`` field in the entry point metadata document (described below).
 
 Stores
 ======
