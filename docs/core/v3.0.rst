@@ -310,8 +310,7 @@ The following figure illustrates the first part of the terminology:
     identified by a tuple of integer coordinates, one for each
     dimension_ of the array_. If all dimensions_ of an array_ have
     finite length, then the number of elements in the array_ is given
-    by the product of the dimension_ lengths. An array_ may not have
-    been fully initialized.
+    by the product of the dimension_ lengths.
 
 .. _data type:
 
