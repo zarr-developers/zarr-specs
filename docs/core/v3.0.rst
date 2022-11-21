@@ -1812,7 +1812,7 @@ References
 Change log
 ==========
 
-All notable possibly implementation-affecting changes to this specification
+All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
 
