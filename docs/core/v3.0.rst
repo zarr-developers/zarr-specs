@@ -1159,8 +1159,8 @@ The following members are optional:
     transformer is used, same for an empty list.
 
 
-All other names within the array metadata object are reserved for
-future versions of this specification.
+The array metadata object must not contain any other names.
+Those are reserved for future versions of this specification.
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
