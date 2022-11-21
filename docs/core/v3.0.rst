@@ -585,6 +585,7 @@ other type sizes in later versions of this specification.
     arrays, one with the actual variable length data and one with fixed size
     (pointer + length) to the variable size data, we do not want to commit to such
     a structure.
+    See https://github.com/zarr-developers/zarr-specs/issues/62.
 
 
 Chunk grids
@@ -943,12 +944,14 @@ containing the following names:
     when saving into the store, associated with a single encoding. By default
     only ``".json"`` is allowed and used with JSON encoding.
 
-    .. note:: This suffix is used to allow non hierarchy browsing and editing by
-     non-zarr-aware tools.
+    .. note::
+      This suffix is used to allow non hierarchy browsing and editing by
+      non-zarr-aware tools.
 
-    .. note:: This is a possible extension point, where an extension which is
-    listed in ``extensions`` (see below) may add new valid suffixes with their
-    associated encodings.
+    .. note::
+      This is a possible extension point, where an extension which is
+      listed in ``extensions`` (see below) may add new valid suffixes with their
+      associated encodings.
 
 ``extensions``
 ^^^^^^^^^^^^^^
