@@ -688,7 +688,7 @@ arbitrary length in a "negative" direction along any dimension.
    will consist of the string ``c``.
 
 .. note:: Chunks at the border of an array always have the full chunk size, even when
-   the array only covers parts of it. For example, having and array with ``shape=(30, 30)``,
+   the array only covers parts of it. For example, having an array with ``shape=(30, 30)``,
    ``chunks=(16, 16)``, the chunk ``0,1`` would also contain unused values for the indices
    ``(0-16, 30-31)``. Since reading anything beyond the array shape is undefined behavior,
    those values may be passed on, be replaced with the fill values or other undefined behavior.
@@ -1160,6 +1160,8 @@ The following members are optional:
 
 The array metadata object must not contain any other names.
 Those are reserved for future versions of this specification.
+An implementation must fail top open zarr hierarchies, groups
+or arrays with unknown metadata fields.
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
