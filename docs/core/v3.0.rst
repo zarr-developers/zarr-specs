@@ -275,10 +275,8 @@ The following figure illustrates the first part of the terminology:
     "foo", whose parent is the root of the hierarchy. The path "/"
     identifies the root node.
 
-    A path always starts with ``/``.
-
-    QUESTION: do we want to codify that group ``path`` end, can end, or must end
-    in ``/`` ?
+    A path always starts with ``/`` and cannot end with ``/``,
+    because node names cannot contain ``/``.
 
 .. _dimension:
 .. _dimensions:
