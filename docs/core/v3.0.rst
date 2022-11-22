@@ -1715,7 +1715,7 @@ A fixed set of storage providers is recommended for implementation with this spe
 Predefined storage transformers
 -------------------------------
 
-- :ref:`sharding-storage-transformer-v1`
+- :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
 
 Extensions
 ==========
