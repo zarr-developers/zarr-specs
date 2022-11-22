@@ -157,11 +157,11 @@ expected to follow this stability policy.
 
 This means that implementations based on a ``3.X`` specification will be
 able to read and write to datasets that follow any ``3.Y`` specification,
-as long as it only uses
+as long as the following conditions are met:
 
-- optional extensions or those supported by the implementation,
-- no codec or one supported by the implementation, and
-- the used store must be supported by the implementation.
+- only optional extensions or those supported by the implementation are used
+- only codecs supported by the implementation are used
+- the store must be supported by the implementation
 
 For details, please see the `zarr_format`_ metadata entry.
 
@@ -453,6 +453,7 @@ terminology for a use case of reading from an array:
 Node names
 ==========
 
+The root node does not have a name and is the empty string ``""``.
 Except for the root node, each node in a hierarchy must have a name,
 which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
@@ -615,10 +616,10 @@ array. Each chunk in the grid can be addressed by a tuple of positive
 integers (`k`, `j`, `i`, ...) corresponding to the indices of the
 chunk along each dimension.
 
-The origin vertex of a chunk has coordinates in the array space (`k` *
+The origin element of a chunk has coordinates in the array space (`k` *
 `dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
 the chunk sizes along each dimension.
-Thus the origin vertex of the chunk at grid index (0, 0, 0,
+Thus the origin element of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
 array dimension is not perfectly divisible by the chunk length along
@@ -672,7 +673,7 @@ chunk grid and the array space are not aligned at the origin vertices
 of the array and the chunk at grid index (0, 0, 0, ...). However,
 extensions may define variations on the regular grid type
 such that the grid indices may include negative integers, and the
-origin vertex of the array may occur at an arbitrary position within
+origin element of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
 
@@ -709,8 +710,8 @@ layouts. Note that there may be an interdependency between memory
 layouts and data types, such that certain memory layouts may only be
 applicable to arrays with certain data types.
 
-C contiguous memory layout
---------------------------
+Row-major (C-style) memory layout
+---------------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the last dimension of the array is
@@ -722,8 +723,8 @@ the binary values for a given chunk are taken from chunk elements in
 the order (0, 0), (0, 1), (0, 2), ..., (`dy` - 1, `dx` - 3), (`dy` - 1, `dx` -
 2), (`dy` - 1, `dx` - 1).
 
-F contiguous memory layout
---------------------------
+Column-major (F-style) memory layout
+------------------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the first dimension of the array
@@ -1295,7 +1296,7 @@ The store interface defines a set of operations involving `keys` and
 `values`. In the context of this interface, a `key` is any string
 containing only characters in the ranges ``a-z``, ``A-Z``, ``0-9``, or
 in the set ``/.-_``, where the final character is **not** a ``/``
-character. A `value` is any sequence of bytes.
+character. A `value` is a sequence of bytes.
 
 It is assumed that the store holds (`key`, `value`) pairs, with only
 one such pair for any given `key`. I.e., a store is a mapping from
