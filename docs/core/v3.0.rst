@@ -687,10 +687,10 @@ arbitrary length in a "negative" direction along any dimension.
    will consist of the string ``c``.
 
 .. note:: Chunks at the border of an array always have the full chunk size, even when
-   the array only covers parts of it. For example, having and array with ``"shape": [30, 30]`` and
+   the array only covers parts of it. For example, having an array with ``"shape": [30, 30]`` and
    ``"chunk_shape": [16, 16]``, the chunk ``0,1`` would also contain unused values for the indices
-   ``0-16, 30-31``. Since reading anything beyond the array shape is undefined behavior,
-   those values may be passed on, be replaced with the fill values or other undefined behavior.
+   ``0-16, 30-31``. When writing such chunks it is recommended to use the current fill value
+   for elements outside the bounds of the array.
 
 Chunk memory layouts
 ====================
