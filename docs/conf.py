@@ -28,8 +28,12 @@ author = 'Zarr Developers'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-  'sphinxcontrib.mermaid'
+  'sphinx.ext.todo',
+  'sphinxcontrib.mermaid',
 ]
+
+# Display todos by setting to True
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

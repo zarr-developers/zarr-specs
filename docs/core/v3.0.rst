@@ -1582,6 +1582,10 @@ concatenating "data/root/" and the chunk identifier.
 Operations
 ----------
 
+.. todo::
+   The following section descripes possible operations of an implementation
+   as a guide-line. Those descriptions are not yet finalized.
+
 Let `P` be an arbitrary hierarchy path.
 
 Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
@@ -1772,7 +1776,7 @@ Erasure of an implicit group may automatically erase any empty parent. For
 example on a S3 store where the namespace is flat, erasure of the last key with
 a prefix will erase all the implicit group in the prefix.
 
-Care must thus be taken when erasing a array or a group if the parent needs to
+Care must thus be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
 
