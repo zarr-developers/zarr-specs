@@ -1324,16 +1324,8 @@ starting at byte `range_start` (inclusive) and having a length of
 `range_length` bytes. `range_length` may be none, indicating all
 available data until the end of the referenced value. For example
 `range` ``[0, none]`` specifies the full value. Stores that do not
-support partial access can still answer the requests using cutouts
-of full values. It is recommended that the implementation of the
-``get_partial_values``, ``set_partial_values`` and
-``erase_values`` methods is made optional, providing fallbacks
-for them by default. However, it is recommended to supply those operations
-where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
-can easily be mapped onto their `partial_values` counterparts.
-Therefore, it is also recommended to supply fallbacks for those if the
-`partial_values` operations can be implemented.
-An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
+support partial access can still fulfill partial requests by first extracting
+the full value and then returning a subset of bytes.
 
 The store interface also defines some operations involving
 `prefixes`. In the context of this interface, a prefix is a string
@@ -1436,6 +1428,15 @@ operations ``set("foo", a)`` and ``set("FOO", b)`` will result in two
 separate (key, value) pairs being stored. Subsequently ``get("foo")``
 will return *a* and ``get("FOO")`` will return *b*.
 
+It is recommended that the implementation of the
+``get_partial_values``, ``set_partial_values`` and
+``erase_values`` methods is made optional, providing fallbacks
+for them by default. However, it is recommended to supply those operations
+where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
+can easily be mapped onto their `partial_values` counterparts.
+Therefore, it is also recommended to supply fallbacks for those if the
+`partial_values` operations can be implemented.
+An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
 
 Store implementations
 ---------------------
@@ -1619,17 +1620,17 @@ Let "+" be the string concatenation operator.
     of the ancestor paths of `P`. Creating an array at path `P`
     implies the existence of groups at all ancestor paths of `P`.
 
-**Store element values in an array**
+**Store chunk data in an array**
 
-    To store element in an array at path `P` and coordinate (`j`, `i`,
+    To store chunk data in an array at path `P` and chunk coordinate (`j`, `i`,
     ...), perform ``set(data_key(P, j, i, ...), value)``, where
     `value` is the serialisation of the corresponding chunk, encoded
     according to the information in the array metadata stored under
     the key ``array_meta_key(P)``.
 
-**Retrieve element values in an array**
+**Retrieve chunk data in an array**
 
-    To retrieve element in an array at path `P` and coordinate (`i`,
+    To retrieve chunk data in an array at path `P` and chunk coordinate (`i`,
     `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
     value is the serialisation of the corresponding chunk, encoded
     according to the array metadata stored at ``array_meta_key(P)``.
