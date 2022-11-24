@@ -3,9 +3,8 @@
 =================================
  File system store (version 1.0)
 =================================
------------------------------
- Editor's draft 26 July 2019
------------------------------
+
+  **Editor's draft 26 July 2019**
 
 Specification URI:
     http://purl.org/zarr/spec/stores/filesystem/1.0

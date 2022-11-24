@@ -1,9 +1,8 @@
 ===================================
  Struct data types (version 1.0)
 ===================================
------------------------------
- Editor's draft 2 March 2022
------------------------------
+
+  **Editor's draft 2 March 2022**
 
 Specification URI:
     http://purl.org/zarr/spec/extensions/struct-dtypes/1.0

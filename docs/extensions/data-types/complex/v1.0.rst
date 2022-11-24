@@ -1,9 +1,8 @@
 =========================================
  Complex number data types (version 1.0)
 =========================================
------------------------------
- Editor's draft 11 June 2019
------------------------------
+
+  **Editor's draft 11 June 2019**
 
 Specification URI:
     http://purl.org/zarr/spec/extensions/complex-dtypes/1.0

@@ -1,9 +1,8 @@
 ======
 Codecs
 ======
-------------------------------
-Editor's Draft 21 October 2020
-------------------------------
+
+  **Editor's Draft 21 October 2020**
 
 Specification URI:
     https://purl.org/zarr/specs/codec

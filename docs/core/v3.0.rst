@@ -4,9 +4,8 @@
 ======================================
  Zarr core specification (version 3.0)
 ======================================
--------------------------------
- Editor's draft 25 May 2022
--------------------------------
+
+  **Editor's draft 25 May 2022**
 
 Specification URI:
     https://purl.org/zarr/spec/core/3.0
