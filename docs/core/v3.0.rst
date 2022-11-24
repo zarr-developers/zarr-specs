@@ -935,21 +935,30 @@ containing the following names:
     version number string to help with discovery of this
     specification.
 
-``metadata_key_suffix``
-^^^^^^^^^^^^^^^^^^^^^^^
+``metadata_encoding``
+^^^^^^^^^^^^^^^^^^^^^
 
-    A string containing a suffix to add to the array and group metadata keys
-    when saving into the store, associated with a single encoding. By default
-    only ``".json"`` is allowed and used with JSON encoding.
+    Specifies the encoding of group and array metadata. To use JSON encoding,
+    which is the only encoding allowed by this core specification, the
+    ``metadata_encoding`` value must be the following object::
+
+        {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        }
+
+    The ``metadata_encoding`` value is an extension point and may be defined by
+    an extension. In this case the value must be an object containing the
+    required names ``extension``, ``type`` and ``metadata_key_suffix``.
+    ``extension`` must be a URI that identifies the extension and dereferences
+    to a human-readable representation of the specification. ``type`` is a
+    string defined by the extension. The ``metadata_key_suffix`` is a string
+    containing a suffix to add to the array and group metadata keys when saving
+    into the store.
 
     .. note::
-      This suffix is used to allow non hierarchy browsing and editing by
+      The metadata key suffix is used to allow non hierarchy browsing and editing by
       non-zarr-aware tools.
-
-    .. note::
-      This is a possible extension point, where an extension which is
-      listed in ``extensions`` (see below) may add new valid suffixes with their
-      associated encodings.
 
 ``extensions``
 ^^^^^^^^^^^^^^
@@ -977,7 +986,10 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_key_suffix" : ".json",
+        "metadata_encoding": {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        },
         "extensions": []
     }
 
@@ -987,7 +999,10 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_key_suffix" : ".json",
+        "metadata_encoding": {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        },
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
@@ -1266,8 +1281,8 @@ Metadata encoding
 -----------------
 
 The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
-group metadata documents (``*.group`` s) must be encoded as per the type associated with
-the ``metadata_key_suffix`` field in the entry point metadata document (described below).
+group metadata documents (``*.group`` s) must be encoded as per the type defined in
+the ``metadata_encoding`` field in the entry point metadata document (described below).
 
 Stores
 ======
@@ -1723,16 +1738,17 @@ Extensions
 Many types of extensions can exist and they can be grouped as
 following:
 
-======================= ========================================= =====================
-extension               metadata                                  is extension required
-======================= ========================================= =====================
-generic                 ``extensions`` in `entry point metadata`_ ``must_understand``
-array                   ``extensions`` in `Array metadata`_       ``must_understand``
-data type               `data_type`_                              no ``fallback``
-chunk grid              `chunk_grid`_                             always
-chunk memory layout     `chunk_memory_layout`_                    always
-storage transformer     `storage_transformers`_                   always
-======================= ========================================= =====================
+======================= ================================================ =====================
+extension               metadata                                         is extension required
+======================= ================================================ =====================
+generic                 ``extensions`` in `entry point metadata`_        ``must_understand``
+metadata encoding       ``metadata_encoding`` in `entry point metadata`_ always
+array                   ``extensions`` in `Array metadata`_              ``must_understand``
+data type               `data_type`_                                     no ``fallback``
+chunk grid              `chunk_grid`_                                    always
+chunk memory layout     `chunk_memory_layout`_                           always
+storage transformer     `storage_transformers`_                          always
+======================= ================================================ =====================
 
 There are no group extensions in Zarr v3.0.
 
