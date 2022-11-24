@@ -471,12 +471,10 @@ node names:
 * must not be a string composed only of period characters, e.g. "." or
   ".."
 
-* must be at most 255 characters long
-
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
-.. note:
+.. note::
     The Zarr core development team recognises that restricting the set
     of allowed characters creates an impediment and bias against users
     of different languages. We are actively discussing whether the full
@@ -484,6 +482,12 @@ identical.
     this would entail. If you have experience or views please comment on
     `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
 
+.. note::
+    The underlying store might pose additional restriction on node names,
+    such as the following:
+
+    * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
+    * `1,024 bytes UTF8 object key limit for AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
 
 Data types
 ==========
