@@ -14,7 +14,7 @@ Specification URI:
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
-    * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>_`), Google
+    * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-spec-v3.0>`_
