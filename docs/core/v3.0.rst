@@ -1043,7 +1043,7 @@ following mandatory names:
     The ``data_type`` value is an extension point and may be defined
     by an extension. If the data type is defined by an
     extension, then the value must be an object containing the names
-    ``extension``, ``type`` and ``fallback``. The ``extension`` is
+    ``extension``, ``type`` and (optionally) ``fallback``. The ``extension`` is
     required and its value must be a URI that identifies the
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and its value is
