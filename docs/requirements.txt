@@ -1,3 +1,4 @@
 sphinx==2.0.1
 pydata-sphinx-theme
 sphinxcontrib-mermaid
+sphinxmark

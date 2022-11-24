@@ -28,8 +28,12 @@ author = 'Zarr Developers'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-  'sphinxcontrib.mermaid'
+  'sphinxcontrib.mermaid',
+  'sphinxmark',
 ]
+
+sphinxmark_enable = True
+sphinxmark_div = 'row'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
