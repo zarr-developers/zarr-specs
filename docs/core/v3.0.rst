@@ -1825,6 +1825,13 @@ by time.
 Draft Changes
 --------------------------
 
+- Removed the 255 character limit for paths. `PR #175
+  <https://github.com/zarr-developers/zarr-specs/pull/175>`_
+- Removed the ``/root`` prefix for paths. `PR #175
+  <https://github.com/zarr-developers/zarr-specs/pull/175>`_
+
+  * ``meta/root.array.json`` is now ``meta/array.json``
+  * ``meta/root/foo/bar.group.json`` is now ``meta/foo/bar.group.json``
 - Changed data type names and changed endianness to be handled by a codec.
   `PR #155 <https://github.com/zarr-developers/zarr-specs/pull/155>`_
 - Replaced the ``compressor`` field in the array metadata with a ``codecs``
