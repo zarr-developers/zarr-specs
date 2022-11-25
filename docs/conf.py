@@ -33,7 +33,7 @@ extensions = [
 ]
 
 sphinxmark_enable = True
-sphinxmark_div = 'row'
+sphinxmark_div = 'bd-article-container'
 sphinxmark_image = 'draft-watermark.png'
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,6 +57,8 @@ html_theme_options = {
   "github_url": "https://github.com/zarr-developers/zarr-specs",
   "twitter_url": "https://twitter.com/zarr_dev/",
   "show_prev_next": False,
+  "secondary_sidebar_items": ["page-toc"],
+  "footer_items": [],  # hidden in custom css
 }
 
 
@@ -64,6 +66,10 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = [
+    'css/custom.css',
+]
 
 suppress_warnings = [
     # suppress "duplicate citation" warnings
