@@ -4,9 +4,8 @@
 ======================================
  Zarr core specification (version 3.0)
 ======================================
--------------------------------
- Editor's draft 25 May 2022
--------------------------------
+
+  **Editor's draft 25 May 2022**
 
 Specification URI:
     https://purl.org/zarr/spec/core/3.0
@@ -1133,8 +1132,9 @@ following mandatory names:
 ``attributes``
 ^^^^^^^^^^^^^^
 
-    The value must be an object. The object may contain any name/value
-    pairs. Intended to allow storage of arbitrary user metadata
+    The value must be an object. The object may contain any key/value
+    pairs, where the key must be a string and the value can be an arbitrary
+    JSON literal. Intended to allow storage of arbitrary user metadata
 
 
   .. note::

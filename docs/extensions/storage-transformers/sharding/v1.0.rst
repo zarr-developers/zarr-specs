@@ -3,9 +3,8 @@
 ==========================================
 Sharding storage transformer (version 1.0)
 ==========================================
------------------------------
- Editor's draft 18 02 2022
------------------------------
+
+  **Editor's draft 18 02 2022**
 
 Specification URI:
     @@TODO
@@ -40,7 +39,7 @@ Status of this document
 
 .. warning::
     This document is a draft for review and subject to changes.
-    It will become final when the `Zarr Enhancement Proposal (ZEP) 2 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    It will become final when the `Zarr Enhancement Proposal (ZEP) 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_
     is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
 
 
