@@ -1,9 +1,8 @@
 ===================================
  String data types (version 1.0)
 ===================================
------------------------------
- Editor's draft 2 March 2022
------------------------------
+
+  **Editor's draft 2 March 2022**
 
 Specification URI:
     http://purl.org/zarr/spec/extensions/string-dtypes/1.0
@@ -33,9 +32,10 @@ part of the core v3 spec.
 Status of this document
 =======================
 
-This document is a **Work in Progress**. It may be updated, replaced
-or obsoleted by other documents at any time. It is inappapropriate to
-cite this document as other than work in progress.
+.. warning::
+  This document is a **Work in Progress**. It may be updated, replaced
+  or obsoleted by other documents at any time. It is inappapropriate to
+  cite this document as other than work in progress.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
