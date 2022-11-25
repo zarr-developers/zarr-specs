@@ -1836,7 +1836,7 @@ by time.
 Draft Changes
 --------------------------
 
-- Moved the `metadata_key_suffix` entrypoint metadata key into `metadata_encoding`,
+- Moved the ``metadata_key_suffix`` entrypoint metadata key into ``metadata_encoding``,
   which now just specifies `"json"` via the `type` key and is an extension point.
   `PR #171 <https://github.com/zarr-developers/zarr-specs/pull/171>`_
 - Changed data type names and changed endianness to be handled by a codec.
