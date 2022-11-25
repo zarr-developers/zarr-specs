@@ -34,6 +34,7 @@ extensions = [
 
 sphinxmark_enable = True
 sphinxmark_div = 'row'
+sphinxmark_image = 'draft-watermark.png'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
