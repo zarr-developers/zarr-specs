@@ -1733,7 +1733,7 @@ Global Storage Transformers
 Global storage transformers act on all keys and values in an entire store.
 They are configured for the store via the root metadata document.
 They are suitable for implementing store-wide logic which modifies keys / values
-in a uniform way. Example of features that might be implemented via global storage
+in a uniform way. Examples of features that might be implemented via global storage
 transformers include data version control and content-addressible storage.
 
 
