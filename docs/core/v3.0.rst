@@ -915,19 +915,7 @@ containing the following names:
     A string containing the URI of the Zarr core
     specification that defines the metadata format. For Zarr
     hierarchies conforming to this specification, the value must be
-    the string "https://purl.org/zarr/spec/core/3.0".
-
-    Implementations of this specification may assume that the final path
-    segment of this URI ("3.0") represents the core specification version
-    number, where "3" is the major version number and "0" is the minor
-    version number. Implementations of this specification may also assume
-    that future versions of this specification that retain the same major
-    versioning number ("3") will be backwards-compatible, in the sense
-    that any new features added to the specification can be safely
-    ignored. In other words, if the major version number is "3",
-    implementations of this specification may read and interpret metadata
-    as defined in this specification, ignoring any name/value pairs
-    where the name is not defined here. See also the `stability policy`_.
+    the string "zarr.dev/v3".
 
     Note that this value is given as a URI rather than as a simple
     version number string to help with discovery of this
@@ -978,7 +966,7 @@ For example, below is an entry point metadata document, specifying that
 JSON is being used for encoding of group and array metadata::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
+        "zarr_format": "zarr.dev/v3",
         "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": []
@@ -989,7 +977,7 @@ specifying that an extension is being used which may be
 ignored if not understood::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
+        "zarr_format": "zarr.dev/v3",
         "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
         "metadata_key_suffix" : ".json",
         "extensions": [
