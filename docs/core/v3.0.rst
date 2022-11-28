@@ -1174,7 +1174,7 @@ The following members are optional:
 
 The array metadata object must not contain any other names.
 Those are reserved for future versions of this specification.
-An implementation must fail top open zarr hierarchies, groups
+An implementation must fail to open zarr hierarchies, groups
 or arrays with unknown metadata fields.
 
 For example, the array metadata JSON document below defines a
