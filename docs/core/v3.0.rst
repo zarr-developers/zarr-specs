@@ -1096,13 +1096,17 @@ The following names are optional:
 
     Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
     an array of strings with the same length as ``shape``.  An unnamed dimension
-    is indicated by an empty string, ``""``.  Within a single zarr array, all
-    non-empty dimension names must be distinct (no two dimensions may have the
-    same non-empty name), but more than one dimension may have an empty name.
-    This specification does not place any restrictions on the use of the same
-    dimension name across multiple arrays within the same zarr hierarchy, but
-    extensions or specific applications may do so.  If ``dimension_names`` is
-    not specified, all dimensions are unnamed.
+    is indicated by an empty string, ``""``.  If ``dimension_names`` is not
+    specified, all dimensions are unnamed.
+
+    For compatibility with zarr implementations and applications that support
+    using dimension names to uniquely identify dimensions, it is recommended but
+    not required that all non-empty dimension names are distinct (no two
+    dimensions have the same non-empty name).
+
+    This specification also does not place any restrictions on the use of the
+    same dimension name across multiple arrays within the same zarr hierarchy,
+    but extensions or specific applications may do so.
 
 All other names within the array metadata object are reserved for
 future versions of this specification.
