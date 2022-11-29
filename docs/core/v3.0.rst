@@ -13,6 +13,7 @@ Specification URI:
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
+    * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 
 Corresponding ZEP:
     `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
