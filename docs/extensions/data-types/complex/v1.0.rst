@@ -37,7 +37,7 @@ Status of this document
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
-<https://github.com/zarr-developers/zarr-specs/labels/complex-dtypes-v1.0>`_. When
+<https://github.com/zarr-developers/zarr-specs/labels/data-type>`_. When
 raising an issue, please add the label "complex-dtypes-v1.0".
 
 This document was produced by the `Zarr core development team

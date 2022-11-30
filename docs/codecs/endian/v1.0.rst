@@ -1,4 +1,4 @@
-.. _file-system-store-v1:
+.. _endian-codec-v1:
 
 ============================
  Endian codec (version 1.0)
