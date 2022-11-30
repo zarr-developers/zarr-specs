@@ -1,0 +1,95 @@
+.. _file-system-store-v1:
+
+============================
+ Endian codec (version 1.0)
+============================
+
+  **Editor's draft 26 July 2019**
+
+Specification URI:
+    https://purl.org/zarr/spec/codecs/endian/1.0
+Corresponding ZEP:
+    `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+Issue tracking:
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
+Suggest an edit for this spec:
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/endian/v1.0.rst>`_
+
+Copyright 2020 `Zarr core development team
+<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
+is licensed under a `Creative Commons Attribution 3.0 Unported License
+<https://creativecommons.org/licenses/by/3.0/>`_.
+
+----
+
+
+Abstract
+========
+
+This specification defines an implementation of the Zarr abstract
+store API using a file system.
+
+
+Status of this document
+=======================
+
+.. warning::
+    This document is a draft for review and subject to changes.
+    It will become final when the `Zarr Enhancement Proposal (ZEP) 1 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
+
+
+Document conventions
+====================
+
+Conformance requirements are expressed with a combination of
+descriptive assertions and [RFC2119]_ terminology. The key words
+"MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the normative
+parts of this document are to be interpreted as described in
+[RFC2119]_. However, for readability, these words do not appear in all
+uppercase letters in this specification.
+
+All of the text of this specification is normative except sections
+explicitly marked as non-normative, examples, and notes. Examples in
+this specification are introduced with the words "for example".
+
+
+Configuration parameters
+========================
+
+endian:
+    Required.  A string equal to either ``"big"`` or ``"little"``.
+
+
+Format and algorithm
+====================
+
+Each element of the array is encoded using the specified endian variant of its
+default binary representation.  Array elements are encoded in lexicographical
+order.  For example, with ``endian`` specified as ``big``, the ``int32`` data
+type is encoded as a 4-byte big endian two's complement integer, and the
+``complex128`` data type is encoded as two consecutive 8-byte big endian IEEE
+754 binary64 values.
+
+.. note::
+
+   Since the default binary representation of all data types is little endian,
+   specifying this codec with ``endian`` equal to ``"little"`` is equivalent to
+   omitting this codec, because if this codec is omitted, the default binary
+   representation of the data type, which is always little endian, is used
+   instead.
+
+
+References
+==========
+
+.. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
+   Requirement Levels. March 1997. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc2119
+
+
+Change log
+==========
+
+No changes yet.

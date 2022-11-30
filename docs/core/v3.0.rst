@@ -860,7 +860,7 @@ The Zarr core development team maintains a repository of codec
 specifications, which are hosted alongside this specification in the
 `zarr-specs GitHub repository`_, and which are
 published on the `zarr-specs documentation Web site
-<http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
 recommended that codec specifications are contributed to the
 zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
@@ -1184,7 +1184,7 @@ compressed using gzip compression prior to storage::
         },
         "chunk_memory_layout": "C",
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
+            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }
@@ -1204,7 +1204,7 @@ chunking as above, but using an extension data type::
     {
         "shape": [10000, 1000],
         "data_type": {
-            "extension": "https://purl.org/zarr/spec/extensions/datetime-dtypes/1.0",
+            "extension": "https://purl.org/zarr/spec/extensions/data-types/datetime/1.0",
             "type": "<M8[ns]",
             "fallback": "<i8"
         },
@@ -1215,7 +1215,7 @@ chunking as above, but using an extension data type::
         },
         "chunk_memory_layout": "C",
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
+            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }

@@ -5,11 +5,11 @@
   **Editor's draft 11 June 2019**
 
 Specification URI:
-    http://purl.org/zarr/spec/extensions/filters/1.0
+    https://purl.org/zarr/spec/extensions/array-extensions/filters/1.0
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/filters-v1.0>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/core-protocol-v3.0-dev/docs/extension/filters/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/array-extensions/filters/v1.0.rst>`_
 
 Copyright 2019 `Zarr core development
 team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO

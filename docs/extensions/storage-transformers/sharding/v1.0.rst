@@ -7,14 +7,16 @@ Sharding storage transformer (version 1.0)
   **Editor's draft 18 02 2022**
 
 Specification URI:
-    @@TODO
-    http://purl.org/zarr/spec/storage-transformers/sharding/1.0
+    https://purl.org/zarr/spec/extensions/storage-transformers/sharding/1.0
+
+Corresponding ZEP:
+    `ZEP 2 — Sharding storage transformer <https://zarr.dev/zeps/draft/ZEP0002.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/storage-transformers-sharding-v1.0>`-
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/storage-transformers/sharding/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/storage-transformers/sharding/v1.0.rst>`_
 
 Copyright 2022-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -92,7 +94,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
     {
       storage_transformers: [
         {
-          "extension": "https://purl.org/zarr/spec/storage_transformers/sharding/1.0",
+          "extension": "https://purl.org/zarr/spec/extensions/storage_transformers/sharding/1.0",
           "type": "indexed",
           "configuration": {
             "chunks_per_shard": [
