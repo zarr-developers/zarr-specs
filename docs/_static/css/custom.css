@@ -1,0 +1,18 @@
+.bd-main .bd-content .bd-article-container {
+    flex-grow: 1;
+    max-width: 100%;
+}
+
+@media (min-width:960px) {
+    .bd-page-width {
+        max-width: 100rem;
+    }
+}
+
+footer {
+    display: none;
+}
+
+.sidebar-end-items {
+    margin-top: 0% !important;
+}

@@ -13,6 +13,7 @@ Specification URI:
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
+    * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 
 Corresponding ZEP:
     `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
@@ -146,7 +147,7 @@ Stability Policy
 ----------------
 
 This core specification adheres to a ``MAJOR.MINOR`` version
-number format. A zarr implementation provides the read and write API by
+number format. A zarr implementation that provides the read and write API by
 implementing this specification can be considered compatible with all
 datasets following the specification with the same major version number.
 
@@ -156,11 +157,11 @@ expected to follow this stability policy.
 
 This means that implementations based on a ``3.X`` specification will be
 able to read and write to datasets that follow any ``3.Y`` specification,
-as long as it only uses
+as long as the following conditions are met:
 
-- optional extensions or those supported by the implementation,
-- no codec or one supported by the implementation, and
-- the used store must be supported by the implementation.
+- only optional extensions or those supported by the implementation are used
+- only codecs supported by the implementation are used
+- the store must be supported by the implementation
 
 For details, please see the `zarr_format`_ metadata entry.
 
@@ -168,20 +169,15 @@ For details, please see the `zarr_format`_ metadata entry.
 Questions that still need to be resolved
 ----------------------------------------
 
-We solicit feedback on the following area during the RFC period of this first
-draft.
+We solicit feedback on the following area during the review period:
 
  - Should core metadata and user attributes be stored together or separate documents?
    (See https://github.com/zarr-developers/zarr-specs/issues/72)
- - extensions and ``must_understand = True`` might be too restrictive.
-   We propose to develop a draft implementation with extensions and
-   see how far we can go. A possible list of extensions to include:
 
-    - Datetime
-    - Named dimensions
-    - Awkward arrays
-
-   See https://github.com/zarr-developers/zarr-specs/issues/89 for discussion on
+ - We want to verify if the extension mechanisms fit different use cases or if
+   they are too restrictive. See
+   https://github.com/zarr-developers/zarr-specs/issues/89 and
+   https://github.com/zarr-developers/zarr-specs/issues/169 for discussion on
    the topic.
 
   - Node name case sensitivity: The node name is now case sensitive. This may
@@ -196,6 +192,7 @@ draft.
 
   - Should named dimensions be part of the core metadata spec?
     https://github.com/zarr-developers/zarr-specs/issues/73
+    https://github.com/zarr-developers/zarr-specs/pull/162
 
 
 Document conventions
@@ -262,7 +259,7 @@ The following figure illustrates the first part of the terminology:
     Each node in a hierarchy_ has a name, which is a string of
     characters with some additional constraints defined in the section
     on `node names`_ below. Two sibling nodes cannot have the same
-    name. The root node does not have a name.
+    name. The root node does not have a name and is the empty string ``""``.
 
 .. _path:
 .. _paths:
@@ -271,17 +268,15 @@ The following figure illustrates the first part of the terminology:
 
     Each node in a hierarchy_ has a path which uniquely identifies
     that node and defines its location within the hierarchy_. The path
-    is formed by joining together the "/" character, followed by the
+    is a string, formed by joining together the "/" character, followed by the
     name_ of each ancestor node separated by the "/" character,
     followed by the name_ of the node itself. For example, the path
     "/foo/bar" identifies a node named "bar", whose parent is named
     "foo", whose parent is the root of the hierarchy. The path "/"
     identifies the root node.
 
-    A path always starts with ``/``.
-
-    QUESTION: do we want to codify that group ``path`` end, can end, or must end
-    in ``/`` ?
+    A path always starts with ``/`` and cannot end with ``/``,
+    because node names cannot contain ``/``.
 
 .. _dimension:
 .. _dimensions:
@@ -313,8 +308,7 @@ The following figure illustrates the first part of the terminology:
     identified by a tuple of integer coordinates, one for each
     dimension_ of the array_. If all dimensions_ of an array_ have
     finite length, then the number of elements in the array_ is given
-    by the product of the dimension_ lengths. An array_ may not have
-    been fully initialized.
+    by the product of the dimension_ lengths.
 
 .. _data type:
 
@@ -459,6 +453,7 @@ terminology for a use case of reading from an array:
 Node names
 ==========
 
+The root node does not have a name and is the empty string ``""``.
 Except for the root node, each node in a hierarchy must have a name,
 which is a string of characters. To ensure consistent behaviour
 across different storage systems, the following constraints apply to
@@ -594,6 +589,7 @@ other type sizes in later versions of this specification.
     arrays, one with the actual variable length data and one with fixed size
     (pointer + length) to the variable size data, we do not want to commit to such
     a structure.
+    See https://github.com/zarr-developers/zarr-specs/issues/62.
 
 
 Chunk grids
@@ -626,10 +622,10 @@ array. Each chunk in the grid can be addressed by a tuple of positive
 integers (`k`, `j`, `i`, ...) corresponding to the indices of the
 chunk along each dimension.
 
-The origin vertex of a chunk has coordinates in the array space (`k` *
+The origin element of a chunk has coordinates in the array space (`k` *
 `dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
 the chunk sizes along each dimension.
-Thus the origin vertex of the chunk at grid index (0, 0, 0,
+Thus the origin element of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
 array dimension is not perfectly divisible by the chunk length along
@@ -683,7 +679,7 @@ chunk grid and the array space are not aligned at the origin vertices
 of the array and the chunk at grid index (0, 0, 0, ...). However,
 extensions may define variations on the regular grid type
 such that the grid indices may include negative integers, and the
-origin vertex of the array may occur at an arbitrary position within
+origin element of the array may occur at an arbitrary position within
 any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
 
@@ -695,6 +691,12 @@ arbitrary length in a "negative" direction along any dimension.
 .. note:: Arrays may have 0 dimension (when for example representing scalars),
    in which case the coordinate of a chunk is the empty tuple, and the chunk key
    will consist of the string ``c``.
+
+.. note:: Chunks at the border of an array always have the full chunk size, even when
+   the array only covers parts of it. For example, having an array with ``"shape": [30, 30]`` and
+   ``"chunk_shape": [16, 16]``, the chunk ``0,1`` would also contain unused values for the indices
+   ``0-16, 30-31``. When writing such chunks it is recommended to use the current fill value
+   for elements outside the bounds of the array.
 
 Chunk memory layouts
 ====================
@@ -714,8 +716,8 @@ layouts. Note that there may be an interdependency between memory
 layouts and data types, such that certain memory layouts may only be
 applicable to arrays with certain data types.
 
-C contiguous memory layout
---------------------------
+Row-major (C-style) memory layout
+---------------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the last dimension of the array is
@@ -727,8 +729,8 @@ the binary values for a given chunk are taken from chunk elements in
 the order (0, 0), (0, 1), (0, 2), ..., (`dy` - 1, `dx` - 3), (`dy` - 1, `dx` -
 2), (`dy` - 1, `dx` - 1).
 
-F contiguous memory layout
---------------------------
+Column-major (F-style) memory layout
+------------------------------------
 
 In this memory layout, the binary values of the array elements are
 organised into a sequence such that the first dimension of the array
@@ -942,22 +944,27 @@ containing the following names:
 ``metadata_encoding``
 ^^^^^^^^^^^^^^^^^^^^^
 
-    A string containing the URI pointing to a document describing the method
-    used for encoding group and array metadata documents.
+    Specifies the encoding of group and array metadata. To use JSON encoding,
+    which is the only encoding allowed by this core specification, the
+    ``metadata_encoding`` value must be the following object::
 
-    For document using the default JSON encoding and format describe in this document
-    then the value must be ``"https://purl.org/zarr/spec/core/3.0``.
+        {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        }
 
-``metadata_key_suffix``
-^^^^^^^^^^^^^^^^^^^^^^^
-
-    A string containing a suffix to add to the metadata keys when saving into
-    the store. By default ``".json"``.
+    The ``metadata_encoding`` value is an extension point and may be defined by
+    an extension. In this case the value must be an object containing the
+    required names ``extension``, ``type`` and ``metadata_key_suffix``.
+    ``extension`` must be a URI that identifies the extension and dereferences
+    to a human-readable representation of the specification. ``type`` is a
+    string defined by the extension. The ``metadata_key_suffix`` is a string
+    containing a suffix to add to the array and group metadata keys when saving
+    into the store.
 
     .. note::
-
-      This suffix is used to allow non hierarchy
-      browsing and editing by non-zarr-aware tools.
+      The metadata key suffix is used to allow non hierarchy browsing and editing by
+      non-zarr-aware tools.
 
 ``extensions``
 ^^^^^^^^^^^^^^
@@ -985,8 +992,10 @@ JSON is being used for encoding of group and array metadata::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_key_suffix" : ".json",
+        "metadata_encoding": {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        },
         "extensions": []
     }
 
@@ -996,8 +1005,10 @@ ignored if not understood::
 
     {
         "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_key_suffix" : ".json",
+        "metadata_encoding": {
+            "type": "json",
+            "metadata_key_suffix": ".json"
+        },
         "extensions": [
             {
                 "extension": "http://example.org/zarr/extension/foo",
@@ -1038,7 +1049,7 @@ following mandatory names:
     The ``data_type`` value is an extension point and may be defined
     by an extension. If the data type is defined by an
     extension, then the value must be an object containing the names
-    ``extension``, ``type`` and ``fallback``. The ``extension`` is
+    ``extension``, ``type`` and (optionally) ``fallback``. The ``extension`` is
     required and its value must be a URI that identifies the
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and its value is
@@ -1168,8 +1179,10 @@ The following members are optional:
     transformer is used, same for an empty list.
 
 
-All other names within the array metadata object are reserved for
-future versions of this specification.
+The array metadata object must not contain any other names.
+Those are reserved for future versions of this specification.
+An implementation must fail to open zarr hierarchies, groups
+or arrays with unknown metadata fields.
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
@@ -1275,9 +1288,8 @@ Metadata encoding
 -----------------
 
 The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
-group metadata documents (``*.group`` s) must be encoded as per the type given in
-the ``metadata_encoding`` field in the entry point metadata document
-(described below).
+group metadata documents (``*.group`` s) must be encoded as per the type defined in
+the ``metadata_encoding`` field in the entry point metadata document (described below).
 
 Stores
 ======
@@ -1306,7 +1318,7 @@ The store interface defines a set of operations involving `keys` and
 `values`. In the context of this interface, a `key` is any string
 containing only characters in the ranges ``a-z``, ``A-Z``, ``0-9``, or
 in the set ``/.-_``, where the final character is **not** a ``/``
-character. A `value` is any sequence of bytes.
+character. A `value` is a sequence of bytes.
 
 It is assumed that the store holds (`key`, `value`) pairs, with only
 one such pair for any given `key`. I.e., a store is a mapping from
@@ -1319,16 +1331,8 @@ starting at byte `range_start` (inclusive) and having a length of
 `range_length` bytes. `range_length` may be none, indicating all
 available data until the end of the referenced value. For example
 `range` ``[0, none]`` specifies the full value. Stores that do not
-support partial access can still answer the requests using cutouts
-of full values. It is recommended that the implementation of the
-``get_partial_values``, ``set_partial_values`` and
-``erase_values`` methods is made optional, providing fallbacks
-for them by default. However, it is recommended to supply those operations
-where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
-can easily be mapped onto their `partial_values` counterparts.
-Therefore, it is also recommended to supply fallbacks for those if the
-`partial_values` operations can be implemented.
-An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
+support partial access can still fulfill partial requests by first extracting
+the full value and then returning a subset of bytes.
 
 The store interface also defines some operations involving
 `prefixes`. In the context of this interface, a prefix is a string
@@ -1431,6 +1435,15 @@ operations ``set("foo", a)`` and ``set("FOO", b)`` will result in two
 separate (key, value) pairs being stored. Subsequently ``get("foo")``
 will return *a* and ``get("FOO")`` will return *b*.
 
+It is recommended that the implementation of the
+``get_partial_values``, ``set_partial_values`` and
+``erase_values`` methods is made optional, providing fallbacks
+for them by default. However, it is recommended to supply those operations
+where possible for efficiency. Also, the ``get``, ``set`` and ``erase``
+can easily be mapped onto their `partial_values` counterparts.
+Therefore, it is also recommended to supply fallbacks for those if the
+`partial_values` operations can be implemented.
+An entity containing those fallbacks could be named ``StoreWithPartialAccess``.
 
 Store implementations
 ---------------------
@@ -1576,6 +1589,10 @@ concatenating "data/" and the chunk identifier.
 Operations
 ----------
 
+.. todo::
+   The following section descripes possible operations of an implementation
+   as a guide-line. Those descriptions are not yet finalized.
+
 Let `P` be an arbitrary hierarchy path.
 
 Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
@@ -1614,17 +1631,17 @@ Let "+" be the string concatenation operator.
     of the ancestor paths of `P`. Creating an array at path `P`
     implies the existence of groups at all ancestor paths of `P`.
 
-**Store element values in an array**
+**Store chunk data in an array**
 
-    To store element in an array at path `P` and coordinate (`j`, `i`,
+    To store chunk data in an array at path `P` and chunk coordinate (`j`, `i`,
     ...), perform ``set(data_key(P, j, i, ...), value)``, where
     `value` is the serialisation of the corresponding chunk, encoded
     according to the information in the array metadata stored under
     the key ``array_meta_key(P)``.
 
-**Retrieve element values in an array**
+**Retrieve chunk data in an array**
 
-    To retrieve element in an array at path `P` and coordinate (`i`,
+    To retrieve chunk data in an array at path `P` and chunk coordinate (`i`,
     `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
     value is the serialisation of the corresponding chunk, encoded
     according to the array metadata stored at ``array_meta_key(P)``.
@@ -1724,7 +1741,7 @@ A fixed set of storage providers is recommended for implementation with this spe
 Predefined storage transformers
 -------------------------------
 
-- :ref:`sharding-storage-transformer-v1`
+- :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
 
 Extensions
 ==========
@@ -1733,16 +1750,17 @@ Extensions
 Many types of extensions can exist and they can be grouped as
 following:
 
-======================= ========================================= =====================
-extension               metadata                                  is extension required
-======================= ========================================= =====================
-generic                 ``extensions`` in `entry point metadata`_ ``must_understand``
-array                   ``extensions`` in `Array metadata`_       ``must_understand``
-data type               `data_type`_                              no ``fallback``
-chunk grid              `chunk_grid`_                             always
-chunk memory layout     `chunk_memory_layout`_                    always
-storage transformer     `storage_transformers`_                   always
-======================= ========================================= =====================
+======================= ================================================ =====================
+extension               metadata                                         is extension required
+======================= ================================================ =====================
+generic                 ``extensions`` in `entry point metadata`_        ``must_understand``
+metadata encoding       ``metadata_encoding`` in `entry point metadata`_ always
+array                   ``extensions`` in `Array metadata`_              ``must_understand``
+data type               `data_type`_                                     no ``fallback``
+chunk grid              `chunk_grid`_                                    always
+chunk memory layout     `chunk_memory_layout`_                           always
+storage transformer     `storage_transformers`_                          always
+======================= ================================================ =====================
 
 There are no group extensions in Zarr v3.0.
 
@@ -1757,15 +1775,15 @@ that need to be carefully considered but do not strictly fall into the spec.
 Explicit vs implicit group
 --------------------------
 
-While the zarr spec v3 defined implicit and explicit group, implementation may
-decide to create an explicit group for all implicit group they encounter; in
+While this zarr spec v3 defines implicit and explicit groups, implementations may
+decide to create an explicit group for all implicit groups they encounter; in
 particular when using a hierarchical storage.
 
 Erasure of an implicit group may automatically erase any empty parent. For
 example on a S3 store where the namespace is flat, erasure of the last key with
 a prefix will erase all the implicit group in the prefix.
 
-Care must thus be taken when erasing a array or a group if the parent needs to
+Care must thus be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
 
@@ -1796,8 +1814,8 @@ Below is a summary of the key differences between this specification
   created. In particular, v3 supports implicit groups, which are
   groups that do not have a metadata document but whose existence is
   implied by descendant nodes. This change enables multiple arrays to
-  be created in parallel without generating any race conditions for
-  creating parent groups.
+  be created in parallel without generating race conditions for the
+  metadata when creating parent groups.
 
 - The set of data types specified in v3 is less than in v2. Additional
   data types will be defined via extensions.
@@ -1832,6 +1850,9 @@ Draft Changes
 
   * ``meta/root.array.json`` is now ``meta/array.json``
   * ``meta/root/foo/bar.group.json`` is now ``meta/foo/bar.group.json``
+- Moved the ``metadata_key_suffix`` entrypoint metadata key into ``metadata_encoding``,
+  which now just specifies `"json"` via the `type` key and is an extension point.
+  `PR #171 <https://github.com/zarr-developers/zarr-specs/pull/171>`_
 - Changed data type names and changed endianness to be handled by a codec.
   `PR #155 <https://github.com/zarr-developers/zarr-specs/pull/155>`_
 - Replaced the ``compressor`` field in the array metadata with a ``codecs``
