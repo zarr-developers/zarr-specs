@@ -28,9 +28,13 @@ author = 'Zarr Developers'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+  'sphinx.ext.todo',
   'sphinxcontrib.mermaid',
   'sphinxmark',
 ]
+
+# Display todos by setting to True
+todo_include_todos = True
 
 sphinxmark_enable = True
 sphinxmark_div = 'bd-article-container'
