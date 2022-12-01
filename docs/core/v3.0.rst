@@ -1061,10 +1061,11 @@ following mandatory names:
 
     The chunk grid of the Zarr array. If the chunk grid is a regular
     chunk grid as defined in this specification, then the value must
-    be an object with the names ``type`` and ``chunk_shape``. The
-    value of ``type`` must be the string ``"regular"``, and the value of
+    be an object with the names ``type``, ``chunk_shape`` and ``separator``.
+    The value of ``type`` must be the string ``"regular"``, and the value of
     ``chunk_shape`` must be an array of integers providing the lengths
-    of the chunk along each dimension of the array. For example,
+    of the chunk along each dimension of the array. ``separator`` must be
+    either ``"/"`` or ``"."``. For example,
     ``{"type": "regular", "chunk_shape": [2, 5], "separator":"/"}`` means a regular
     grid where the chunks have length 2 along the first dimension and
     length 5 along the second dimension.
