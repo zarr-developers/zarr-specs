@@ -467,12 +467,10 @@ node names:
 * must not be a string composed only of period characters, e.g. "." or
   ".."
 
-* must be at most 255 characters long
-
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
-.. note:
+.. note::
     The Zarr core development team recognises that restricting the set
     of allowed characters creates an impediment and bias against users
     of different languages. We are actively discussing whether the full
@@ -480,6 +478,14 @@ identical.
     this would entail. If you have experience or views please comment on
     `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
 
+.. note::
+    The underlying store might pose additional restriction on node names,
+    such as the following:
+
+    * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
+    * `1,024 bytes UTF8 object key limit for AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+    * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
+    * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
 
 Data types
 ==========
@@ -1513,31 +1519,31 @@ Storage keys
 The entry point metadata document is stored under the key ``zarr.json``.
 
 For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating "meta/root", `P`,
+group metadata document is formed by concatenating "meta", `P`,
 ".group", and the metadata key suffix (which defaults to ".json").
 
 For example, for a group at hierarchy path ``/foo/bar``, the
-corresponding metadata key is "meta/root/foo/bar.group.json".
+corresponding metadata key is "meta/foo/bar.group.json".
 
 For an array at a non-root hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta/root",
+the array metadata document is formed by concatenating "meta",
 `P`, ".array", and the metadata key suffix.
 
-The data key for array chunks is formed by concatenating "data/root", `P`,
+The data key for array chunks is formed by concatenating "data", `P`,
 "/", and the chunk identifier as defined by the chunk grid layout.
 
-To get the path ``P`` from a metadata key, remove the trailing
-".array.json" or ".group.json" and the "meta/root" prefix.
+To get the path ``P`` from a non-root metadata key, remove the trailing
+".array.json" or ".group.json" and the "meta" prefix.
 
 For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/root/foo/baz.array.json". If the
+corresponding metadata key is "meta/foo/baz.array.json". If the
 array has two dimensions and a regular chunk grid, the data key for
-the chunk with grid coordinates (0, 0) is "data/root/foo/baz/c0/0".
+the chunk with grid coordinates (0, 0) is "data/foo/baz/c0/0".
 
 If the root node is a group, the metadata key is
-"meta/root.group.json". If the root node is an array, the metadata key
-is "meta/root.array.json", and the data keys are formed by
-concatenating "data/root/" and the chunk identifier.
+"meta/group.json". If the root node is an array, the metadata key
+is "meta/array.json", and the data keys are formed by
+concatenating "data/" and the chunk identifier.
 
 
 .. list-table:: Metadata Storage Key example
@@ -1551,22 +1557,22 @@ concatenating "data/root/" and the chunk identifier.
       - `zarr.json`
     * - Array (Root)
       - `/`
-      - `meta/root.array.json`
+      - `meta/array.json`
     * - Group (Root)
       - `/`
-      - `meta/root.group.json`
+      - `meta/group.json`
     * - Group
       - `/foo`
-      - `meta/root/foo.group.json`
+      - `meta/foo.group.json`
     * - Array
       - `/foo`
-      - `meta/root/foo.array.json`
+      - `meta/foo.array.json`
     * - Group
       - `/foo/bar`
-      - `meta/root/foo/bar.group.json`
+      - `meta/foo/bar.group.json`
     * - Array
       - `/foo/baz`
-      - `meta/root/foo/baz.array.json`
+      - `meta/foo/baz.array.json`
 
 
 .. list-table:: Data Storage Key example
@@ -1577,7 +1583,7 @@ concatenating "data/root/" and the chunk identifier.
       - Data key
     * - `/foo/baz`
       - `(1, 0)`
-      - `data/root/foo/baz/c1/0`
+      - `data/foo/baz/c1/0`
 
 
 
@@ -1644,20 +1650,20 @@ Let "+" be the string concatenation operator.
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
-    ``list_dir("meta/root" + P + "/")``. Any returned key ending in
+    ``list_dir("meta" + P + "/")``. Any returned key ending in
     ".array.json" indicates an array. Any returned key ending in
     ".group.json" indicates a group. Any returned prefix indicates a
     child group implied by some descendant.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
-    keys "meta/root/foo/bar.group.json" and
-    "meta/root/foo/bar/baz/qux.array.json". Groups at paths "/",
+    keys "meta/foo/bar.group.json" and
+    "meta/foo/bar/baz/qux.array.json". Groups at paths "/",
     "/foo" and "/foo/baz" have not been explicitly created but are
     implied by their descendants. To list the children of the group at
-    path "/foo", perform ``list_dir("meta/root/foo/")``, which will
-    return the key "meta/root/foo/bar.group.json" and the prefix
-    "meta/root/foo/baz/". From this it can be inferred that child
+    path "/foo", perform ``list_dir("meta/foo/")``, which will
+    return the key "meta/foo/bar.group.json" and the prefix
+    "meta/foo/baz/". From this it can be inferred that child
     groups "/foo/bar" and "/foo/baz" are present.
 
     If a store does not support any of the list operations then
@@ -1668,7 +1674,7 @@ Let "+" be the string concatenation operator.
 **Discover all nodes in a hierarchy**
 
     To discover all nodes in a hierarchy, one can call
-    ``list_prefix("meta/root/")``. All keys represent either explicit group or
+    ``list_prefix("meta/")``. All keys represent either explicit group or
     arrays. All intermediate prefixes ending in a ``/`` are implicit
     groups.
 
@@ -1677,25 +1683,25 @@ Let "+" be the string concatenation operator.
     To erase an array at path `P`:
       - erase the metadata document for the array, ``erase(array_meta_key(P))``
       - erase all data keys which prefix have path pointing to this array,
-        ``erase_prefix("data/root" + P + "/")``
+        ``erase_prefix("data" + P + "/")``
 
     To erase an implicit group at path `P`:
       - erase all nodes under this group - it should be sufficient to
-        perform ``erase_prefix("meta/root" + P + "/")`` and
-        ``erase_prefix("data/root" + P + "/")``.
+        perform ``erase_prefix("meta" + P + "/")`` and
+        ``erase_prefix("data" + P + "/")``.
 
     To erase an explicit group at path `P`:
       - erase the metadata document for the group, ``erase(group_meta_key(P))``
       - erase all nodes under this group - it should be sufficient to
-        perform ``erase_prefix("meta/root" + P + "/")`` and
-        ``erase_prefix("data/root" + P + "/")``.
+        perform ``erase_prefix("meta" + P + "/")`` and
+        ``erase_prefix("data" + P + "/")``.
 
 **Determine if a node exists**
 
     To determine if a node exists at path ``P``, try in the following
     order ``get(array_meta_key(P))`` (success implies an array at
     ``P``); ``get(group_meta_key(P))`` (success implies an explicit
-    group at ``P``); ``list_dir("meta/root" + P + "/")`` (non-empty
+    group at ``P``); ``list_dir("meta" + P + "/")`` (non-empty
     result set implies an implicit group at ``P``).
 
     .. note::
@@ -1838,6 +1844,13 @@ by time.
 Draft Changes
 --------------------------
 
+- Removed the 255 character limit for paths. `PR #175
+  <https://github.com/zarr-developers/zarr-specs/pull/175>`_
+- Removed the ``/root`` prefix for paths. `PR #175
+  <https://github.com/zarr-developers/zarr-specs/pull/175>`_
+
+  * ``meta/root.array.json`` is now ``meta/array.json``
+  * ``meta/root/foo/bar.group.json`` is now ``meta/foo/bar.group.json``
 - Moved the ``metadata_key_suffix`` entrypoint metadata key into ``metadata_encoding``,
   which now just specifies `"json"` via the `type` key and is an extension point.
   `PR #171 <https://github.com/zarr-developers/zarr-specs/pull/171>`_
