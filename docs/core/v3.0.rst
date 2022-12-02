@@ -141,7 +141,7 @@ provide a framework for community-defined extensions, which can be
 developed and published independently without requiring centralised
 coordination of all specifications.
 
-See `extensions`_ below.
+See :ref:`extensions<extensions_section>` below.
 
 Stability Policy
 ----------------
@@ -283,11 +283,11 @@ The following figure illustrates the first part of the terminology:
 
 *Dimension*
 
-    An array_ has a fixed number of zero or more dimensions. Each
-    dimension has an integer length. This specification only considers
-    the case where the lengths of all dimensions are finite. However,
-    `extensions`_ may be defined which allow a dimension to have
-    an infinite or variable length.
+    An array_ has a fixed number of zero or more dimensions. Each dimension has
+    an integer length. This specification only considers the case where the
+    lengths of all dimensions are finite. However,
+    :ref:`extensions<extensions_section>` may be defined which allow a dimension
+    to have an infinite or variable length.
 
 .. _shape:
 
@@ -572,7 +572,7 @@ other type sizes in later versions of this specification.
 .. note::
 
    While the default binary representation is little endian, the :ref:`endian
-   codec<endian-codec>` may be specified to use big endian encoding instead.
+   codec<endian-codec-v1>` may be specified to use big endian encoding instead.
 
 
 .. note::
@@ -867,7 +867,7 @@ The Zarr core development team maintains a repository of codec
 specifications, which are hosted alongside this specification in the
 `zarr-specs GitHub repository`_, and which are
 published on the `zarr-specs documentation Web site
-<http://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
 recommended that codec specifications are contributed to the
 zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
@@ -1203,7 +1203,7 @@ compressed using gzip compression prior to storage::
         },
         "chunk_memory_layout": "C",
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
+            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }
@@ -1223,7 +1223,7 @@ chunking as above, but using an extension data type::
     {
         "shape": [10000, 1000],
         "data_type": {
-            "extension": "https://purl.org/zarr/spec/extensions/datetime-dtypes/1.0",
+            "extension": "https://purl.org/zarr/spec/extensions/data-types/datetime/1.0",
             "type": "<M8[ns]",
             "fallback": "<i8"
         },
@@ -1234,7 +1234,7 @@ chunking as above, but using an extension data type::
         },
         "chunk_memory_layout": "C",
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codec/gzip/1.0",
+            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
             "configuration": {
                 "level": 1
             }
@@ -1259,7 +1259,7 @@ Group metadata
 A Zarr group metadata object must contain the
 ``attributes`` name as defined above in the `Array metadata`_ section. All
 other names are reserved for future versions of this specification. See also
-the section on `Extensions`_ below.
+the section on :ref:`extensions<extensions_section>` below.
 
 For example, the JSON document below defines an explicit group::
 
@@ -1743,6 +1743,8 @@ Predefined storage transformers
 -------------------------------
 
 - :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
+
+.. _extensions_section:
 
 Extensions
 ==========
