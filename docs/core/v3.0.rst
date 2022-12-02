@@ -1054,13 +1054,19 @@ following mandatory names:
     extension and dereferences to a human-readable representation of
     the specification.  The ``type`` is required and its value is
     defined by the extension. The ``fallback`` is optional
-    and, if provided, its value must be one of the data type
-    identifiers defined in this specification. If an implementation
-    does not recognise the extension, but a ``fallback`` is present,
-    then the implementation may proceed using the ``fallback`` value
-    as the data type. For fallback types that do not correspond to base
-    known types, extensions can fallback on a raw number of bytes using
-    the raw type (``r*``).
+    and, if provided, its value must be one or a list of the data type
+    identifiers defined in this specification or an extension. If
+    an implementation does not recognise the extension or specific data
+    type, but a ``fallback`` is present, then the implementation may proceed
+    using the first known ``fallback`` value as the data type. For fixed-sized data types,
+    if there is no more specific fallback available, a raw number of bytes using the raw type (``r*``)
+    should be given.
+
+    The default list of fallbacks to put into the metadata should by defined by the data type extension,
+    but it may be overridden by the user.
+    *Note for implementations*: Silently using a fallback without explicit
+    approval might cause problems for users, please consider options to
+    (de-)activate fallback behavior and/or appropriate warnings.
 
 ``chunk_grid``
 ^^^^^^^^^^^^^^
