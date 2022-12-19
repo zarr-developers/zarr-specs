@@ -1865,7 +1865,7 @@ by time.
 Draft Changes
 --------------------------
 
-- Added dimension_names array metadata field. `PR #162
+- Added the ``dimension_names`` array metadata field. `PR #162
   <https://github.com/zarr-developers/zarr-specs/pull/162>`_
 - Allowed to have a list of fallback data types. `PR #167
   <https://github.com/zarr-developers/zarr-specs/pull/167>`_
