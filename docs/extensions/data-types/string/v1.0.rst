@@ -11,11 +11,10 @@ Issue tracking:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/data-types/string/v1.0.rst>`_
 
-Copyright 2022 `Zarr core development
-team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
-list institutions?). This work is licensed under a `Creative Commons
-Attribution 3.0 Unported
-License <https://creativecommons.org/licenses/by/3.0/>`_.
+Copyright 2022 `Zarr core development team
+<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work is
+licensed under a `Creative Commons Attribution 3.0 Unported License
+<https://creativecommons.org/licenses/by/3.0/>`_.
 
 ----
 

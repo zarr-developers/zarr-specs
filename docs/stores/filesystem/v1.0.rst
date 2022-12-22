@@ -13,11 +13,10 @@ Issue tracking:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/stores/filesystem/v1.0.rst>`_
 
-Copyright 2019 `Zarr core development
-team <https://github.com/orgs/zarr-developers/teams/core-devs>`_ (@@TODO
-list institutions?). This work is licensed under a `Creative Commons
-Attribution 3.0 Unported
-License <https://creativecommons.org/licenses/by/3.0/>`_.
+Copyright 2019 `Zarr core development team
+<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work is
+licensed under a `Creative Commons Attribution 3.0 Unported License
+<https://creativecommons.org/licenses/by/3.0/>`_.
 
 ----
 
@@ -33,9 +32,9 @@ Status of this document
 =======================
 
 .. warning::
-  This document is a **Work in Progress**. It may be updated, replaced
-  or obsoleted by other documents at any time. It is inappapropriate to
-  cite this document as other than work in progress.
+    This document is a draft for review and subject to changes.
+    It will become final when the `Zarr Enhancement Proposal (ZEP) 1 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
 
 Comments, questions or contributions to this document are very
 welcome. Comments and questions should be raised via `GitHub issues
@@ -87,7 +86,7 @@ directories, where:
   name and the names of all ancestor directories, which uniquely
   identifies it within the file system.
 
-...and where the following native operations are supported:
+… and where the following native operations are supported:
 
 * Create a file.
 
@@ -181,6 +180,16 @@ in the section above.
   ``fspath_to_key(fp)`` for each child file path ``fp``, and a set of
   prefixes obtained by calling ``fspath_to_key(dp)`` for each child
   directory path ``dp``.
+
+
+Store limitations
+=================
+
+The following limitations for this store are know:
+
+* `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
+* `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
+* `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
 
 
 References
