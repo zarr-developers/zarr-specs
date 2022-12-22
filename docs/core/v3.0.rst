@@ -455,28 +455,21 @@ Node names
 
 The root node does not have a name and is the empty string ``""``.
 Except for the root node, each node in a hierarchy must have a name,
-which is a string of characters. To ensure consistent behaviour
-across different storage systems, the following constraints apply to
+which is a string of characters. The following constraints apply to
 node names:
 
-* must not be the empty string ("")
+* must be a Unicode code point sequence
+* must not be the empty string (``""``)
+* must not include the character ``"/"``
+* must not start with the reserved prefix (TBD, e.g. ``"_z_"``)
+* must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 
-* must use only characters in the sets ``a-z``, ``A-Z``, ``0-9``,
-  ``-_.``
-
-* must not be a string composed only of period characters, e.g. "." or
-  ".."
+To ensure consistent behaviour across different storage systems and programming
+languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
+``0-9``, ``-``, ``_``, ``.``.
 
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
-
-.. note::
-    The Zarr core development team recognises that restricting the set
-    of allowed characters creates an impediment and bias against users
-    of different languages. We are actively discussing whether the full
-    Unicode character set could be allowed and what technical issues
-    this would entail. If you have experience or views please comment on
-    `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
 
 .. note::
     The underlying store might pose additional restriction on node names,
@@ -1773,7 +1766,7 @@ storage transformer     `storage_transformers`_                          always
 
 There are no group extensions in Zarr v3.0.
 
-See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
+See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions.
 
 Implementation Notes
 ====================
