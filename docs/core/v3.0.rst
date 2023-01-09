@@ -444,7 +444,7 @@ terminology for a use case of reading from an array:
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
     transformer. Any number of `predefined storage transformers`_ can be
-    registered and stacked. In contrast to codecs, strorage transformers can
+    registered and stacked. In contrast to codecs, storage transformers can
     act on the a complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
@@ -1597,7 +1597,7 @@ Operations
 ----------
 
 .. todo::
-   The following section descripes possible operations of an implementation
+   The following section describes possible operations of an implementation
    as a guide-line. Those descriptions are not yet finalized.
 
 Let `P` be an arbitrary hierarchy path.
