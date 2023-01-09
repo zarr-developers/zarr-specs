@@ -1,4 +1,4 @@
-.. This file is in restructured text format: http://docutils.sourceforge.net/rst.html
+.. This file is in restructured text format: https://docutils.sourceforge.io/rst.html
 .. _zarr-core-specification-v3.0:
 
 ======================================
