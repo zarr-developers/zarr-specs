@@ -696,7 +696,7 @@ Determination of encoded representations
 To encode or decode a chunk, the encoded and decoded representations for each
 codec in the chain must first be determined as follows:
 
-1. The initial decoded representation, ``decoded_representation[0]`` is
+1. The initial decoded representation, ``decoded_representation[0]`` is a
    multi-dimensional array with the same data type as the zarr array, and shape
    equal to the chunk shape.
 
@@ -721,6 +721,12 @@ representations of each element in lexicographical order (C order).  Similarly,
 if a codec that expects a multi-dimensional array as input instead receives a
 byte string, it may decode each element in lexicographical order according to
 the default binary representation of each element.
+
+.. note::
+
+   To encode elements in a different order than the default lexicographical
+   order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
+   be specified.
 
 Encoding procedure
 ------------------
@@ -1150,12 +1156,14 @@ chunking as above, but using an extension data type::
     }
 
 .. note::
-   comparison with spec v2,
-   ``dtype`` has been renamed to ``data_type``,
-   ``chunks`` has been renamed to ``chunk_grid``,
-   ``order`` has been replaced by the ``transform`` codec,
-   the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field,
-   ``zarr_format`` has been removed,
+   
+   Comparison with zarr spec v2:
+   
+   - ``dtype`` has been renamed to ``data_type``,
+   - ``chunks`` has been renamed to ``chunk_grid``,
+   - ``order`` has been replaced by the :ref:`transpose <transpose-codec-v1>` codec,
+   - the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field,
+   - ``zarr_format`` has been removed.
 
 
 Group metadata
@@ -1750,6 +1758,8 @@ by time.
 Draft Changes
 --------------------------
 
+- Replaced ``chunk_memory_layout`` with transpose codec.  `PR #189
+  <https://github.com/zarr-developers/zarr-specs/pull/189>`_
 - Removed the 255 character limit for paths. `PR #175
   <https://github.com/zarr-developers/zarr-specs/pull/175>`_
 - Removed the ``/root`` prefix for paths. `PR #175
