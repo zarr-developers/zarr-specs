@@ -461,7 +461,6 @@ node names:
 * must be a Unicode code point sequence
 * must not be the empty string (``""``)
 * must not include the character ``"/"``
-* must not start with the reserved prefix (TBD, e.g. ``"_z_"``)
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 
 To ensure consistent behaviour across different storage systems and programming
@@ -479,6 +478,11 @@ identical.
     * `1,024 bytes UTF8 object key limit for AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
     * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
     * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
+
+.. note::
+    Node names starting with an underscore will be prefix with an additional
+    underscore in the path. This avoids conflicts with zarr-internal keys
+    which use a single underscore as a prefix.
 
 Data types
 ==========
