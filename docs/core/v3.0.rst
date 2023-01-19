@@ -461,7 +461,10 @@ identical.
     such as the following:
 
     * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
-    * `1,024 bytes UTF8 object key limit for AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+    * 1,024 bytes UTF8 object key limit for
+      `AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+      and `GCS <https://cloud.google.com/storage/docs/objects#naming>`_, with
+      additional constraints.
     * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
     * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
 
