@@ -448,6 +448,7 @@ node names:
 * must not be the empty string (``""``)
 * must not include the character ``"/"``
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
+* must not start with the reserved prefix ``"__"``
 
 To ensure consistent behaviour across different storage systems and programming
 languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
@@ -469,9 +470,12 @@ identical.
     * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
 
 .. note::
-    Node names starting with an underscore will be prefix with an additional
-    underscore in the path. This avoids conflicts with zarr-internal keys
-    which use a single underscore as a prefix.
+    The prefix ``__zarr`` is reserved for core zarr data, and extensions 
+    can use other files and folders starting with ``__``.
+
+.. note::
+    An extension to normalize unicode node names is being discussed,
+    see https://github.com/zarr-developers/zarr-specs/issues/56.
 
 Data types
 ==========
