@@ -190,10 +190,6 @@ We solicit feedback on the following area during the review period:
     solicit feedback on whether store implementation should support full unicode.
     https://github.com/zarr-developers/zarr-specs/issues/56
 
-  - Should named dimensions be part of the core metadata spec?
-    https://github.com/zarr-developers/zarr-specs/issues/73
-    https://github.com/zarr-developers/zarr-specs/pull/162
-
 
 Document conventions
 ====================
@@ -1092,6 +1088,22 @@ The following members are optional:
     specification. When the ``storage_transformers`` name is absent no storage
     transformer is used, same for an empty list.
 
+``dimension_names``
+^^^^^^^^^^^^^^^^^^^
+
+    Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
+    an array of strings or null objects with the same length as ``shape``.  An
+    unnamed dimension is indicated by the null object.  If ``dimension_names`` is
+    not specified, all dimensions are unnamed.
+
+    For compatibility with zarr implementations and applications that support
+    using dimension names to uniquely identify dimensions, it is recommended but
+    not required that all non-null dimension names are distinct (no two
+    dimensions have the same non-empty name).
+
+    This specification also does not place any restrictions on the use of the
+    same dimension name across multiple arrays within the same zarr hierarchy,
+    but extensions or specific applications may do so.
 
 The array metadata object must not contain any other names.
 Those are reserved for future versions of this specification.
@@ -1108,6 +1120,7 @@ compressed using gzip compression prior to storage::
 
     {
         "shape": [10000, 1000],
+        "dimension_names": ["rows", "columns"],
         "data_type": "<f8",
         "chunk_grid": {
             "type": "regular",
@@ -1758,6 +1771,8 @@ by time.
 Draft Changes
 --------------------------
 
+- Added the ``dimension_names`` array metadata field. `PR #162
+  <https://github.com/zarr-developers/zarr-specs/pull/162>`_
 - Replaced ``chunk_memory_layout`` with transpose codec.  `PR #189
   <https://github.com/zarr-developers/zarr-specs/pull/189>`_
 - Allowed to have a list of fallback data types. `PR #167
