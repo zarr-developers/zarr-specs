@@ -1092,13 +1092,13 @@ The following members are optional:
 ^^^^^^^^^^^^^^^^^^^
 
     Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
-    an array of strings with the same length as ``shape``.  An unnamed dimension
-    is indicated by an empty string, ``""``.  If ``dimension_names`` is not
-    specified, all dimensions are unnamed.
+    an array of strings or null objects with the same length as ``shape``.  An
+    unnamed dimension is indicated by the null object.  If ``dimension_names`` is
+    not specified, all dimensions are unnamed.
 
     For compatibility with zarr implementations and applications that support
     using dimension names to uniquely identify dimensions, it is recommended but
-    not required that all non-empty dimension names are distinct (no two
+    not required that all non-null dimension names are distinct (no two
     dimensions have the same non-empty name).
 
     This specification also does not place any restrictions on the use of the
