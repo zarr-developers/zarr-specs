@@ -454,6 +454,15 @@ To ensure consistent behaviour across different storage systems and programming
 languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
 ``0-9``, ``-``, ``_``, ``.``.
 
+When using non-ASCII Unicode characters, we recommend to only use NFC-normalized
+characters, as recommended by the
+`Unicode Standard Annex # 31 – Normalization and Case <https://www.unicode.org/reports/tr31/#normalization_and_case>`_
+for case-sensitive identifiers.
+
+.. note::
+    A storage transformer for unicode normalization might be added later, see
+    `spec issue #201 <https://github.com/zarr-developers/zarr-specs/issues/201>`_
+
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
