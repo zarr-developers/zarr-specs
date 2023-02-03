@@ -225,9 +225,9 @@ The following figure illustrates the first part of the terminology:
 *Hierarchy*
 
     A Zarr hierarchy is a tree structure, where each node in the tree
-    is either a group_ or an array_.  Group nodes may have children but
+    is either a group_ or an array_. Group nodes may have children but
     array nodes may not. All nodes in a hierarchy have a name_ and a
-    path_.  The root of a Zarr hierarchy may be either a group_ or an array_.
+    path_. The root of a Zarr hierarchy may be either a group_ or an array_.
     In the latter case, the hierarchy consists of just the single array.
 
 .. _group:
@@ -650,7 +650,7 @@ The identifier for chunk with grid index (``k``, ``j``, ``i``, ...) is
 formed by taking the initial prefix ``c``, and appending for each dimension:
 
 - the ``separator`` character specified within the ``chunk_grid`` metadata object (see
-the section on `Array metadata`_ below), followed by,
+  the section on `Array metadata`_ below), followed by,
 - the ASCII decimal string representation of the chunk index within that dimension.
 
 For example, in a 3 dimensional array, with a separator of ``/`` the identifier
@@ -1083,7 +1083,7 @@ chunking as above, but using an extension data type::
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the following mandatory keys:
+A Zarr group metadata object must contain the following mandatory key:
 
 ``zarr_format``
 ^^^^^^^^^^^^^^^
@@ -1488,21 +1488,19 @@ Let "+" be the string concatenation operator.
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
-    ``list_dir("meta" + P + "/")``. Any returned key ending in
-    ".array.json" indicates an array. Any returned key ending in
-    ".group.json" indicates a group. Any returned prefix indicates a
-    child group implied by some descendant.
+    ``list_dir(P + "/")``. Any returned prefix not being ``c`` or
+    starting with ``__`` indicates a child group implied by some
+    descendant group or array.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
-    keys "meta/foo/bar.group.json" and
-    "meta/foo/bar/baz/qux.array.json". Groups at paths "/",
-    "/foo" and "/foo/baz" have not been explicitly created but are
-    implied by their descendants. To list the children of the group at
-    path "/foo", perform ``list_dir("meta/foo/")``, which will
-    return the key "meta/foo/bar.group.json" and the prefix
-    "meta/foo/baz/". From this it can be inferred that child
-    groups "/foo/bar" and "/foo/baz" are present.
+    keys "foo/bar/zarr.json" and "foo/baz/qux/zarr.json".
+    Groups at paths "/", "/foo" and "/foo/baz" have not been explicitly
+    created but are implied by their descendants. To list the children
+    of the group at path "/foo", perform ``list_dir("meta/foo/")``,
+    which will return the prefixes "meta/foo/bar" and "meta/foo/baz".
+    From this it can be inferred that child groups or arrays
+    "/foo/bar" and "/foo/baz" are present.
 
     If a store does not support any of the list operations then
     discovery of group children is not possible, and the contents of
