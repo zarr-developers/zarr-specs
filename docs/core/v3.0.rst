@@ -457,7 +457,7 @@ languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
 ``0-9``, ``-``, ``_``, ``.``.
 
 When using non-ASCII Unicode characters, we recommend to only use NFC-normalized
-characters, as recommended by the
+strings, as recommended by the
 `Unicode Standard Annex # 31 – Normalization and Case <https://www.unicode.org/reports/tr31/#normalization_and_case>`_
 for case-sensitive identifiers.
 
