@@ -651,6 +651,7 @@ formed by taking the initial prefix ``c``, and appending for each dimension:
 
 - the ``separator`` character specified within the ``chunk_grid`` metadata object (see
   the section on `Array metadata`_ below), followed by,
+
 - the ASCII decimal string representation of the chunk index within that dimension.
 
 For example, in a 3 dimensional array, with a separator of ``/`` the identifier
