@@ -449,6 +449,8 @@ node names:
 * must not include the character ``"/"``
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 * must not start with the reserved prefix ``"__"``
+* must not contain `control characters (Cc) <https://www.compart.com/en/unicode/category/Cc>`_
+  or `format characters (Cf) <https://www.compart.com/en/unicode/category/Cf>`_
 
 To ensure consistent behaviour across different storage systems and programming
 languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
@@ -477,6 +479,10 @@ identical.
       additional constraints.
     * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
     * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
+
+.. note::
+    If a store requires an explicit byte string representation the default
+    representation is the ``UTF-8`` encoded Unicode string.
 
 .. note::
     The prefix ``__zarr`` is reserved for core zarr data, and extensions 
