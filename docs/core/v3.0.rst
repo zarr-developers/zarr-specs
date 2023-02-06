@@ -441,25 +441,23 @@ Node names
 
 The root node does not have a name and is the empty string ``""``.
 Except for the root node, each node in a hierarchy must have a name,
-which is a string of characters. The following constraints apply to
-node names:
+which is a string of unicode code points. The following constraints
+apply to node names:
 
-* must be a Unicode code point sequence
 * must not be the empty string (``""``)
 * must not include the character ``"/"``
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 * must not start with the reserved prefix ``"__"``
-* must not contain `control characters (Cc) <https://www.compart.com/en/unicode/category/Cc>`_
-  or `format characters (Cf) <https://www.compart.com/en/unicode/category/Cf>`_
 
 To ensure consistent behaviour across different storage systems and programming
 languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
 ``0-9``, ``-``, ``_``, ``.``.
 
-When using non-ASCII Unicode characters, we recommend to only use NFC-normalized
-strings, as recommended by the
-`Unicode Standard Annex # 31 – Normalization and Case <https://www.unicode.org/reports/tr31/#normalization_and_case>`_
-for case-sensitive identifiers.
+When using non-ASCII Unicode characters, we recommend users to only use
+NFC-normalized immutible identifiers according to
+`Unicode Standard Annex # 31 – Immutable Identifiers – UAX31-R2-1 <https://www.unicode.org/reports/tr31/#R2-1>`_.
+Normalization form C is recommended for case-sensitive identifiers in
+`Unicode Standard Annex # 31 – Normalization and Case <https://www.unicode.org/reports/tr31/#normalization_and_case>`_.
 
 .. note::
     A storage transformer for unicode normalization might be added later, see
