@@ -515,6 +515,9 @@ Core data types
    * - ``int32``
      - Integer in ``[-2^31, 2^31-1]``
      - 4-byte little endian two's complement
+   * - ``int64``
+     - Integer in ``[-2^63, 2^63-1]``
+     - 8-byte little endian two's complement
    * - ``uint8``
      - Integer in ``[0, 2^8-1]``
      - 1 byte
@@ -524,6 +527,9 @@ Core data types
    * - ``uint32``
      - Integer in ``[0, 2^32-1]``
      - 4-byte little endian
+   * - ``uint64``
+     - Integer in ``[0, 2^64-1]``
+     - 8-byte little endian
    * - ``float16`` (optionally supported)
      - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
      - 2-byte little endian IEEE 754 binary16 
