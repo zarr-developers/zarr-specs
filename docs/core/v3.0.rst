@@ -450,21 +450,21 @@ apply to node names:
 * must not start with the reserved prefix ``"__"``
 
 To ensure consistent behaviour across different storage systems and programming
-languages, we recommend to use only characters in the sets ``a-z``, ``A-Z``,
-``0-9``, ``-``, ``_``, ``.``.
+languages, we recommend users to only use characters in the sets ``a-z``,
+``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
 
-When using non-ASCII Unicode characters, we recommend users to only use
-NFC-normalized immutible identifiers according to
-`Unicode Standard Annex # 31 – Immutable Identifiers – UAX31-R2-1 <https://www.unicode.org/reports/tr31/#R2-1>`_.
-Normalization form C is recommended for case-sensitive identifiers in
-`Unicode Standard Annex # 31 – Normalization and Case <https://www.unicode.org/reports/tr31/#normalization_and_case>`_.
+Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
+identical.
+
+When using non-ASCII Unicode characters, we recommend users to use
+case-folded NFKC-normalized strings following the
+`General Security Profile for Identifiers of the Unicode Security Mechanisms (Unicode Technical Standard #39) <http://www.unicode.org/reports/tr39/#General_Security_Profile>`_.
+This follows the
+`Recommendations for Programmers (B) of the Unicode Security Considerations (Unicode Technical Report #36) <https://unicode.org/reports/tr36/#Recommendations_General>`_.
 
 .. note::
     A storage transformer for unicode normalization might be added later, see
     `spec issue #201 <https://github.com/zarr-developers/zarr-specs/issues/201>`_
-
-Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
-identical.
 
 .. note::
     The underlying store might pose additional restriction on node names,
