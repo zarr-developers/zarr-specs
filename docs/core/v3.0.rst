@@ -1680,6 +1680,8 @@ by time.
 Draft Changes
 --------------------------
 
+- Restructured keys and removed entry-point metadata `PR #200
+  <https://github.com/zarr-developers/zarr-specs/pull/200>`_
 - Added the ``dimension_names`` array metadata field. `PR #162
   <https://github.com/zarr-developers/zarr-specs/pull/162>`_
 - Replaced ``chunk_memory_layout`` with transpose codec.  `PR #189
