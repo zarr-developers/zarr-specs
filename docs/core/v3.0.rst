@@ -1268,7 +1268,10 @@ The store interface defines a set of operations involving `keys` and
 `values`. In the context of this interface, a `key` is any string
 containing only characters in the ranges ``a-z``, ``A-Z``, ``0-9``, or
 in the set ``/.-_``, where the final character is **not** a ``/``
-character. A `value` is a sequence of bytes.
+character. In general, a `value` is a sequence of bytes. Specific stores
+may choose more specific storage formats, which must be stated in the
+specification of the respective store. E.g. a database store might
+encode values of ``*.json`` keys with a database-native json type.
 
 It is assumed that the store holds (`key`, `value`) pairs, with only
 one such pair for any given `key`. I.e., a store is a mapping from
