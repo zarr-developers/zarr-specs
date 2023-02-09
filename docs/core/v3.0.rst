@@ -227,7 +227,8 @@ The following figure illustrates the first part of the terminology:
     A Zarr hierarchy is a tree structure, where each node in the tree
     is either a group_ or an array_. Group nodes may have children but
     array nodes may not. All nodes in a hierarchy have a name_ and a
-    path_.
+    path_. The root of a Zarr hierarchy may be either a group_ or an array_.
+    In the latter case, the hierarchy consists of just the single array.
 
 .. _group:
 .. _groups:
@@ -668,16 +669,17 @@ that chunk, where "%" is the modulo operator. For example, if a
 is contained within the chunk at grid index (1, 7, 2) and has coordinates
 (2, 10, 100) within that chunk.
 
-
 The identifier for chunk with grid index (``k``, ``j``, ``i``, ...) is
-formed by joining together ASCII string representations of each index
-using a separator and prefixed with the character ``c``. The default value for
-the separator is the slash character, ``/``, but this may be configured by
-providing a ``separator`` value within the ``chunk_grid`` metadata object (see
-the section on `Array metadata`_ below).
+formed by taking the initial prefix ``c``, and appending for each dimension:
 
-For example, in a 3 dimensional array, the identifier for the chunk at
-grid index (1, 23, 45) is the string "c1/23/45".
+- the ``separator`` character specified within the ``chunk_grid`` metadata object (see
+  the section on `Array metadata`_ below), followed by,
+
+- the ASCII decimal string representation of the chunk index within that dimension.
+
+For example, in a 3 dimensional array, with a separator of ``/`` the identifier
+for the chunk at grid index (1, 23, 45) is the string "c/1/23/45".  With a
+separator of ``.``, the identifier is the string "c.1.23.45".
 
 Note that this specification does not consider the case where the
 chunk grid and the array space are not aligned at the origin vertices
@@ -689,11 +691,10 @@ any chunk, which is required to allow arrays to be extended by an
 arbitrary length in a "negative" direction along any dimension.
 
 .. note:: A main difference with spec v2 is that the default chunk separator
-   changed from ``.`` to ``/``. This helps with compatibility with N5 as well as
-   decreases the maximum number of items in hierarchical stores like directory
-   stores.
+   changed from ``.`` to ``/``, as in N5.  This decreases the maximum number of
+   items in hierarchical stores like directory stores.
 
-.. note:: Arrays may have 0 dimension (when for example representing scalars),
+.. note:: Arrays may have 0 dimensions (when for example representing scalars),
    in which case the coordinate of a chunk is the empty tuple, and the chunk key
    will consist of the string ``c``.
 
@@ -824,10 +825,10 @@ Metadata
 ========
 
 This section defines the structure of metadata documents for Zarr hierarchies,
-which consists of three types of metadata documents: an entry point metadata
-document (``zarr.json``), array metadata documents, and group metadata
-documents. Each type of metadata document is described in the following
-subsections.
+which consists of two types of metadata documents: array metadata documents, and
+group metadata documents. Both types of metadata documents are stored under the
+key ``zarr.json`` within the prefix of the array or group.  Each type of
+metadata document is described in the following subsections.
 
 Metadata documents are defined here using the JSON
 type system defined in [RFC8259]_. In this section, the terms "value",
@@ -838,139 +839,23 @@ defined in [RFC8259]_. The term "array" is also used as defined in
 name/value pairs. This section also defines how metadata documents are
 encoded for storage.
 
-
-Only the top level metadata document ``zarr.json`` is guaranteed to be of JSON
-type, and can be used to define other formats for array-level and group-level
-metadata documents. In the case where non-JSON metadata documents are used in a
-Zarr hierarchy, the following sections on group and array level metadata are
-non-normative, but other metadata formats are expected to define some
-equivalence relations with the JSON documents.
-
-
-Entry point metadata
---------------------
-
-Each Zarr hierarchy must have an entry point metadata document, which
-provides essential information regarding the format version being
-used, the encoding being used for group and array metadata, and any
-extensions that affect the layout or interpretation of data
-in the store.
-
-The entry point metadata document must contain a single object
-containing the following names:
-
-``zarr_format``
-^^^^^^^^^^^^^^^
-
-    A string containing the URI of the Zarr core
-    specification that defines the metadata format. For Zarr
-    hierarchies conforming to this specification, the value must be
-    the string "https://purl.org/zarr/spec/core/3.0".
-
-    Implementations of this specification may assume that the final path
-    segment of this URI ("3.0") represents the core specification version
-    number, where "3" is the major version number and "0" is the minor
-    version number. Implementations of this specification may also assume
-    that future versions of this specification that retain the same major
-    versioning number ("3") will be backwards-compatible, in the sense
-    that any new features added to the specification can be safely
-    ignored. In other words, if the major version number is "3",
-    implementations of this specification may read and interpret metadata
-    as defined in this specification, ignoring any name/value pairs
-    where the name is not defined here. See also the `stability policy`_.
-
-    Note that this value is given as a URI rather than as a simple
-    version number string to help with discovery of this
-    specification.
-
-``metadata_encoding``
-^^^^^^^^^^^^^^^^^^^^^
-
-    Specifies the encoding of group and array metadata. To use JSON encoding,
-    which is the only encoding allowed by this core specification, the
-    ``metadata_encoding`` value must be the following object::
-
-        {
-            "type": "json",
-            "metadata_key_suffix": ".json"
-        }
-
-    The ``metadata_encoding`` value is an extension point and may be defined by
-    an extension. In this case the value must be an object containing the
-    required names ``extension``, ``type`` and ``metadata_key_suffix``.
-    ``extension`` must be a URI that identifies the extension and dereferences
-    to a human-readable representation of the specification. ``type`` is a
-    string defined by the extension. The ``metadata_key_suffix`` is a string
-    containing a suffix to add to the array and group metadata keys when saving
-    into the store.
-
-    .. note::
-      The metadata key suffix is used to allow non hierarchy browsing and editing by
-      non-zarr-aware tools.
-
-``extensions``
-^^^^^^^^^^^^^^
-
-    An array containing zero or more objects, each of which identifies
-    an extension and provides any additional extension
-    configuration metadata. Each object must contain the name
-    ``extension`` whose value is a URI that identifies a Zarr
-    extension and dereferences to a human readable representation of
-    the extension specification. Each object must also contain the
-    name ``must_understand`` whose value is either the literal
-    ``true`` or ``false``. Each object may also contain the name
-    ``configuration`` whose value is defined by the
-    extension.
-
-    If an implementation of this specification encounters an extension
-    that it does not recognize, but the value of ``must_understand``
-    is ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognized and the value of
-    ``must_understand`` is ``true`` then processing must terminate and
-    an appropriate error raised.
-
-For example, below is an entry point metadata document, specifying that
-JSON is being used for encoding of group and array metadata::
-
-    {
-        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": {
-            "type": "json",
-            "metadata_key_suffix": ".json"
-        },
-        "extensions": []
-    }
-
-For example, below is an entry point metadata document as above, but also
-specifying that an extension is being used which may be
-ignored if not understood::
-
-    {
-        "zarr_format": "https://purl.org/zarr/spec/core/3.0",
-        "metadata_encoding": {
-            "type": "json",
-            "metadata_key_suffix": ".json"
-        },
-        "extensions": [
-            {
-                "extension": "http://example.org/zarr/extension/foo",
-                "must_understand": false,
-                "configuration": {
-                    "foo": "bar"
-                }
-            }
-        ]
-    }
-
-
 .. _array-metadata:
 
 Array metadata
 --------------
 
 Each Zarr array in a hierarchy must have an array metadata
-document. This document must contain a single object with the
+document, named ``zarr.json``.  This document must contain a single object with the
 following mandatory names:
+
+``zarr_format``
+^^^^^^^^^^^^^^^
+
+    Must be the string "https://purl.org/zarr/spec/v3#array".
+
+    Note that this value is given as a URI rather than as a simple
+    version number string to help with discovery of this
+    specification.
 
 ``shape``
 ^^^^^^^^^
@@ -1063,27 +948,43 @@ following mandatory names:
     ``"+Infinity"`` and ``"-Infinity"`` are also understood for floating point
     data types.
 
+
+The following members are optional:
+
+
 ``extensions``
 ^^^^^^^^^^^^^^
 
-    See the top level metadata extension section for the time being.
+    An array containing zero or more objects, each of which identifies
+    an extension and provides any additional extension
+    configuration metadata. Each object must contain the name
+    ``extension`` whose value is a URI that identifies a Zarr
+    extension and dereferences to a human readable representation of
+    the extension specification. Each object must also contain the
+    name ``must_understand`` whose value is either the literal
+    ``true`` or ``false``. Each object may also contain the name
+    ``configuration`` whose value is defined by the
+    extension.
 
+    If an implementation of this specification encounters an extension
+    that it does not recognize, but the value of ``must_understand``
+    is ``false``, then the extension may be ignored and processing may
+    continue. If the extension is not recognized and the value of
+    ``must_understand`` is ``true`` then processing must terminate and
+    an appropriate error raised.
 
 ``attributes``
 ^^^^^^^^^^^^^^
 
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
-    JSON literal. Intended to allow storage of arbitrary user metadata
+    JSON literal. Intended to allow storage of arbitrary user metadata.
 
 
   .. note::
     The question of whether core metadata and user attributes should be
     stored together or in separate documents is a topic of ongoing discussion.
     (See https://github.com/zarr-developers/zarr-specs/issues/72.)
-
-
-The following members are optional:
 
 ``codecs``
 ^^^^^^^^^^
@@ -1142,6 +1043,7 @@ binary values are laid out in C contiguous order. Each chunk is
 compressed using gzip compression prior to storage::
 
     {
+        "zarr_format": "https://purl.org/zarr/spec/v3#array",
         "shape": [10000, 1000],
         "dimension_names": ["rows", "columns"],
         "data_type": "<f8",
@@ -1199,20 +1101,66 @@ chunking as above, but using an extension data type::
    - ``chunks`` has been renamed to ``chunk_grid``,
    - ``order`` has been replaced by the :ref:`transpose <transpose-codec-v1>` codec,
    - the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field,
-   - ``zarr_format`` has been removed.
+   - ``zarr_format`` is now a string URL rather than a number.
 
 
 Group metadata
 --------------
 
-A Zarr group metadata object must contain the
-``attributes`` name as defined above in the `Array metadata`_ section. All
-other names are reserved for future versions of this specification. See also
-the section on :ref:`extensions<extensions_section>` below.
+A Zarr group metadata object must contain the following mandatory key:
+
+``zarr_format``
+^^^^^^^^^^^^^^^
+
+    Must be the string "https://purl.org/zarr/spec/v3#group".
+
+Optional keys:
+
+``extensions``
+^^^^^^^^^^^^^^
+
+    An array containing zero or more objects, each of which identifies
+    an extension and provides any additional extension
+    configuration metadata. Each object must contain the name
+    ``extension`` whose value is a URI that identifies a Zarr
+    extension and dereferences to a human readable representation of
+    the extension specification. Each object must also contain the
+    name ``must_understand`` whose value is either the literal
+    ``true`` or ``false``. Each object may also contain the name
+    ``configuration`` whose value is defined by the
+    extension.
+
+    If an implementation of this specification encounters an extension
+    that it does not recognize, but the value of ``must_understand``
+    is ``false``, then the extension may be ignored and processing may
+    continue. If the extension is not recognized and the value of
+    ``must_understand`` is ``true`` then processing must terminate and
+    an appropriate error raised.
+
+``descenents_may_have_group_extensions``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    Boolean that indicates whether any descendant groups may themselves specify
+    group extensions.  Defaults to ``false``.  If set to ``true``,
+    implementations must read the metadata of all groups along the path to any
+    descendant arrays or groups.  If set to ``false`` (or not specified), for
+    improved efficiency implementations need not read the metadata of groups
+    along the path to descendants when opening those descendants.
+
+    When adding a group extension to a non-root group, implementations must set
+    this attribute to ``true`` in all ancestor groups.
+
+``attributes``
+^^^^^^^^^^^^^^
+
+    The value must be an object. The object may contain any key/value
+    pairs, where the key must be a string and the value can be an arbitrary
+    JSON literal. Intended to allow storage of arbitrary user metadata.
 
 For example, the JSON document below defines an explicit group::
 
     {
+        "zarr_format": "https://purl.org/zarr/spec/v3#group",
         "attributes": {
             "spam": "ham",
             "eggs": 42,
@@ -1221,25 +1169,9 @@ For example, the JSON document below defines an explicit group::
 
 .. note::
 
-   Groups cannot have extensions attached to them as of spec v3.0. Allowing
-   groups to have extensions would force any implementation to sequentially
-   traverse the store hierarchy in order to check for extensions, which would
-   defeat the purpose of a flat namespace and concurrent access.
-
-   For the time being groups can only have attributes.
-
-.. note::
-
    A group does not need a metadata document to exist. (See implicit groups.)
 
 
-
-Metadata encoding
------------------
-
-The entry point metadata document must be encoded as JSON. The array (``*.array`` s) and
-group metadata documents (``*.group`` s) must be encoded as per the type defined in
-the ``metadata_encoding`` field in the entry point metadata document (described below).
 
 Stores
 ======
@@ -1465,35 +1397,19 @@ identify ancestor nodes in the hierarchy. For example, the path
 Storage keys
 ------------
 
-The entry point metadata document is stored under the key ``zarr.json``.
+The array or group metadata document for the root of a Zarr hierarchy is stored
+under the key ``zarr.json``.
 
-For a group at a non-root hierarchy path `P`, the metadata key for the
-group metadata document is formed by concatenating "meta", `P`,
-".group", and the metadata key suffix (which defaults to ".json").
+The metadata document of a non-root array or group with hierarchy path ``P`` is
+obtained by stripping the leading ``/`` of the path and appending
+``/zarr.json``.  For example, the metadata document of an array or group with
+path ``/foo/bar`` is ``foo/bar/zarr.json``.
 
-For example, for a group at hierarchy path ``/foo/bar``, the
-corresponding metadata key is "meta/foo/bar.group.json".
-
-For an array at a non-root hierarchy path `P`, the metadata key for
-the array metadata document is formed by concatenating "meta",
-`P`, ".array", and the metadata key suffix.
-
-The data key for array chunks is formed by concatenating "data", `P`,
-"/", and the chunk identifier as defined by the chunk grid layout.
-
-To get the path ``P`` from a non-root metadata key, remove the trailing
-".array.json" or ".group.json" and the "meta" prefix.
-
-For example, for an array at hierarchy path "/foo/baz", the
-corresponding metadata key is "meta/foo/baz.array.json". If the
-array has two dimensions and a regular chunk grid, the data key for
-the chunk with grid coordinates (0, 0) is "data/foo/baz/c0/0".
-
-If the root node is a group, the metadata key is
-"meta/group.json". If the root node is an array, the metadata key
-is "meta/array.json", and the data keys are formed by
-concatenating "data/" and the chunk identifier.
-
+All chunk or other data of an array is stored under the key prefix determined by
+its path.  For a root array, the key prefix is obtained from the metadata
+document key by stripping the trailing "zarr.json".  For example, for a root
+array, the prefix is the empty string.  For a non-root array with hierarchy path
+``/foo/bar``, the prefix is ``foo/bar/``.
 
 .. list-table:: Metadata Storage Key example
     :header-rows: 1
@@ -1501,27 +1417,24 @@ concatenating "data/" and the chunk identifier.
     * - Type
       - Path "P"
       - Key for Metadata at path `P`
-    * - Entry-Point metadata (zarr.json)
-      - `n/a`
-      - `zarr.json`
     * - Array (Root)
       - `/`
-      - `meta/array.json`
+      - `zarr.json`
     * - Group (Root)
       - `/`
-      - `meta/group.json`
+      - `zarr.json`
     * - Group
       - `/foo`
-      - `meta/foo.group.json`
+      - `foo/zarr.json`
     * - Array
       - `/foo`
-      - `meta/foo.array.json`
+      - `foo/zarr.json`
     * - Group
       - `/foo/bar`
-      - `meta/foo/bar.group.json`
+      - `foo/bar/zarr.json`
     * - Array
       - `/foo/baz`
-      - `meta/foo/baz.array.json`
+      - `foo/baz/zarr.json`
 
 
 .. list-table:: Data Storage Key example
@@ -1532,7 +1445,7 @@ concatenating "data/" and the chunk identifier.
       - Data key
     * - `/foo/baz`
       - `(1, 0)`
-      - `data/foo/baz/c1/0`
+      - `foo/baz/c/1/0`
 
 
 
@@ -1599,21 +1512,19 @@ Let "+" be the string concatenation operator.
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
-    ``list_dir("meta" + P + "/")``. Any returned key ending in
-    ".array.json" indicates an array. Any returned key ending in
-    ".group.json" indicates a group. Any returned prefix indicates a
-    child group implied by some descendant.
+    ``list_dir(P + "/")``. Any returned prefix not being ``c`` or
+    starting with ``__`` indicates a child group implied by some
+    descendant group or array.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
-    keys "meta/foo/bar.group.json" and
-    "meta/foo/bar/baz/qux.array.json". Groups at paths "/",
-    "/foo" and "/foo/baz" have not been explicitly created but are
-    implied by their descendants. To list the children of the group at
-    path "/foo", perform ``list_dir("meta/foo/")``, which will
-    return the key "meta/foo/bar.group.json" and the prefix
-    "meta/foo/baz/". From this it can be inferred that child
-    groups "/foo/bar" and "/foo/baz" are present.
+    keys "foo/bar/zarr.json" and "foo/baz/qux/zarr.json".
+    Groups at paths "/", "/foo" and "/foo/baz" have not been explicitly
+    created but are implied by their descendants. To list the children
+    of the group at path "/foo", perform ``list_dir("meta/foo/")``,
+    which will return the prefixes "meta/foo/bar" and "meta/foo/baz".
+    From this it can be inferred that child groups or arrays
+    "/foo/bar" and "/foo/baz" are present.
 
     If a store does not support any of the list operations then
     discovery of group children is not possible, and the contents of
@@ -1705,8 +1616,6 @@ following:
 ======================= ================================================ =====================
 extension               metadata                                         is extension required
 ======================= ================================================ =====================
-generic                 ``extensions`` in `entry point metadata`_        ``must_understand``
-metadata encoding       ``metadata_encoding`` in `entry point metadata`_ always
 array                   ``extensions`` in `Array metadata`_              ``must_understand``
 data type               `data_type`_                                     no ``fallback``
 chunk grid              `chunk_grid`_                                    always
@@ -1794,6 +1703,8 @@ by time.
 Draft Changes
 --------------------------
 
+- Restructured keys and removed entry-point metadata `PR #200
+  <https://github.com/zarr-developers/zarr-specs/pull/200>`_
 - Added the ``dimension_names`` array metadata field. `PR #162
   <https://github.com/zarr-developers/zarr-specs/pull/162>`_
 - Replaced ``chunk_memory_layout`` with transpose codec.  `PR #189
