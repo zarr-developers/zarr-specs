@@ -437,37 +437,54 @@ Node names
 
 The root node does not have a name and is the empty string ``""``.
 Except for the root node, each node in a hierarchy must have a name,
-which is a string of characters. To ensure consistent behaviour
-across different storage systems, the following constraints apply to
-node names:
+which is a string of unicode code points. The following constraints
+apply to node names:
 
-* must not be the empty string ("")
+* must not be the empty string (``""``)
+* must not include the character ``"/"``
+* must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
+* must not start with the reserved prefix ``"__"``
 
-* must use only characters in the sets ``a-z``, ``A-Z``, ``0-9``,
-  ``-_.``
-
-* must not be a string composed only of period characters, e.g. "." or
-  ".."
+To ensure consistent behaviour across different storage systems and programming
+languages, we recommend users to only use characters in the sets ``a-z``,
+``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
 
 Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
 identical.
 
+When using non-ASCII Unicode characters, we recommend users to use
+case-folded NFKC-normalized strings following the
+`General Security Profile for Identifiers of the Unicode Security Mechanisms (Unicode Technical Standard #39) <http://www.unicode.org/reports/tr39/#General_Security_Profile>`_.
+This follows the
+`Recommendations for Programmers (B) of the Unicode Security Considerations (Unicode Technical Report #36) <https://unicode.org/reports/tr36/#Recommendations_General>`_.
+
 .. note::
-    The Zarr core development team recognises that restricting the set
-    of allowed characters creates an impediment and bias against users
-    of different languages. We are actively discussing whether the full
-    Unicode character set could be allowed and what technical issues
-    this would entail. If you have experience or views please comment on
-    `issue #56 <https://github.com/zarr-developers/zarr-specs/issues/56>`_.
+    A storage transformer for unicode normalization might be added later, see
+    `spec issue #201 <https://github.com/zarr-developers/zarr-specs/issues/201>`_
 
 .. note::
     The underlying store might pose additional restriction on node names,
     such as the following:
 
     * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
-    * `1,024 bytes UTF8 object key limit for AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+    * 1,024 bytes UTF8 object key limit for
+      `AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+      and `GCS <https://cloud.google.com/storage/docs/objects#naming>`_, with
+      additional constraints.
     * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
     * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
+
+.. note::
+    If a store requires an explicit byte string representation the default
+    representation is the ``UTF-8`` encoded Unicode string.
+
+.. note::
+    The prefix ``__zarr`` is reserved for core zarr data, and extensions 
+    can use other files and folders starting with ``__``.
+
+.. note::
+    An extension to normalize unicode node names is being discussed,
+    see https://github.com/zarr-developers/zarr-specs/issues/56.
 
 Data types
 ==========
@@ -1698,7 +1715,7 @@ storage transformer     `storage_transformers`_                          always
 
 There are no group extensions in Zarr v3.0.
 
-See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions
+See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions.
 
 Implementation Notes
 ====================
