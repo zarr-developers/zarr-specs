@@ -1,0 +1,78 @@
+==========================================
+Zarr-based Chunk-level Accumulation in Reduced Dimensions (version 1.0)
+==========================================
+
+  **Editor's draft 12 02 2023**
+
+Specification URI:
+    https://purl.org/zarr/spec/extensions/zarr-accumulation/1.0
+
+Corresponding ZEP:
+    `ZEP 5 — Zarr-based Chunk-level Accumulation in Reduced Dimensions <https://zarr.dev/zeps/draft/ZEP0005.html>`_
+
+Suggest an edit for this spec:
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/zarr-accumulation/v1.0.rst>`_
+
+This proposal is licensed under the Apache License, Version 2.0.
+
+----
+
+
+Abstract
+========
+
+At NASA GES DISC, we receive a large number of user requests each day for a variety of analysis and visualization services involving averaging along one or more dimensions, some of which are computationally expensive when running against large amounts of geospatial data. We proposed a generic and dimension-agnostic method based on chunk-level cumulative sums (accumulation) on a regular grid, which provides fast and cost-efficient cloud analysis for multidimensional averaging services. This method introduces a small adjustable set of auxiliary data on top of the raw data, and dramatically reduces the computational time by orders of magnitude based on chunk-level accumulation along one or more dimensions.
+
+We hereby propose a Zarr extension for this chunk-level accumulation approach. In this proposal, we will present a Zarr group for the accumulation data, a JSON schema for the accumulation group attribute, a JSON schema for the accumulation data array attribute, and an example of the user application interface.
+shards.
+
+
+Status of this document
+=======================
+
+.. warning::
+    This document is a draft for review and subject to changes.
+
+
+Motivation
+==========
+
+Performing the averaging operation over data in Zarr generally requires a full scan of the data. This can be parallelized with Dask (or any other distributed framework), but reading all of the data is an unavoidable bottleneck. Our proposed approach, Zarr-based Chunk-level Accumulation, will improve the speed and cost of long-range calculation by loading only a few data chunks at the averaging boundary. Here, we provide examples of how the approach is applied to geospatial data with temporal and spatial dimensions; however, it’s noteworthy that this approach is dimension-agnostic and can be generalized for all types of multidimensional data aggregation services with Zarr.
+
+
+Document conventions
+====================
+
+Conformance requirements are expressed with a combination of descriptive
+assertions and [RFC2119]_ terminology. The key words "MUST", "MUST NOT",
+"REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+and "OPTIONAL" in the normative parts of this document are to be interpreted as
+described in [RFC2119]_. However, for readability, these words do not appear in
+all uppercase letters in this specification.
+
+All of the text of this specification is normative except sections explicitly
+marked as non-normative, examples, and notes. Examples in this specification are
+introduced with the words "for example".
+
+
+Implementation
+==================================
+
+Zarr group structure of accumulation data
+--------------------------
+
+
+
+References
+==========
+
+.. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
+   Requirement Levels. March 1997. Best Current Practice. URL:
+   https://tools.ietf.org/html/rfc2119
+
+
+Change log
+==========
+
+This section is a placeholder for keeping a log of the snapshots of this
+document that are tagged in GitHub and what changed between them.
