@@ -1,17 +1,17 @@
-==========================
- Gzip codec (version 1.0)
-==========================
+===========================
+ Blosc codec (version 1.0)
+===========================
 
   **Editor's draft 26 July 2019**
 
 Specification URI:
-    https://purl.org/zarr/spec/codecs/gzip/1.0
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/blosc/v1.0.html
 Corresponding ZEP:
     `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/gzip/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/blosc/v1.0.rst>`_
 
 Copyright 2020 `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -56,21 +56,48 @@ this specification are introduced with the words "for example".
 Configuration parameters
 ========================
 
-level:
+cname:
+    A string identifying the internal compression algorithm to be
+    used. At the time of writing, the following values are supported
+    by the c-blosc library: "lz4", "lz4hc", "blosclz", "zstd",
+    "snappy", "zlib".
+    
+clevel:
     An integer from 0 to 9 which controls the speed and level of
     compression. A level of 1 is the fastest compression method and
     produces the least compressions, while 9 is slowest and produces
     the most compression. Compression is turned off completely when
     level is 0.
 
-For example, the array metadata below specifies that the compressor is
-the Gzip codec configured with a compression level of 1::
+shuffle:
+    An integer value in the set {0, 1, 2, -1} indicating the way
+    bytes or bits are rearranged, which can lead to faster
+    and/or greater compression. A value of 1
+    indicates that byte-wise shuffling is performed prior to
+    compression. A value of 2 indicates the bit-wise shuffling is
+    performed prior to compression. If a value of -1 is given,
+    then default shuffling is used: bit-wise shuffling for buffers
+    with item size of 1 byte, byte-wise shuffling otherwise.
+    Shuffling is turned off completely when the value is 0.
+
+blocksize:
+    An integer giving the size in bytes of blocks into which a
+    buffer is divided before compression. A value of 0
+    indicates that an automatic size will be used.
+
+For example, the array metadata document below specifies that the
+compressor is the Blosc codec configured with a compression level of
+1, byte-wise shuffling, the ``lz4`` compression algorithm and the
+default block size::
 
     {
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codec/gzip",
-            "configuration": {                                                                                
-                "level": 1                                                                                    
+            "type": "blosc",
+            "configuration": {
+                "cname": "lz4",
+                "clevel": 1,
+                "shuffle": 1,
+                "blocksize": 0
             }
         }],
     }
@@ -79,10 +106,12 @@ the Gzip codec configured with a compression level of 1::
 Format and algorithm
 ====================
 
-Encoding and decoding is performed using the algorithm defined in
-[RFC1951]_.
-
-Encoded data should conform to the Gzip file format [RFC1952]_.
+Blosc is a meta-compressor, which divides an input buffer into blocks,
+then applies an internal compression algorithm to each block, then
+packs the encoded blocks together into a single output buffer with a
+header. The format of the encoded buffer is defined in [BLOSC]_. The
+reference implementation is provided by the `c-blosc library
+<https://github.com/Blosc/c-blosc>`_.
 
 
 References
@@ -92,13 +121,8 @@ References
    Requirement Levels. March 1997. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc2119
 
-.. [RFC1951] P. Deutsch. DEFLATE Compressed Data Format Specification version
-   1.3. Requirement Levels. May 1996. Informational. URL:
-   https://tools.ietf.org/html/rfc1951
-
-.. [RFC1952] P. Deutsch. GZIP file format specification version 4.3.
-   Requirement Levels. May 1996. Informational. URL:
-   https://tools.ietf.org/html/rfc1952
+.. [BLOSC] F. Alted. Blosc Chunk Format. URL:
+   https://github.com/Blosc/c-blosc/blob/HEAD/README_CHUNK_FORMAT.rst
 
 
 Change log

@@ -16,3 +16,8 @@ footer {
 .sidebar-end-items {
     margin-top: 0% !important;
 }
+
+/* Remove ↗ for external links in top bar menu */
+.nav-link.nav-external:after {
+    display: none;
+}

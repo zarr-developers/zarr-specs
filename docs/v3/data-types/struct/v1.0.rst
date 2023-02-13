@@ -5,11 +5,11 @@
   **Editor's draft 2 March 2022**
 
 Specification URI:
-    https://purl.org/zarr/spec/extensions/data-types/struct/1.0
+    https://zarr-specs.readthedocs.io/en/latest/v3/data-types/struct/v1.0.html
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/data-type>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/data-types/struct/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/data-types/struct/v1.0.rst>`_
 
 Copyright 2022 `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work is
