@@ -236,7 +236,8 @@ and the following attribute file represents the accumulation that is performed a
         ]
     }
 
-### Application Interface
+Application Interface
+--------------------------
 
 The accumulation-based workflow requires the application to locate the accumulation data along certain dimensions.  The accumulation data array name for the given dimensions can be obtained from the accumulation group attributes.  The following example shows the steps to get the weighted accumulation data array name along *latitude+longitude* dimensions:
 
