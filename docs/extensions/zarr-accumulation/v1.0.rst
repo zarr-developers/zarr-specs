@@ -36,7 +36,7 @@ Status of this document
 Motivation
 ==========
 
-Performing the averaging operation over data in Zarr generally requires a full scan of the data. This can be parallelized with Dask (or any other distributed framework), but reading all of the data is an unavoidable bottleneck. Our proposed approach, Zarr-based Chunk-level Accumulation, will improve the speed and cost of long-range calculation by loading only a few data chunks at the averaging boundary. Here, we provide examples of how the approach is applied to geospatial data with temporal and spatial dimensions; however, it’s noteworthy that this approach is dimension-agnostic and can be generalized for all types of multidimensional data aggregation services with Zarr.
+At NASA GES DISC, our use case is for computing averages along a range of data dimensions (e.g., space, time) in a cost effective and highly performant manner. In the Geo-spatial community, computing area or temporal averages over a long range of observations is popular with users. Performing the averaging operation over data in Zarr generally requires a full scan of the data. This can be parallelized with Dask (or any other distributed framework), but reading all of the data is an unavoidable bottleneck. Our proposed approach, Zarr-based Chunk-level Accumulation, will improve the speed and cost of long-range calculation by loading only a few data chunks at the averaging boundary. Here, we provide examples of how the approach is applied to geospatial data with temporal and spatial dimensions; however, it’s noteworthy that this approach is dimension-agnostic and can be generalized for all types of multidimensional data aggregation services with Zarr.
 
 
 Document conventions
