@@ -169,6 +169,7 @@ Zarr attribute file of accumulation data array
 With Zarr-based chunk-level accumulation, the cumulative sums are not necessarily computed for every single chunk.  To further reduce the computation and storage cost for the accumulation data, the cumulative sums can be computed every certain number of chunks, and we call this tunable number the *accumulation stride*.  This information is saved in the Zarr attribute file for the accumulation dataset (e.g., ``${raw_dataset}_accumulation_group/{accumulation_dataset_1}/.zattr``).
 
 As mentioned above, the dimension labels are needed to identify the accumulation datasets.  We assume that the dimensions are defined in the attributes of the dataset as ``_ARRAY_DIMENSIONS`` as from `the xarray implementation <https://docs.xarray.dev/en/stable/internals/zarr-encoding-spec.html>`_.  In the present approach, the accumulation stride is saved in an object called ``_ACCUMULATION_STRIDE`` in parallel with ``_ARRAY_DIMENSIONS``.  The related schema segment of this attribute file is shown as follows: ::
+
     {
         "$schema":"http://json-schema.org/draft-07/schema#",
         "type":"object",
