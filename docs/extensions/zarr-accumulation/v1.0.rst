@@ -68,8 +68,7 @@ Rather than storing the chunk-level statistics in a separate store, we could sto
 
 The accumulation datasets are organized in a data group adjacent to the raw data and dimension arrays with the following structure:
 
-.. code-block::
-
+``
 ├── ${dimension_array}
 ├── ...
 ├── ${raw_dataset}
@@ -86,7 +85,7 @@ The accumulation datasets are organized in a data group adjacent to the raw data
     │   ├── .zattr
     │   └── ...
     ...
-
+``
 
 
 References
