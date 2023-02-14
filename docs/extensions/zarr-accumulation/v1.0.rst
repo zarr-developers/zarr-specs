@@ -87,8 +87,7 @@ The accumulation datasets are organized in a data group adjacent to the raw data
         │   └── ...
         ...
 
-Done
-
+where `${dimension_array}`` is the data array for the dimension variable, `${raw_dataset}` is the data array for the raw dataset, `${raw_dataset}_accumulation_group` is the group for accumulation, and `${accumulation_dataset_1}` and `${accumulation_dataset_2}` are the data arrays for each accumulation dataset.
 
 References
 ==========
