@@ -90,7 +90,47 @@ where ``${dimension_array}`` is the data array for the dimension variable, ``${r
 Zarr attribute file of accumulation group
 --------------------------
 
-The accumulation group attribute file, ``${raw_dataset}_accumulation_group/.zattr``, provides details of the accumulation implementation and data organization. It follows the JSON schema shown below:
+The accumulation group attribute file, ``${raw_dataset}_accumulation_group/.zattr``, provides details of the accumulation implementation and data organization. It follows the JSON schema shown below: ::
+    {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "definitions": {
+            "accumulation_data_array": {
+                "type": "object",
+                "properties": {
+                    "_DATA_UNWEIGHTED": {
+                        "type": "string"
+                    },
+                    "_DATA_WEIGHTED": {
+                        "type": "string"
+                    },
+                    "_WEIGHTS": {
+                        "type": "string"
+                    }
+                },
+                "patternProperties": {
+                    "^(?!_DATA_UNWEIGHTED|_DATA_WEIGHTED|_WEIGHTS).*$": {
+                        "$ref": "#/definitions/accumulation_data_array"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "properties": {
+            "_ACCUMULATION_GROUP": {
+                "type": "object",
+                "patternProperties": {
+                    "^(?!_DATA_UNWEIGHTED|_DATA_WEIGHTED|_WEIGHTS).*$": {
+                        "$ref": "#/definitions/accumulation_data_array"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "required": [
+            "_ACCUMULATION_GROUP"
+        ]
+    }
 
 
 References
