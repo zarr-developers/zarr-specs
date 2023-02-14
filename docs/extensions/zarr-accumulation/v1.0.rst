@@ -60,7 +60,7 @@ The fundamental of this Zarr-based Chunk-level Accumulation algorithm is to pre-
 
 For example:
 
-For a sequence `A=(a, b, c, d)`, the cumulative sums are `S=(s0, s1, s2, s3)` where `s0=a, s1=a+b, s2=a+b+c, s3=a+b+c+d`. The average of the sequence over a range can now be calculated using the cumulative sums. For example, assuming zero-based indexing, average `(A[1:])=(S[3]-S[0])/3=(s3-s0)/3`.
+For a sequence ``A=(a, b, c, d)``, the cumulative sums are ``S=(s0, s1, s2, s3)`` where ``s0=a, s1=a+b, s2=a+b+c, s3=a+b+c+d``. The average of the sequence over a range can now be calculated using the cumulative sums. For example, assuming zero-based indexing, average ``(A[1:])=(S[3]-S[0])/3=(s3-s0)/3``.
 
 The above example can be extended and generalized for multiple dimensions. This makes the problem of computing averages *O(1)* vs *O(N^m)* for the dimensions being averaged, where *N* is the number of data values and *m* is the number of dimensions to be averaged. See our `ESIP 2022 presentation <https://www.youtube.com/watch?v=ac_UKunUrNM&t=2250s>`_ (and the `slides <https://docs.google.com/presentation/d/1RNvkIlCFvtoy89OTMzQNn_0jixOpdhnu/edit?usp=sharing&ouid=106287227661991623566&rtpof=true&sd=true>`_) for a more detailed description.
 
