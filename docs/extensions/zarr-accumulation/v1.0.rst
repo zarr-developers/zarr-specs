@@ -58,7 +58,7 @@ Detailed description
 
 The fundamental of this Zarr-based Chunk-level Accumulation algorithm is to pre-compute `cumulative sums <https://mathworld.wolfram.com/CumulativeSum.html>`_ of data values and weights/counts along data dimensions at the chunk intervals. These cumulative sums can then be used to find data averages for dimension ranges. 
 
-Example:
+For example:
 
 For a sequence `A=(a, b, c, d)`, the cumulative sums are `S=(s0, s1, s2, s3)` where `s0=a, s1=a+b, s2=a+b+c, s3=a+b+c+d`. The average of the sequence over a range can now be calculated using the cumulative sums. For example, assuming zero-based indexing, average `(A[1:])=(S[3]-S[0])/3=(s3-s0)/3`.
 
