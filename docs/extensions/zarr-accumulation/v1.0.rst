@@ -58,8 +58,35 @@ introduced with the words "for example".
 Implementation
 ==================================
 
+We propose to formalize this Zarr-based Chunk-level Accumulation approach as a Zarr extension.  To implement this approach, cumulative sums are computed at chunk intervals and are stored in a Zarr group. The API for averaging the data fetches the necessary pre-computed sums based on the user-requested dimensions (e.g., time)  and dimension ranges (e.g., from 1980 to 1990).
+
+Please note that this solution is also applicable for storing chunk statistics (min, max, sum, count, etc.) to help with performing aggregations.
+
 Zarr group structure of accumulation data
 --------------------------
+
+Rather than storing the chunk-level statistics in a separate store, we could store them inline with the arrays they are derived from. This would enable other applications to take advantage of such pre-computed data to optimize queries. This is similar to an optimization in Snowflake ([twitter link](https://twitter.com/teej_m/status/1546591452750159873)).
+
+The accumulation datasets are organized in a data group adjacent to the raw data and dimension arrays with the following structure:
+
+.. code-block::
+
+├── ${dimension_array}
+├── ...
+├── ${raw_dataset}
+├── ...
+└── ${raw_dataset}_accumulation_group
+    ├── .zgroup
+    ├── .zattr
+    ├── ${accumulation_dataset_1}
+    │   ├── .zarray
+    │   ├── .zattr
+    │   └── ...
+    ├── ${accumulation_dataset_2}
+    │   ├── .zarray
+    │   ├── .zattr
+    │   └── ...
+    ...
 
 
 
