@@ -66,7 +66,8 @@ Zarr group structure of accumulation data
 
 Rather than storing the chunk-level statistics in a separate store, we could store them inline with the arrays they are derived from. This would enable other applications to take advantage of such pre-computed data to optimize queries. This is similar to an optimization in Snowflake (`twitter link <https://twitter.com/teej_m/status/1546591452750159873>`_).
 
-The accumulation datasets are organized in a data group adjacent to the raw data and dimension arrays with the following structure:::
+The accumulation datasets are organized in a data group adjacent to the raw data and dimension arrays with the following structure:
+.. code-block::
 
     ├── ${dimension_array}
     ├── ...
