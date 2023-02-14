@@ -225,6 +225,17 @@ and the following attribute file represents the accumulation that is performed a
         ]
     }
 
+### Application Interface
+
+The accumulation-based workflow requires the application to locate the accumulation data along certain dimensions.  The accumulation data array name for the given dimensions can be obtained from the accumulation group attributes.  The following example shows the steps to get the weighted accumulation data array name along *latitude+longitude* dimensions:
+
+.. image:: Zarr_accumulation-App_Interface-1.png
+
+The accumulation stride is also needed to locate the accumulation data for a given chunk number.  They can be obtained from the accumulation data attributes, and the following example shows the steps to get the accumulation stride for the accumulation data along *latitude+longitude* dimensions:
+
+.. image:: Zarr_accumulation-App_Interface-2.png
+
+
 References
 ==========
 
