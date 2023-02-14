@@ -24,7 +24,6 @@ Abstract
 At NASA GES DISC, we receive a large number of user requests each day for a variety of analysis and visualization services involving averaging along one or more dimensions, some of which are computationally expensive when running against large amounts of geospatial data. We proposed a generic and dimension-agnostic method based on chunk-level cumulative sums (accumulation) on a regular grid, which provides fast and cost-efficient cloud analysis for multidimensional averaging services. This method introduces a small adjustable set of auxiliary data on top of the raw data, and dramatically reduces the computational time by orders of magnitude based on chunk-level accumulation along one or more dimensions.
 
 We hereby propose a Zarr extension for this chunk-level accumulation approach. In this proposal, we will present a Zarr group for the accumulation data, a JSON schema for the accumulation group attribute, a JSON schema for the accumulation data array attribute, and an example of the user application interface.
-shards.
 
 
 Status of this document
