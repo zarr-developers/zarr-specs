@@ -13,7 +13,7 @@ Corresponding ZEP:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/extensions/zarr-accumulation/v1.0.rst>`_
 
-This proposal is licensed under the Apache License, Version 2.0.
+This proposal is licensed under `the Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>`_.
 
 ----
 
