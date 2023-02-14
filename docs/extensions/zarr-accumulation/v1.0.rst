@@ -68,24 +68,26 @@ Rather than storing the chunk-level statistics in a separate store, we could sto
 
 The accumulation datasets are organized in a data group adjacent to the raw data and dimension arrays with the following structure:
 
-``
-├── ${dimension_array}
-├── ...
-├── ${raw_dataset}
-├── ...
-└── ${raw_dataset}_accumulation_group
-    ├── .zgroup
-    ├── .zattr
-    ├── ${accumulation_dataset_1}
-    │   ├── .zarray
-    │   ├── .zattr
-    │   └── ...
-    ├── ${accumulation_dataset_2}
-    │   ├── .zarray
-    │   ├── .zattr
-    │   └── ...
-    ...
-``
+.. code-block::
+
+    ├── ${dimension_array}
+    ├── ...
+    ├── ${raw_dataset}
+    ├── ...
+    └── ${raw_dataset}_accumulation_group
+        ├── .zgroup
+        ├── .zattr
+        ├── ${accumulation_dataset_1}
+        │   ├── .zarray
+        │   ├── .zattr
+        │   └── ...
+        ├── ${accumulation_dataset_2}
+        │   ├── .zarray
+        │   ├── .zattr
+        │   └── ...
+        ...
+
+Done
 
 
 References
