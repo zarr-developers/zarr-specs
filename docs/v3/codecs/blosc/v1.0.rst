@@ -92,7 +92,7 @@ default block size::
 
     {
         "codecs": [{
-            "type": "blosc",
+            "name": "blosc",
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,

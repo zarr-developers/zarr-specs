@@ -94,21 +94,13 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
     {
       storage_transformers: [
         {
-          "extension": "sharding",
-          "type": "indexed",
+          "name": "sharding",
           "configuration": {
-            "chunks_per_shard": [
-                2,
-                2
-            ]
+            "chunks_per_shard": [2, 2]
           }
+        }
       ]
     }
-
-``type``
-
-    Specifies a `Binary shard format`_. In this version, the only binary format
-    is the ``indexed`` format.
 
 ``chunks_per_shard``
 
@@ -157,8 +149,8 @@ separator (e.g. "data/root/foo/baz/c3/9"). Chunk grid positions ``[96, 19]``,
 Binary shard format
 -------------------
 
-The only binary format is the ``indexed`` format, as specified by the ``type``
-configuration key. Other binary formats might be added in future versions.
+The only binary format at the moment is an indexed binary format as described
+below. Other binary formats might be added in future versions.
 
 In the indexed binary format, chunks are written successively in a shard, where
 unused space between them is allowed, followed by an index referencing them. The

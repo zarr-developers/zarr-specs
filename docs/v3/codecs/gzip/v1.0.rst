@@ -68,7 +68,7 @@ the Gzip codec configured with a compression level of 1::
 
     {
         "codecs": [{
-            "type": "gzip",
+            "name": "gzip",
             "configuration": {                                                                                
                 "level": 1                                                                                    
             }
