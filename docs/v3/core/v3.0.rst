@@ -832,6 +832,12 @@ mandatory names:
     An integer defining the version of the storage specification to which the
     array store adheres, muste be ``3`` here.
 
+``node_type``
+^^^^^^^^^^^^^^^
+
+    A string defining the type of hierarchy node element, muste be ``array``
+    here.
+
 ``shape``
 ^^^^^^^^^
 
@@ -993,6 +999,7 @@ compressed using gzip compression prior to storage::
 
     {
         "zarr_format": 3,
+        "node_type": "array",
         "shape": [10000, 1000],
         "dimension_names": ["rows", "columns"],
         "data_type": "<f8",
@@ -1022,6 +1029,7 @@ chunking as above, but using an extension data type::
 
     {
         "zarr_format": 3,
+        "node_type": "array",
         "shape": [10000, 1000],
         "data_type": {
             "name": "datetime",
@@ -1068,26 +1076,18 @@ A Zarr group metadata object must contain the following mandatory key:
     An integer defining the version of the storage specification to which the
     array store adheres, muste be ``3`` here.
 
+``node_type``
+^^^^^^^^^^^^^^^
+
+    A string defining the type of hierarchy node element, muste be ``group``
+    here.
+
 Optional keys:
 
 ``storage_transformers`` (group)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     TBD
-
-``descenents_must_be_read``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    Boolean that indicates whether any descendant groups may themselves specify
-    storage transformers or other features needed to read their contents.
-    Defaults to ``false``. If set to ``true``, implementations must read the
-    metadata of all groups along the path to any descendant arrays or groups. If
-    set to ``false`` (or not specified), for improved efficiency implementations
-    need not read the metadata of groups along the path to descendants when
-    opening those descendants.
-
-    When adding a group extension to a non-root group, implementations must set
-    this attribute to ``true`` in all ancestor groups.
 
 ``attributes``
 ^^^^^^^^^^^^^^
@@ -1100,6 +1100,7 @@ For example, the JSON document below defines an explicit group::
 
     {
         "zarr_format": 3,
+        "node_type": "group",
         "attributes": {
             "spam": "ham",
             "eggs": 42,
@@ -1644,7 +1645,12 @@ by time.
 Draft Changes
 --------------------------
 
-- Restructured keys and removed entry-point metadata `PR #200
+- Removed `extensions` field and clarified extension point behavior, changing the config format of
+  data-types, chunk-grid, storage-transformers and codecs. `PR #204
+  <https://github.com/zarr-developers/zarr-specs/pull/204>`_
+- Changed `format_version` to the int ``3``, added key ``node_type`` to group and array metadata. `PR #204
+  <https://github.com/zarr-developers/zarr-specs/pull/204>`_
+- Restructured keys and removed entry-point metadata. `PR #200
   <https://github.com/zarr-developers/zarr-specs/pull/200>`_
 - Added the ``dimension_names`` array metadata field. `PR #162
   <https://github.com/zarr-developers/zarr-specs/pull/162>`_
