@@ -1009,6 +1009,7 @@ compressed using gzip compression prior to storage::
               "chunk_shape": [1000, 100],
               "separator" : "/"
             }
+        },
         "codecs": [{
             "type": "gzip",
             "configuration": {
