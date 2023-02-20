@@ -830,12 +830,12 @@ mandatory names:
 ^^^^^^^^^^^^^^^
 
     An integer defining the version of the storage specification to which the
-    array store adheres, muste be ``3`` here.
+    array store adheres, must be ``3`` here.
 
 ``node_type``
 ^^^^^^^^^^^^^^^
 
-    A string defining the type of hierarchy node element, muste be ``array``
+    A string defining the type of hierarchy node element, must be ``array``
     here.
 
 ``shape``
@@ -1075,12 +1075,12 @@ A Zarr group metadata object must contain the following mandatory key:
 ^^^^^^^^^^^^^^^
 
     An integer defining the version of the storage specification to which the
-    array store adheres, muste be ``3`` here.
+    array store adheres, must be ``3`` here.
 
 ``node_type``
 ^^^^^^^^^^^^^^^
 
-    A string defining the type of hierarchy node element, muste be ``group``
+    A string defining the type of hierarchy node element, must be ``group``
     here.
 
 Optional keys:
