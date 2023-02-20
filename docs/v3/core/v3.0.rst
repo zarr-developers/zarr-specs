@@ -1601,6 +1601,28 @@ a prefix will erase all the implicit group in the prefix.
 Care must thus be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
+Resizing
+--------
+
+In general, arrays can be resized for writable (and if necessary deletable)
+stores. In the most basic case, two scenarios can be considered, shrinking along
+an array dimension, or increasing its size.
+
+When shrinking, implementations can consider to delete chunks if the store
+allows this, or keep them. This should either be configurable, or be
+communicated to the user appropriately.
+
+When increasing an array along a dimension, chunks may or may not have existed
+in the new area. For areas where no chunks existed previously, they implicitly
+have the fill value after updating the metadata, no new chunks need to be
+written in this case. Previous partial chunks will contain the fill value at the
+time of writing them by default. If there was chunk data in the new area which
+was not deleted when shrinking the array, this data will be shown by default.
+The latter case should be signalled to the user appropriately. An implementation
+can also allow the user to choose to delete previous data explicitly when
+increasing the array (by writing the fill value into partial chunks and deleting
+others), but this should not be the default behavior.
+
 
 Comparison with Zarr v2
 =======================
