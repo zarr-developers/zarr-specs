@@ -31,6 +31,7 @@ extensions = [
   'sphinx.ext.todo',
   'sphinxcontrib.mermaid',
   'sphinxmark',
+  'sphinx_reredirects',
 ]
 
 # Display todos by setting to True
@@ -60,11 +61,17 @@ html_logo = '_static/logo.png'
 html_theme_options = {
   "github_url": "https://github.com/zarr-developers/zarr-specs",
   "twitter_url": "https://twitter.com/zarr_dev/",
+  "icon_links": [
+    {
+      "name": "Gitter",
+      "url": "https://gitter.im/zarr-developers/community",
+      "icon": "fa-brands fa-gitter",
+    },
+  ],
   "show_prev_next": False,
   "secondary_sidebar_items": ["page-toc"],
   "footer_items": [],  # hidden in custom css
 }
-
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -79,3 +86,7 @@ suppress_warnings = [
     # suppress "duplicate citation" warnings
     'ref.citation',
 ]
+
+redirects = {
+    "index": "specs.html",
+}
