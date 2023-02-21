@@ -8,7 +8,7 @@
   **Editor's draft 25 May 2022**
 
 Specification URI:
-    https://purl.org/zarr/spec/core/3.0
+    https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html
     
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
@@ -22,7 +22,7 @@ Issue tracking and discussion overview:
     `GitHub project board <https://github.com/orgs/zarr-developers/projects/2>`_
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/core/v3.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/v3.0.rst>`_
 
 Suggest extensions or other changes as a Zarr Enhancement Proposal (ZEP):
     `ZEP 0 — Purpose and process <https://zarr.dev/zeps/active/ZEP0000.html>`_
@@ -141,54 +141,34 @@ provide a framework for community-defined extensions, which can be
 developed and published independently without requiring centralised
 coordination of all specifications.
 
-See :ref:`extensions<extensions_section>` below.
+See :ref:`extension points <extensions_section>` below.
 
 Stability Policy
 ----------------
 
 This core specification adheres to a ``MAJOR.MINOR`` version
-number format. A zarr implementation that provides the read and write API by
-implementing this specification can be considered compatible with all
-datasets following the specification with the same major version number.
+number format. When incrementing the minor version, only additional features
+can be added. Breaking changes require to increment the major version.
 
-Notably, this excludes extensions, codecs and stores from the compatibility
-of the core specification. However, versioned extensions and stores are also
+A zarr implementation that provides the read and write API by
+implementing a specification ``X.Y`` can be considered compatible with all
+datasets which only use features contained in version ``X.Y``.
+
+For example, spec ``X.1`` adds core feature "foo" compared to ``X.0``. Assuming
+implementation A implements ``X.0`` and implementation B implements ``X.1``.
+Data using feature "foo" can only be read with implementation A. B fails to open
+it, as the key "foo" is unknown.
+
+Data not using "foo" can be used with both implementations, even if it's written
+with implementation B.
+
+Therefore, data is only marked with the respective major version, unknown
+features are auto-discovered via the metadata document.
+
+Notably, this excludes extension points such as codecs, data types, chunk grids
+and storage transformers from the compatibility of the core specification, as
+well as store support. However, versioned extension points and stores are also
 expected to follow this stability policy.
-
-This means that implementations based on a ``3.X`` specification will be
-able to read and write to datasets that follow any ``3.Y`` specification,
-as long as the following conditions are met:
-
-- only optional extensions or those supported by the implementation are used
-- only codecs supported by the implementation are used
-- the store must be supported by the implementation
-
-For details, please see the `zarr_format`_ metadata entry.
-
-
-Questions that still need to be resolved
-----------------------------------------
-
-We solicit feedback on the following area during the review period:
-
- - Should core metadata and user attributes be stored together or separate documents?
-   (See https://github.com/zarr-developers/zarr-specs/issues/72)
-
- - We want to verify if the extension mechanisms fit different use cases or if
-   they are too restrictive. See
-   https://github.com/zarr-developers/zarr-specs/issues/89 and
-   https://github.com/zarr-developers/zarr-specs/issues/169 for discussion on
-   the topic.
-
-  - Node name case sensitivity: The node name is now case sensitive. This may
-    make store implementation more complicated as some backends might not be
-    (like some specific filesystem / object store), and we may want to
-    recommend a standard escaping mechanism in those cases.
-    https://github.com/zarr-developers/zarr-specs/issues/57
-
-  - Node name character set: We
-    solicit feedback on whether store implementation should support full unicode.
-    https://github.com/zarr-developers/zarr-specs/issues/56
 
 
 Document conventions
@@ -219,6 +199,7 @@ The following figure illustrates the first part of the terminology:
    The following image was produced with https://excalidraw.com/
    and can be loaded there, as the source is embedded in the png.
 .. image:: terminology-hierarchy.excalidraw.png
+  :width: 600
 
 .. _hierarchy:
 
@@ -380,6 +361,7 @@ terminology for a use case of reading from an array:
    The following image was produced with https://excalidraw.com/
    and can be loaded there, as the source is embedded in the png.
 .. image:: terminology-read.excalidraw.png
+  :width: 600
 
 .. _codec:
 .. _codecs:
@@ -461,7 +443,7 @@ This follows the
 
 .. note::
     A storage transformer for unicode normalization might be added later, see
-    `spec issue #201 <https://github.com/zarr-developers/zarr-specs/issues/201>`_
+    https://github.com/zarr-developers/zarr-specs/issues/201.
 
 .. note::
     The underlying store might pose additional restriction on node names,
@@ -483,9 +465,6 @@ This follows the
     The prefix ``__zarr`` is reserved for core zarr data, and extensions 
     can use other files and folders starting with ``__``.
 
-.. note::
-    An extension to normalize unicode node names is being discussed,
-    see https://github.com/zarr-developers/zarr-specs/issues/56.
 
 Data types
 ==========
@@ -579,7 +558,6 @@ other type sizes in later versions of this specification.
 
    While the default binary representation is little endian, the :ref:`endian
    codec<endian-codec-v1>` may be specified to use big endian encoding instead.
-
 
 .. note::
 
@@ -844,18 +822,21 @@ encoded for storage.
 Array metadata
 --------------
 
-Each Zarr array in a hierarchy must have an array metadata
-document, named ``zarr.json``.  This document must contain a single object with the
-following mandatory names:
+Each Zarr array in a hierarchy must have an array metadata document, named
+``zarr.json``. This document must contain a single object with the following
+mandatory names:
 
 ``zarr_format``
 ^^^^^^^^^^^^^^^
 
-    Must be the string "https://purl.org/zarr/spec/v3#array".
+    An integer defining the version of the storage specification to which the
+    array store adheres, must be ``3`` here.
 
-    Note that this value is given as a URI rather than as a simple
-    version number string to help with discovery of this
-    specification.
+``node_type``
+^^^^^^^^^^^^^^^
+
+    A string defining the type of hierarchy node element, must be ``array``
+    here.
 
 ``shape``
 ^^^^^^^^^
@@ -873,50 +854,46 @@ following mandatory names:
     identifier provided as a string. For example, ``"<f8"`` for
     little-endian 64-bit floating point number.
 
-    The ``data_type`` value is an extension point and may be defined
-    by an extension. If the data type is defined by an
-    extension, then the value must be an object containing the names
-    ``extension``, ``type`` and (optionally) ``fallback``. The ``extension`` is
-    required and its value must be a URI that identifies the
-    extension and dereferences to a human-readable representation of
-    the specification.  The ``type`` is required and its value is
-    defined by the extension. The ``fallback`` is optional
-    and, if provided, its value must be one or a list of the data type
-    identifiers defined in this specification or an extension. If
-    an implementation does not recognise the extension or specific data
-    type, but a ``fallback`` is present, then the implementation may proceed
-    using the first known ``fallback`` value as the data type. For fixed-sized data types,
-    if there is no more specific fallback available, a raw number of bytes using the raw type (``r*``)
-    should be given.
+    The ``data_type`` value is an extension point and may be defined by a data
+    type extension. If the data type is defined by an extension, then the value
+    must be an object containing the names ``name`` and optionally
+    ``configuration`` and ``fallback``. The ``name`` is required and its value
+    must refer to a v3 data type specification. ``configuration`` is optional
+    and its value is defined by the extension. The ``fallback`` is optional and,
+    if provided, its value must be one or a list of the data type identifiers
+    defined in this specification or an extension. Fallback extension datatypes
+    are specified as an object with ``name`` and (optionally) ``configuration``.
+    
+    If an implementation does not recognise the extension or specific data type,
+    but a ``fallback`` is present, then the implementation may proceed using the
+    first known ``fallback`` value as the data type. For fixed-sized data types,
+    if there is no more specific fallback available, a raw number of bytes using
+    the raw type (``r*``) should be given.
 
-    The default list of fallbacks to put into the metadata should by defined by the data type extension,
-    but it may be overridden by the user.
-    *Note for implementations*: Silently using a fallback without explicit
-    approval might cause problems for users, please consider options to
-    (de-)activate fallback behavior and/or appropriate warnings.
+    The default list of fallbacks to put into the metadata should by defined by
+    the data type extension, but it may be overridden by the user. *Note for
+    implementations*: Silently using a fallback without explicit approval might
+    cause problems for users, please consider options to (de-)activate fallback
+    behavior and/or appropriate warnings.
 
 ``chunk_grid``
 ^^^^^^^^^^^^^^
 
-    The chunk grid of the Zarr array. If the chunk grid is a regular
-    chunk grid as defined in this specification, then the value must
-    be an object with the names ``type``, ``chunk_shape`` and ``separator``.
-    The value of ``type`` must be the string ``"regular"``, and the value of
-    ``chunk_shape`` must be an array of integers providing the lengths
-    of the chunk along each dimension of the array. ``separator`` must be
-    either ``"/"`` or ``"."``. For example,
-    ``{"type": "regular", "chunk_shape": [2, 5], "separator":"/"}`` means a regular
-    grid where the chunks have length 2 along the first dimension and
-    length 5 along the second dimension.
+    The chunk grid of the Zarr array. If the chunk grid is a regular chunk grid
+    as defined in this specification, then the value must be an object with the
+    names ``name`` and ``configuration``. The value of ``name`` must be the
+    string ``"regular"``, and the value of ``configuration`` an object with the
+    names ``chunk_shape`` and ``separator``. ``chunk_shape`` must be an array of
+    integers providing the lengths of the chunk along each dimension of the
+    array. ``separator`` must be either ``"/"`` or ``"."``. For example,
+    ``{"type": "regular", "configuration": {"chunk_shape": [2, 5], "separator":"/"}}``
+    means a regular grid where the chunks have length 2 along the first
+    dimension and length 5 along the second dimension.
 
-    The ``chunk_grid`` value is an extension point and may be defined
-    by an extension. If the chunk grid type is defined by an
-    extension, then the value must be an object containing
-    the names ``extension`` and ``type``. The ``extension`` is
-    required and the value must be a URI that identifies the
-    extension and dereferences to a human-readable representation of
-    the specification.  The ``type`` is required and the value is
-    defined by the extension.
+    The ``chunk_grid`` value is an extension point and may be defined by an
+    extension. If the chunk grid type is defined by an extension, then ``name``
+    must be a string referring to a v3 chunk grid specification. The
+    ``configuration`` is optional and defined by the extension.
 
 ``fill_value``
 ^^^^^^^^^^^^^^
@@ -951,28 +928,6 @@ following mandatory names:
 
 The following members are optional:
 
-
-``extensions``
-^^^^^^^^^^^^^^
-
-    An array containing zero or more objects, each of which identifies
-    an extension and provides any additional extension
-    configuration metadata. Each object must contain the name
-    ``extension`` whose value is a URI that identifies a Zarr
-    extension and dereferences to a human readable representation of
-    the extension specification. Each object must also contain the
-    name ``must_understand`` whose value is either the literal
-    ``true`` or ``false``. Each object may also contain the name
-    ``configuration`` whose value is defined by the
-    extension.
-
-    If an implementation of this specification encounters an extension
-    that it does not recognize, but the value of ``must_understand``
-    is ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognized and the value of
-    ``must_understand`` is ``true`` then processing must terminate and
-    an appropriate error raised.
-
 ``attributes``
 ^^^^^^^^^^^^^^
 
@@ -982,35 +937,34 @@ The following members are optional:
 
 
   .. note::
-    The question of whether core metadata and user attributes should be
-    stored together or in separate documents is a topic of ongoing discussion.
-    (See https://github.com/zarr-developers/zarr-specs/issues/72.)
+    An extension to store user attributes in a separate document is being
+    discussed in https://github.com/zarr-developers/zarr-specs/issues/72.
+
+  .. note::
+    A proposal to specify metadata conventions (ZEP 4) is being discussed in
+    https://github.com/zarr-developers/zeps/pull/28.
 
 ``codecs``
 ^^^^^^^^^^
 
     Specifies a list of codecs to be used for encoding and decoding chunks. The
     value must be an array of objects, each object containing a member with
-    ``type`` whose value is a URI that identifies a codec and dereferences to a
-    human-readable representation of the codec specification. The codec object
-    may also contain a ``configuration`` object which consists of the parameter
-    names and values as defined by the corresponding codec specification. An
-    absent ``codecs`` member is equivalent to specifying an empty list of
-    codecs.
+    ``name`` whose value is a string referring to a v3 codec specification. The
+    codec object may also contain a ``configuration`` object which consists of
+    the parameter names and values as defined by the corresponding codec
+    specification. An absent ``codecs`` member is equivalent to specifying an
+    empty list of codecs.
 
-``storage_transformers``
-^^^^^^^^^^^^^^^^^^^^^^^^
+``storage_transformers`` (array)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    Specifies a stack of `storage transformers`_. Each value in the list must
-    be an object containing the names ``extension`` and ``type``.
-    The ``extension`` is required and the value must be a URI that identifies
-    the extension and dereferences to a human-readable representation
-    of the specification.  The ``type`` is required and the value is
-    defined by the extension. The
-    object may also contain a ``configuration`` object which consists of the
-    parameter names and values as defined by the corresponding storage transformer
-    specification. When the ``storage_transformers`` name is absent no storage
-    transformer is used, same for an empty list.
+    Specifies a stack of `storage transformers`_. Each value in the list must be
+    an object containing the names ``name`` and optionally ``configuration``.
+    The ``name`` is required and the value must be a string referring to the
+    extension. The object may also contain a ``configuration`` object which
+    consists of the parameter names and values as defined by the corresponding
+    storage transformer specification. When the ``storage_transformers`` name is
+    absent no storage transformer is used, same for an empty list.
 
 ``dimension_names``
 ^^^^^^^^^^^^^^^^^^^
@@ -1032,7 +986,8 @@ The following members are optional:
 The array metadata object must not contain any other names.
 Those are reserved for future versions of this specification.
 An implementation must fail to open zarr hierarchies, groups
-or arrays with unknown metadata fields.
+or arrays with unknown metadata fields, with the exception of
+objects with a ``"must_understand": false`` key-value pair.
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
@@ -1043,17 +998,20 @@ binary values are laid out in C contiguous order. Each chunk is
 compressed using gzip compression prior to storage::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/v3#array",
+        "zarr_format": 3,
+        "node_type": "array",
         "shape": [10000, 1000],
         "dimension_names": ["rows", "columns"],
         "data_type": "<f8",
         "chunk_grid": {
-            "type": "regular",
-            "chunk_shape": [1000, 100],
-            "separator" : "/"
+            "name": "regular",
+            "configuration": {
+              "chunk_shape": [1000, 100],
+              "separator" : "/"
+            }
         },
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
+            "type": "gzip",
             "configuration": {
                 "level": 1
             }
@@ -1071,26 +1029,30 @@ The following example illustrates an array with the same shape and
 chunking as above, but using an extension data type::
 
     {
+        "zarr_format": 3,
+        "node_type": "array",
         "shape": [10000, 1000],
         "data_type": {
-            "extension": "https://purl.org/zarr/spec/extensions/data-types/datetime/1.0",
-            "type": "<M8[ns]",
+            "name": "datetime",
+            "configuration": {
+              "unit": "ns"
+            },
             "fallback": "<i8"
         },
         "chunk_grid": {
-            "type": "regular",
-            "chunk_shape": [1000, 100],
-            "separator" : "/"
+            "name": "regular",
+            "configuration": {
+              "chunk_shape": [1000, 100],
+              "separator" : "/"
+            }
         },
         "codecs": [{
-            "type": "https://purl.org/zarr/spec/codecs/gzip/1.0",
+            "name": "gzip",
             "configuration": {
                 "level": 1
             }
         }],
         "fill_value": null,
-        "extensions": [],
-        "attributes": {}
     }
 
 .. note::
@@ -1112,43 +1074,21 @@ A Zarr group metadata object must contain the following mandatory key:
 ``zarr_format``
 ^^^^^^^^^^^^^^^
 
-    Must be the string "https://purl.org/zarr/spec/v3#group".
+    An integer defining the version of the storage specification to which the
+    array store adheres, must be ``3`` here.
+
+``node_type``
+^^^^^^^^^^^^^^^
+
+    A string defining the type of hierarchy node element, must be ``group``
+    here.
 
 Optional keys:
 
-``extensions``
-^^^^^^^^^^^^^^
+``storage_transformers`` (group)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    An array containing zero or more objects, each of which identifies
-    an extension and provides any additional extension
-    configuration metadata. Each object must contain the name
-    ``extension`` whose value is a URI that identifies a Zarr
-    extension and dereferences to a human readable representation of
-    the extension specification. Each object must also contain the
-    name ``must_understand`` whose value is either the literal
-    ``true`` or ``false``. Each object may also contain the name
-    ``configuration`` whose value is defined by the
-    extension.
-
-    If an implementation of this specification encounters an extension
-    that it does not recognize, but the value of ``must_understand``
-    is ``false``, then the extension may be ignored and processing may
-    continue. If the extension is not recognized and the value of
-    ``must_understand`` is ``true`` then processing must terminate and
-    an appropriate error raised.
-
-``descenents_may_have_group_extensions``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    Boolean that indicates whether any descendant groups may themselves specify
-    group extensions.  Defaults to ``false``.  If set to ``true``,
-    implementations must read the metadata of all groups along the path to any
-    descendant arrays or groups.  If set to ``false`` (or not specified), for
-    improved efficiency implementations need not read the metadata of groups
-    along the path to descendants when opening those descendants.
-
-    When adding a group extension to a non-root group, implementations must set
-    this attribute to ``true`` in all ancestor groups.
+    TBD
 
 ``attributes``
 ^^^^^^^^^^^^^^
@@ -1160,12 +1100,18 @@ Optional keys:
 For example, the JSON document below defines an explicit group::
 
     {
-        "zarr_format": "https://purl.org/zarr/spec/v3#group",
+        "zarr_format": 3,
+        "node_type": "group",
         "attributes": {
             "spam": "ham",
             "eggs": 42,
         }
     }
+
+The group metadata object must not contain any other names. Those are reserved
+for future versions of this specification. An implementation must fail to open
+zarr hierarchies or groups with unknown metadata fields, with the exception of
+objects with a ``"must_understand": false`` key-value pair.
 
 .. note::
 
@@ -1577,7 +1523,7 @@ Storage transformers
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers`_ name in the `array metadata`_. Storage transformers which do
+`storage_transformers <storage_transformers (array)_>`_ name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1609,25 +1555,31 @@ Predefined storage transformers
 
 .. _extensions_section:
 
-Extensions
-==========
+Extension points
+================
 
 
-Many types of extensions can exist and they can be grouped as
-following:
+Different types of extensions can exist and they can be grouped as follows:
 
-======================= ================================================ =====================
-extension               metadata                                         is extension required
-======================= ================================================ =====================
-array                   ``extensions`` in `Array metadata`_              ``must_understand``
-data type               `data_type`_                                     no ``fallback``
-chunk grid              `chunk_grid`_                                    always
-storage transformer     `storage_transformers`_                          always
-======================= ================================================ =====================
+=========== ======================= ================================================
+level       extension               metadata                                        
+=========== ======================= ================================================
+array       data type               `data_type`_                                    
+array       chunk grid              `chunk_grid`_                                   
+array       codecs                  `codecs`_                                       
+array       storage transformer     `storage_transformers (array)`_                         
+group       storage transformer     `storage_transformers (group)`_                         
+=========== ======================= ================================================
 
-There are no group extensions in Zarr v3.0.
+If such extension points are used by groups or arrays, they are required, except
+for data types specifying fallback data types.
 
-See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of potential extensions.
+See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
+potential extensions.
+
+Future versions of this specification may also add new core features by adding new top-level
+metadata keys. Such features are required by default. However, if the value of an unknown feature
+is an object containing the key-value pair ```"must_understand": false``, it can be ignored.
 
 Implementation Notes
 ====================
@@ -1680,18 +1632,6 @@ This section is informative.
 Below is a summary of the key differences between this specification
 (v3) and Zarr v2.
 
-- In v3 each hierarchy has an explicit root, and must be opened at the
-  root. In v2 there was no explicit root and a hierarchy could be
-  opened at its original root or at any sub-group.
-
-- In v3 the storage keys have been redesigned to separate the space of
-  keys used for metadata and data, by using different prefixes. This
-  is intended to allow for more performant listing and querying of
-  metadata documents on high latency stores. There are also
-  differences including a change to the default separator used to
-  construct chunk keys, and the addition of a key suffix for metadata
-  keys.
-
 - v3 has explicit support for extensions via defined
   extension points and mechanisms.
 
@@ -1728,7 +1668,12 @@ by time.
 Draft Changes
 --------------------------
 
-- Restructured keys and removed entry-point metadata `PR #200
+- Removed `extensions` field and clarified extension point behavior, changing the config format of
+  data-types, chunk-grid, storage-transformers and codecs. `PR #204
+  <https://github.com/zarr-developers/zarr-specs/pull/204>`_
+- Changed `format_version` to the int ``3``, added key ``node_type`` to group and array metadata. `PR #204
+  <https://github.com/zarr-developers/zarr-specs/pull/204>`_
+- Restructured keys and removed entry-point metadata. `PR #200
   <https://github.com/zarr-developers/zarr-specs/pull/200>`_
 - Added the ``dimension_names`` array metadata field. `PR #162
   <https://github.com/zarr-developers/zarr-specs/pull/162>`_

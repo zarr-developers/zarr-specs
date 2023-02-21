@@ -1,4 +1,5 @@
-sphinx
+sphinx<6.0.0
 pydata-sphinx-theme==0.12.0
 sphinxcontrib-mermaid
 sphinxmark
+sphinx-reredirects
