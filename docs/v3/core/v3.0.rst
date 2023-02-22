@@ -1401,120 +1401,104 @@ array, the prefix is the empty string.  For a non-root array with hierarchy path
 Operations
 ----------
 
-.. todo::
-   The following section describes possible operations of an implementation
-   as a guide-line. Those descriptions are not yet finalized.
+The following section describes possible operations of an implementation as a
+non-normative guide-line.
 
 Let `P` be an arbitrary hierarchy path.
 
-Let ``array_meta_key(P)`` be the array metadata key for `P`. Let
-``group_meta_key(P)`` be the group metadata key for `P`.
+Let ``meta_key(P)`` be the metadata key for `P`, ``P/zarr.json``.
 
 Let ``data_key(P, j, i ...)`` be the data key for `P` for the chunk
 with grid coordinates (`j`, `i`, ...).
 
 Let "+" be the string concatenation operator.
 
-.. note::
-
-   Store and implementation can assume that a client will not try to
-   create both an *array* and *group* at the same path, and thus
-   may skip check of existence of a group/array of the same name.
 
 **Create a group**
 
     To create an explicit group at hierarchy path `P`, perform
-    ``set(group_meta_key(P), value)``, where `value` is the
+    ``set(meta_key(P), value)``, where `value` is the
     serialization of a valid group metadata document.
 
-    If `P` is a non-root path then it is **not** necessary to create
-    or check for the existence of metadata documents for groups at any
-    of the ancestor paths of `P`. Creating a group at path `P` implies
+    Creating a group at path `P` implies
     the existence of groups at all ancestor paths of `P`.
 
 **Create an array**
 
     To create an array at hierarchy path `P`, perform
-    ``set(array_meta_key(P), value)``, where `value` is the
-    serialisation of a valid array metadata document.
+    ``set(meta_key(P), value)``, where `value` is the serialisation of a valid
+    array metadata document.
 
-    If `P` is a non-root path then it is **not** necessary to create
-    or check for the existence of metadata documents for groups at any
-    of the ancestor paths of `P`. Creating an array at path `P`
-    implies the existence of groups at all ancestor paths of `P`.
+    Creating an array at path `P` implies the existence of groups at all
+    ancestor paths of `P`.
 
 **Store chunk data in an array**
 
     To store chunk data in an array at path `P` and chunk coordinate (`j`, `i`,
-    ...), perform ``set(data_key(P, j, i, ...), value)``, where
-    `value` is the serialisation of the corresponding chunk, encoded
-    according to the information in the array metadata stored under
-    the key ``array_meta_key(P)``.
+    ...), perform ``set(data_key(P, j, i, ...), value)``, where `value` is the
+    serialisation of the corresponding chunk, encoded according to the
+    information in the array metadata stored under the key ``meta_key(P)``.
 
 **Retrieve chunk data in an array**
 
     To retrieve chunk data in an array at path `P` and chunk coordinate (`i`,
     `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
-    value is the serialisation of the corresponding chunk, encoded
-    according to the array metadata stored at ``array_meta_key(P)``.
+    value is the serialisation of the corresponding chunk, encoded according to
+    the array metadata stored at ``meta_key(P)``.
 
 **Discover children of a group**
 
     To discover the children of a group at hierarchy path `P`, perform
-    ``list_dir(P + "/")``. Any returned prefix not being ``c`` or
-    starting with ``__`` indicates a child group implied by some
-    descendant group or array.
+    ``list_dir(P + "/")``. Any returned prefix not starting with ``__``
+    indicates a child group implied by some descendant group or array.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
     keys "foo/bar/zarr.json" and "foo/baz/qux/zarr.json".
     Groups at paths "/", "/foo" and "/foo/baz" have not been explicitly
     created but are implied by their descendants. To list the children
-    of the group at path "/foo", perform ``list_dir("meta/foo/")``,
-    which will return the prefixes "meta/foo/bar" and "meta/foo/baz".
+    of the group at path "/foo", perform ``list_dir("/foo/")``,
+    which will return the prefixes "foo/bar" and "foo/baz".
     From this it can be inferred that child groups or arrays
     "/foo/bar" and "/foo/baz" are present.
 
-    If a store does not support any of the list operations then
-    discovery of group children is not possible, and the contents of
-    the hierarchy must be communicated by some other means, such as
-    via an extension, or via some out of band communication.
+    If a store does not support any of the list operations then discovery of
+    group children is not possible, and the contents of the hierarchy must be
+    communicated by some other means, such as via an extension (see
+    https://github.com/zarr-developers/zarr-specs/issues/15) or via some out of
+    band communication.
 
 **Discover all nodes in a hierarchy**
 
-    To discover all nodes in a hierarchy, one can call
-    ``list_prefix("meta/")``. All keys represent either explicit group or
-    arrays. All intermediate prefixes ending in a ``/`` are implicit
+    To discover all nodes in a hierarchy, one should discover the children of
+    the root of the hierarchy and then recursively list children of child
+    groups.
+    
+    For hierarchies without group storage transformers one may also call
+    ``list_prefix("/")``. All ``zarr.json`` keys represent either explicit
+    groups or arrays. All intermediate prefixes ending in a ``/`` are implicit
     groups.
 
 **Erase a group or array**
 
-    To erase an array at path `P`:
-      - erase the metadata document for the array, ``erase(array_meta_key(P))``
-      - erase all data keys which prefix have path pointing to this array,
-        ``erase_prefix("data" + P + "/")``
+    To erase an array at path `P`, erase the metadata document and array data
+    for the array, ``erase_prefix(P + "/")``.
 
-    To erase an implicit group at path `P`:
-      - erase all nodes under this group - it should be sufficient to
-        perform ``erase_prefix("meta" + P + "/")`` and
-        ``erase_prefix("data" + P + "/")``.
-
-    To erase an explicit group at path `P`:
-      - erase the metadata document for the group, ``erase(group_meta_key(P))``
-      - erase all nodes under this group - it should be sufficient to
-        perform ``erase_prefix("meta" + P + "/")`` and
-        ``erase_prefix("data" + P + "/")``.
+    To erase an explicit or implicit group at path `P`: erase all nodes under
+    this group and its metadata document - it should be sufficient to perform
+    ``erase_prefix(P + "/")``
 
 **Determine if a node exists**
 
-    To determine if a node exists at path ``P``, try in the following
-    order ``get(array_meta_key(P))`` (success implies an array at
-    ``P``); ``get(group_meta_key(P))`` (success implies an explicit
-    group at ``P``); ``list_dir("meta" + P + "/")`` (non-empty
-    result set implies an implicit group at ``P``).
+    To determine if a node exists at path ``P``, try in the following order
+
+    - ``get(meta_key(P))``
+      (success implies an array or explicit group at ``P``);
+    - ``list_dir(P + "/")``
+      (non-empty result set implies an implicit group at ``P``).
 
     .. note::
-       For listable store, ``list_dir(parent(P))`` can be an alternative.
+        For listable stores, ``list_dir(parent(P))`` can be an alternative.
 
 
 Storage transformers
