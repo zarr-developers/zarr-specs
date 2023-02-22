@@ -1129,6 +1129,9 @@ interface`_ subsection. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
+Additionally, a store should specify a canonical URI format that can be used to
+identify nodes in this store. Implementations should use the specified formats
+when opening a Zarr hierarchy to automatically determine the appropriate store.
 
 .. _abstract-store-interface:
 

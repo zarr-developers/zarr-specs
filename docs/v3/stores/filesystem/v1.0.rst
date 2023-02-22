@@ -182,6 +182,19 @@ in the section above.
   directory path ``dp``.
 
 
+Canonical URI
+=============
+
+The canonical URI format for this store follows the file URI scheme defined in
+[RFC8089]_. In the common case where the hostname is omitted this is
+``"file:///" + P``, where `P` is the base directory path, e.g.
+``"file:///C:\\data\\foo\\bar"``.
+
+In cases where a filesystem store may be considered the default, the
+``"file:///"`` prefix can be omitted and only the base directory path is used,
+possibly with a leading ``/`` for POSIX file systems.
+
+
 Store limitations
 =================
 
@@ -198,6 +211,9 @@ References
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc2119
+
+.. [RFC8089] M. Kerwin. The "file" URI Scheme. February 2017. Proposed Standard.
+   URL: https://tools.ietf.org/html/rfc8089
 
 
 Change log
