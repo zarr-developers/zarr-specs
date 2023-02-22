@@ -18,8 +18,8 @@ Editors:
 Corresponding ZEP:
     `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 
-Issue tracking and discussion overview:
-    `GitHub project board <https://github.com/orgs/zarr-developers/projects/2>`_
+Issue tracking:
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
 
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/v3.0.rst>`_
