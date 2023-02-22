@@ -1396,6 +1396,8 @@ array, the prefix is the empty string.  For a non-root array with hierarchy path
       - `(1, 0)`
       - `foo/baz/c/1/0`
 
+It is recommended that the root of a Zarr fileset ends with ``.zarr``
+to indicate the start of a hierarchy to users.
 
 
 Operations
