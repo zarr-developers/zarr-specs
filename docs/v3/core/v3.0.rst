@@ -1585,6 +1585,9 @@ a prefix will erase all the implicit group in the prefix.
 Care must thus be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
+A race-condition arises if a client writes an array at path ``P``,
+and another concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
+
 Resizing
 --------
 
