@@ -1455,8 +1455,8 @@ Let "+" be the string concatenation operator.
 
     To discover the children of a group at hierarchy path `P`, perform
     ``list_dir(P + "/")``. Any returned prefix ``Q`` not starting with ``__``
-    indicates a potential child array or group. To determine if the child is an array or group,
-    the document ``meta_key(Q)`` must be checked.
+    indicates a potential child array or group. To determine whether the
+    child is an array or group, the document ``meta_key(Q)`` must be checked.
 
     For example, if a group is created at path "/foo/bar" and an array
     is created at path "/foo/baz/qux", then the store will contain the
