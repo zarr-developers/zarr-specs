@@ -1592,6 +1592,7 @@ be converted into an explicit group.
 
 A race-condition arises if a client writes an array at path ``P``,
 and another concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
+Implementations may choose to never use implicit groups to avoid this.
 
 Resizing
 --------
