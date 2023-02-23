@@ -185,14 +185,14 @@ in the section above.
 Canonical URI
 =============
 
-The canonical URI format for this store follows the file URI scheme defined in
-[RFC8089]_. In the common case where the hostname is omitted this is
-``"file:///" + P``, where `P` is the base directory path, e.g.
-``"file:///C:\\data\\foo\\bar"``.
+The canonical URI format for this store follows the file URI scheme of the base
+directory path, as defined in [RFC8089]_. For a Windows base directory path
+"c:\\my data" the canonical URI would be "file:///c:/my%20data", for a Posix
+base directory "/my data" it would be"file:///my%20data".
 
-In cases where a filesystem store may be considered the default, the
-``"file:///"`` prefix can be omitted and only the base directory path is used,
-possibly with a leading ``/`` for POSIX file systems.
+When expecting a URI string, but no scheme is present, implementations may
+assume a filesystem store with the (supposedly URI) string as the base directory
+path.
 
 
 Store limitations
