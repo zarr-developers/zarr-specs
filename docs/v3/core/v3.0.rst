@@ -1085,11 +1085,6 @@ A Zarr group metadata object must contain the following mandatory key:
 
 Optional keys:
 
-``storage_transformers`` (group)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    TBD
-
 ``attributes``
 ^^^^^^^^^^^^^^
 
@@ -1527,6 +1522,10 @@ by the Array. Storage transformers can be configured per array via the
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
+.. note::
+    It is planned to add storage transformers also to groups in a later revision
+    of this spec, see https://github.com/zarr-developers/zarr-specs/issues/215.
+
 A storage transformer serves the same `abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,
 but instead propagates this to the next storage transformer or the final store.
@@ -1567,8 +1566,7 @@ level       extension               metadata
 array       data type               `data_type`_                                    
 array       chunk grid              `chunk_grid`_                                   
 array       codecs                  `codecs`_                                       
-array       storage transformer     `storage_transformers (array)`_                         
-group       storage transformer     `storage_transformers (group)`_                         
+array       storage transformer     `storage_transformers (array)`_                 
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
