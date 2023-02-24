@@ -1025,8 +1025,8 @@ compressed using gzip compression prior to storage::
         }
     }
 
-The following example illustrates an array with the same shape and
-chunking as above, but using an extension data type::
+The following example illustrates an array with the same shape and chunking as
+above, but using a (currently made up) extension data type::
 
     {
         "zarr_format": 3,
