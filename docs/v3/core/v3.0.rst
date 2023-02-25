@@ -1078,8 +1078,8 @@ compressed using gzip compression prior to storage::
         }
     }
 
-The following example illustrates an array with the same shape and
-chunking as above, but using an extension data type::
+The following example illustrates an array with the same shape and chunking as
+above, but using a (currently made up) extension data type::
 
     {
         "zarr_format": 3,
@@ -1142,11 +1142,6 @@ A Zarr group metadata object must contain the following mandatory key:
     here.
 
 Optional keys:
-
-``storage_transformers`` (group)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    TBD
 
 ``attributes``
 ^^^^^^^^^^^^^^
@@ -1585,6 +1580,10 @@ by the Array. Storage transformers can be configured per array via the
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
+.. note::
+    It is planned to add storage transformers also to groups in a later revision
+    of this spec, see https://github.com/zarr-developers/zarr-specs/issues/215.
+
 A storage transformer serves the same `abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,
 but instead propagates this to the next storage transformer or the final store.
@@ -1627,7 +1626,6 @@ array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
 array       storage transformer     `storage_transformers (array)`_
-group       storage transformer     `storage_transformers (group)`_
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
@@ -1636,9 +1634,17 @@ for data types specifying fallback data types.
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
 potential extensions.
 
+Specifications for new extensions are recommended to be published in the
+https://github.com/zarr-developers/zarr-specs repository via the
+`ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_. If a specification
+is published decentralized (e.g. for initial experimentation or due to a very
+specialized scope), it must use a URL in the `name` key of its metadata, which
+identifies the publishing organization or individual, and should point to the
+specification of the extension.
+
 Future versions of this specification may also add new core features by adding new top-level
 metadata keys. Such features are required by default. However, if the value of an unknown feature
-is an object containing the key-value pair ```"must_understand": false``, it can be ignored.
+is an object containing the key-value pair ``"must_understand": false``, it can be ignored.
 
 Implementation Notes
 ====================
