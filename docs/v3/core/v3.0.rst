@@ -1575,9 +1575,17 @@ for data types specifying fallback data types.
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
 potential extensions.
 
+Specifications for new extensions are recommended to be published in the
+https://github.com/zarr-developers/zarr-specs repository via the
+`ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_. If a specification
+is published decentralized (e.g. for initial experimentation or due to a very
+specialized scope), it must use a URL in the `name` key of its metadata, which
+identifies the publishing organization or individual, and should point to the
+specification of the extension.
+
 Future versions of this specification may also add new core features by adding new top-level
 metadata keys. Such features are required by default. However, if the value of an unknown feature
-is an object containing the key-value pair ```"must_understand": false``, it can be ignored.
+is an object containing the key-value pair ``"must_understand": false``, it can be ignored.
 
 Implementation Notes
 ====================
