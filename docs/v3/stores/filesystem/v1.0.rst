@@ -182,6 +182,19 @@ in the section above.
   directory path ``dp``.
 
 
+Canonical URI
+=============
+
+The canonical URI format for this store follows the file URI scheme of the base
+directory path, as defined in [RFC8089]_. For a Windows base directory path
+"c:\\my data" the canonical URI would be "file:///c:/my%20data", for a Posix
+base directory "/my data" it would be"file:///my%20data".
+
+When expecting a URI string, but no scheme is present, implementations may
+assume a filesystem store with the (supposedly URI) string as the base directory
+path.
+
+
 Store limitations
 =================
 
@@ -198,6 +211,9 @@ References
 .. [RFC2119] S. Bradner. Key words for use in RFCs to Indicate
    Requirement Levels. March 1997. Best Current Practice. URL:
    https://tools.ietf.org/html/rfc2119
+
+.. [RFC8089] M. Kerwin. The "file" URI Scheme. February 2017. Proposed Standard.
+   URL: https://tools.ietf.org/html/rfc8089
 
 
 Change log
