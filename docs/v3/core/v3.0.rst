@@ -1002,7 +1002,7 @@ compressed using gzip compression prior to storage::
         "node_type": "array",
         "shape": [10000, 1000],
         "dimension_names": ["rows", "columns"],
-        "data_type": "<f8",
+        "data_type": "float64",
         "chunk_grid": {
             "name": "regular",
             "configuration": {
@@ -1037,7 +1037,7 @@ above, but using a (currently made up) extension data type::
             "configuration": {
               "unit": "ns"
             },
-            "fallback": "<i8"
+            "fallback": "int64"
         },
         "chunk_grid": {
             "name": "regular",
