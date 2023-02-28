@@ -851,7 +851,7 @@ mandatory names:
 
     The data type of the Zarr array. If the data type is defined in
     this specification, then the value must be the data type
-    identifier provided as a string. For example, ``"<f8"`` for
+    identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
     The ``data_type`` value is an extension point and may be defined by a data
