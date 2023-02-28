@@ -851,7 +851,7 @@ mandatory names:
 
     The data type of the Zarr array. If the data type is defined in
     this specification, then the value must be the data type
-    identifier provided as a string. For example, ``"<f8"`` for
+    identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
     The ``data_type`` value is an extension point and may be defined by a data
@@ -1002,7 +1002,7 @@ compressed using gzip compression prior to storage::
         "node_type": "array",
         "shape": [10000, 1000],
         "dimension_names": ["rows", "columns"],
-        "data_type": "<f8",
+        "data_type": "float64",
         "chunk_grid": {
             "name": "regular",
             "configuration": {
@@ -1037,7 +1037,7 @@ above, but using a (currently made up) extension data type::
             "configuration": {
               "unit": "ns"
             },
-            "fallback": "<i8"
+            "fallback": "int64"
         },
         "chunk_grid": {
             "name": "regular",
