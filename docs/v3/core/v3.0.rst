@@ -869,7 +869,7 @@ mandatory names:
     member ``chunk_shape``. ``chunk_shape`` must be an array of
     integers providing the lengths of the chunk along each dimension of the
     array.  For example,
-    ``{"type": "regular", "configuration": {"chunk_shape": [2, 5]}}``
+    ``{"name": "regular", "configuration": {"chunk_shape": [2, 5]}}``
     means a regular grid where the chunks have length 2 along the first
     dimension and length 5 along the second dimension.
 
@@ -1064,7 +1064,7 @@ compressed using gzip compression prior to storage::
             }
         },
         "codecs": [{
-            "type": "gzip",
+            "name": "gzip",
             "configuration": {
                 "level": 1
             }
