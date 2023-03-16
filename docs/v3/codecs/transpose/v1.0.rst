@@ -26,7 +26,8 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-Defines a codec that permutes the dimensions of the chunk array.
+Defines an ``array -> array`` codec that permutes the dimensions of the chunk
+array.
 
 
 Status of this document
@@ -71,9 +72,7 @@ order:
 Format and algorithm
 ====================
 
-The decoded chunk representation to which this codec is applied must be an
-array.  Implementations must fail if this codec is specified immediately after
-another codec that produces a byte string as its encoded representation.
+This is an ``array -> array` codec.
 
 Given a chunk array ``A`` with shape ``A_shape`` as the decoded representation,
 the encoded representation is an array ``B`` with the same data type as ``A``

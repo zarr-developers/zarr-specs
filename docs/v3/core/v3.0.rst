@@ -1089,6 +1089,36 @@ each of these two representations are defined to be either:
 - a multi-dimensional array of some shape and data type, or
 - a byte string.
 
+Based on the input and output representations for the encode transform,
+codecs can be classified as one of three kinds:
+
+- ``array -> array``
+- ``array -> bytes``
+- ``bytes -> bytes``
+
+.. note::
+
+   ``bytes -> array`` codecs, where after encoding an array as a byte
+   string, it is subsequently transformed back into an array, to then later
+   be transformed back into a byte string, are not currently allowed, due to
+   the lack of a clear use case.
+
+If multiple codecs are specified for an array, each codec is applied
+sequentially; when encoding, the encoded output of codec ``i`` serves as the
+decoded input of codec ``i+1``, and similarly when decoding, the decoded output
+of codec ``i+1`` serves as the encoded input to codec ``i``.  Since ``bytes ->
+array`` codecs are not supported, it follows that the list of codecs must be of
+the following form:
+
+- zero or more ``array -> array`` codecs; followed by
+- at most one ``array -> bytes`` codec; followed by
+- zero or more ``bytes -> bytes`` codecs.
+
+If no ``array -> bytes`` codec is specified, then the default byte
+representation for the data type of the array is used.  For all data types
+currently defined by the core spec, that is equivalent to the ``endian`` codec
+with an endianness of ``little``.
+
 Logically, a codec ``c`` must define three properties:
 
 - ``c.compute_encoded_representation_type(decoded_representation_type)``, a
@@ -1106,11 +1136,31 @@ Logically, a codec ``c`` must define three properties:
 - ``c.decode(encoded_value, decoded_representation_type)``, a procedure that
   computes the decoded representation, and is used when reading an array.
 
-If more than one codec is specified for an array, each codec is applied
-sequentially; when encoding, the encoded output of codec ``i`` serves as the
-decoded input of codec ``i+1``, and similarly when decoding, the decoded
-output of codec ``i+1`` serves as the encoded input to codec ``i``.
+Implementations MAY support partial decoding for certain codecs
+(e.g. sharding, blosc).  Logically, partial decoding may be defined in terms
+of an additional operation:
 
+- ``c.partial_decode(input_handle, decoded_representation_type,
+  decoded_regions)``, where:
+
+  - ``input_handle`` provides an interface for requesting partial reads of
+    the encoded representation and itself supports the same
+    ``partial_decode`` interface;
+  - ``decoded_representation_type`` is the same as for ``c.decode``;
+  - ``decoded_regions`` specifies the regions of the decoded representation
+    that must be returned.
+
+  If the encoded representation is a multi-dimensional array, then
+  ``decoded_regions`` specifies a subset of the array's domain.  If the
+  encoded representation is a byte string, then ``decoded_regions``
+  specifies a list of byte ranges.
+
+.. note::
+
+   If ``partial_decode`` is not supported by a particular codec, it can
+   always be implemented in terms of ``decode`` by simply decoding in full
+   and then satisfying any ``decoded_regions`` requests directly from the
+   cached decoded representation.
 
 Determination of encoded representations
 ----------------------------------------

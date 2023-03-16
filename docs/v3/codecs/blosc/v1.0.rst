@@ -24,8 +24,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This specification defines an implementation of the Zarr abstract
-store API using a file system.
+Defines a ``bytes -> bytes`` codec that uses the blosc container format.
 
 
 Status of this document
@@ -105,6 +104,8 @@ default block size::
 
 Format and algorithm
 ====================
+
+This is a ``bytes -> bytes`` codec.
 
 Blosc is a meta-compressor, which divides an input buffer into blocks,
 then applies an internal compression algorithm to each block, then

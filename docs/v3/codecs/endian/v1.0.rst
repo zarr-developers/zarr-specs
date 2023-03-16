@@ -26,8 +26,8 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This specification defines an implementation of the Zarr abstract
-store API using a file system.
+Defines an ``array -> bytes`` codec that encodes arrays of fixed-size numeric
+data types as little endian or big endian in lexicographical order.
 
 
 Status of this document
@@ -64,6 +64,8 @@ endian:
 
 Format and algorithm
 ====================
+
+This is an ``array -> bytes`` codec.
 
 Each element of the array is encoded using the specified endian variant of its
 default binary representation.  Array elements are encoded in lexicographical
