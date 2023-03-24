@@ -1561,7 +1561,7 @@ Storage transformers
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <_storage_transformers_array_>`_ name in the `array metadata`_. Storage transformers which do
+`storage_transformers <storage_transformers_array_>`_ name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1610,7 +1610,7 @@ array       data type               `data_type`_
 array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers_array`_
+array       storage transformer     `storage_transformers <storage_transformers_array>`_
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
