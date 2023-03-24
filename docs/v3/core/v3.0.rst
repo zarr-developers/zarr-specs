@@ -652,8 +652,10 @@ The following members are optional:
     specification. An absent ``codecs`` member is equivalent to specifying an
     empty list of codecs.
 
-``storage_transformers`` (array)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _storage_transformers_array:
+
+``storage_transformers``
+^^^^^^^^^^^^^^^^^^^^^^^^
 
     Specifies a stack of `storage transformers`_. Each value in the list must be
     an object containing the names ``name`` and optionally ``configuration``.
@@ -767,6 +769,7 @@ above, but using a (currently made up) extension data type::
    Comparison with zarr spec v2:
 
    - ``dtype`` has been renamed to ``data_type``,
+   - endianness specification in ``dtype`` has been replaced by the :ref:`endian <endian-codec-v1>` codec,
    - ``chunks`` has been replaced with ``chunk_grid``,
    - ``dimension_separator`` has been replaced with ``chunk_key_encoding``,
    - ``order`` has been replaced by the :ref:`transpose <transpose-codec-v1>` codec,
@@ -1558,7 +1561,7 @@ Storage transformers
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <storage_transformers (array)_>`_ name in the `array metadata`_. Storage transformers which do
+`storage_transformers <_storage_transformers_array_>`_ name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1607,7 +1610,7 @@ array       data type               `data_type`_
 array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers (array)`_
+array       storage transformer     `storage_transformers_array`_
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
@@ -1685,6 +1688,19 @@ Below is a summary of the key differences between this specification
 
 - v3 has explicit support for extensions via defined
   extension points and mechanisms.
+
+- v3 uses ``zarr.json`` files for specifying core metadata of groups and arrays
+  as well as user attributes instead of ``.zgroup``, ``.zarray`` and ``.zattrs``.
+
+- v3 has a different metadata schema to accommodate the extension points.
+
+- v3 introduces storage transformers, which transform reads and writes between
+  array and store.
+
+- v3 introduces chainable codecs to unify the codec and filter concepts of v2.
+
+- The default chunk keys have changed from `0.1.2` to `c/0/1/2`. The v2-style
+  chunk keys are still available through the ``v2`` ``chunk_key_encoding``.
 
 - v3 allows for greater flexibility in how groups and arrays are
   created. In particular, v3 supports implicit groups, which are
