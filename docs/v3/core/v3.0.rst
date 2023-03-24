@@ -348,12 +348,12 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of `predefined storage transformers`_ can be
+    transformer. Any number of predefined storage transformers can be
     registered and stacked. In contrast to codecs, storage transformers can
     act on the a complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
-.. _`storage transformers details`: #storage-transformers-1
+.. _`storage transformers details`:
 
 The following figure illustrates the codec, store and storage transformer
 terminology for a use case of reading from an array:
@@ -1591,11 +1591,6 @@ Storage transformers may be stacked to combine different functionalities:
 A fixed set of storage providers is recommended for implementation with this specification:
 
 
-Predefined storage transformers
--------------------------------
-
-- :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
-
 .. _extensions_section:
 
 Extension points
@@ -1688,20 +1683,20 @@ Below is a summary of the key differences between this specification
 (v3) and Zarr v2.
 
 - v3 has explicit support for extensions via defined
-  extension points and mechanisms.
+  `extension points_` and mechanisms.
 
 - v3 uses ``zarr.json`` files for specifying core metadata of groups and arrays
   as well as user attributes instead of ``.zgroup``, ``.zarray`` and ``.zattrs``.
 
-- v3 has a different metadata schema to accommodate the extension points.
+- v3 has a different metadata_ schema to accommodate the extension points.
 
-- v3 introduces storage transformers, which transform reads and writes between
+- v3 introduces `storage transformers_`, which transform reads and writes between
   array and store.
 
-- v3 introduces chainable codecs to unify the codec and filter concepts of v2.
+- v3 introduces chainable codecs_ to unify the codec and filter concepts of v2.
 
-- The default chunk keys have changed from `0.1.2` to `c/0/1/2`. The v2-style
-  chunk keys are still available through the ``v2`` ``chunk_key_encoding``.
+- The default chunk keys have changed from ``0.1.2`` to ``c/0/1/2``. The v2-style
+  chunk keys are still available through the ``"v2"`` `chunk_key_encoding_`.
 
 - v3 allows for greater flexibility in how groups and arrays are
   created. In particular, v3 supports implicit groups, which are
@@ -1710,7 +1705,7 @@ Below is a summary of the key differences between this specification
   be created in parallel without generating race conditions for the
   metadata when creating parent groups.
 
-- The set of data types specified in v3 is less than in v2. Additional
+- The set of `core data types_` specified in v3 is less than in v2. Additional
   data types will be defined via extensions.
 
 References
