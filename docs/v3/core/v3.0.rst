@@ -769,6 +769,7 @@ above, but using a (currently made up) extension data type::
    Comparison with zarr spec v2:
 
    - ``dtype`` has been renamed to ``data_type``,
+   - the identifiers of data types has have been changed to ``uint8``, ``int16``, ``float32`` etc.,
    - endianness specification in ``dtype`` has been replaced by the :ref:`endian <endian-codec-v1>` codec,
    - ``chunks`` has been replaced with ``chunk_grid``,
    - ``dimension_separator`` has been replaced with ``chunk_key_encoding``,
