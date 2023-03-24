@@ -4,7 +4,7 @@
 Sharding codec (version 1.0)
 ==========================================
 -----------------------------
- Editor's draft 18 02 2022
+ Editor's draft 23 03 2023
 -----------------------------
 
 Specification URI:
@@ -39,15 +39,15 @@ Motivation
 ==========
 
 In many cases, it becomes inefficient or impractical to store a large number of
-chunks in single files or objects due to the design constraints of the
+chunks as separate files or objects due to the design constraints of the
 underlying storage. For example, the file block size and maximum inode number
 restrict the usage of numerous small files for typical file systems, also cloud
 storage such as S3, GCS, and various distributed filesystems do not efficiently
 handle large numbers of small files or objects.
 
 Increasing the chunk size works only up to a certain point, as chunk sizes need
-to be small for read and write efficiency requirements, for example to stream
-data in browser-based visualization software.
+to be small for read efficiency requirements, for example to stream data in 
+browser-based visualization software.
 
 Therefore, chunks may need to be smaller than the minimum size of one storage
 key. In those cases, it is efficient to store objects at a more coarse
@@ -85,10 +85,12 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
         {
           "name": "sharding_indexed"
           "configuration": {
-            "chunk_shape": [
-                32,
-                32
-            ],
+            "chunk_grid": {
+              "name": "regular",
+              "configuration": {
+                "chunk_shape": [32, 32]
+              }
+            }
             "codecs": [
               {
                 "name": "gzip",
@@ -102,12 +104,13 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
       ]
     }
 
-``chunk_shape``
+``chunk_grid``
 
-    An array of integers providing the shape of inner chunks in a shard for each 
-    dimension of the Zarr array. The length of the array must match the length
-    of the array metadata ``shape`` entry. The each integer must by divisible by 
-    the ``chunk_shape`` of the array as defined in the ``chunk_grid`` metadata. 
+    Specifies the chunk grid of the inner chunks. The value must be an object, 
+    as specified in the :ref:`_array-metadata`. 
+    Currently, only the ``"regular"`` chunk grid is supported for inner chunks.
+    Each integer of the inner ``chunk_shape`` must by divisible by the shape of
+    the shard (i.e, ``chunk_shape`` of the array for regular chunk grids). 
     For example, an inner chunk shape of ``[32, 2]`` with an outer chunk shape 
     ``[64, 64]`` indicates that 64 chunks are combined in one shard, 2 along the 
     first dimension, and for each of those 32 along the second dimension.
@@ -164,8 +167,6 @@ chunks may be expected. Some writing strategies might be
 Any configuration parameters for the write strategy must not be part of the
 metadata document; instead they need to be configured at runtime, as this is
 implementation specific.
-
-Currently, only the ``regular`` chunk grid is supported.
 
 
 Implementation notes
