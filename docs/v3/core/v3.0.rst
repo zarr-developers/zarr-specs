@@ -252,7 +252,7 @@ The following figure illustrates the first part of the terminology:
     example, if an array_ has 2 dimensions_, where the length of the
     first dimension_ is 100 and the length of the second dimension_ is
     20, then the shape of the array_ is (100, 20). A shape can be the empty
-    tuple in the case of zero-dimension arrays (scalar)
+    tuple in the case of zero-dimension arrays (scalar).
 
 .. _element:
 .. _elements:
@@ -308,7 +308,7 @@ The following figure illustrates the first part of the terminology:
 *Codec*
 
     The list of *codecs* specified for an array_ determine the encoded byte
-    representation of each chunk in the store_.
+    representation of each chunk in the store_. See `chunk encoding`_.
 
 .. _metadata document:
 .. _metadata documents:
@@ -640,6 +640,8 @@ The following members are optional:
   .. note::
     A proposal to specify metadata conventions (ZEP 4) is being discussed in
     https://github.com/zarr-developers/zeps/pull/28.
+
+.. _codecs_array:
 
 ``codecs``
 ^^^^^^^^^^
@@ -1683,20 +1685,20 @@ Below is a summary of the key differences between this specification
 (v3) and Zarr v2.
 
 - v3 has explicit support for extensions via defined
-  `extension points_` and mechanisms.
+  `extension points`_ and mechanisms.
 
 - v3 uses ``zarr.json`` files for specifying core metadata of groups and arrays
   as well as user attributes instead of ``.zgroup``, ``.zarray`` and ``.zattrs``.
 
 - v3 has a different metadata_ schema to accommodate the extension points.
 
-- v3 introduces `storage transformers_`, which transform reads and writes between
+- v3 introduces `storage transformers`_, which transform reads and writes between
   array and store.
 
 - v3 introduces chainable codecs_ to unify the codec and filter concepts of v2.
 
 - The default chunk keys have changed from ``0.1.2`` to ``c/0/1/2``. The v2-style
-  chunk keys are still available through the ``"v2"`` `chunk_key_encoding_`.
+  chunk keys are still available through the ``"v2"`` chunk_key_encoding_.
 
 - v3 allows for greater flexibility in how groups and arrays are
   created. In particular, v3 supports implicit groups, which are
@@ -1705,7 +1707,7 @@ Below is a summary of the key differences between this specification
   be created in parallel without generating race conditions for the
   metadata when creating parent groups.
 
-- The set of `core data types_` specified in v3 is less than in v2. Additional
+- The set of `core data types`_ specified in v3 is less than in v2. Additional
   data types will be defined via extensions.
 
 References
