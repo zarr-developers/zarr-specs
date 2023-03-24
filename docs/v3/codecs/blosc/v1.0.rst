@@ -70,25 +70,27 @@ clevel:
     level is 0.
 
 shuffle:
-    An integer value in the set {0, 1, 2, -1} indicating the way
-    bytes or bits are rearranged, which can lead to faster
-    and/or greater compression. A value of 1
-    indicates that byte-wise shuffling is performed prior to
-    compression. A value of 2 indicates the bit-wise shuffling is
-    performed prior to compression. If a value of -1 is given,
-    then default shuffling is used: bit-wise shuffling for buffers
-    with item size of 1 byte, byte-wise shuffling otherwise.
-    Shuffling is turned off completely when the value is 0.
+    Specifies the type of shuffling to perform, if any, prior to compression.
+    Must be one of:
+
+    - ``"noshuffle"``, to indicate no shuffling;
+    - ``"shuffle"``, to indicate byte-wise shuffling;
+    - ``"bitshuffle"``, to indicate bit-wise shuffling.
+
+typesize:
+    Positive integer specifying the stride in bytes over which shuffling is
+    performed.  Required unless ``shuffle`` is ``"noshuffle"``, in which case the value
+    is ignored.
 
 blocksize:
     An integer giving the size in bytes of blocks into which a
     buffer is divided before compression. A value of 0
     indicates that an automatic size will be used.
 
-For example, the array metadata document below specifies that the
-compressor is the Blosc codec configured with a compression level of
-1, byte-wise shuffling, the ``lz4`` compression algorithm and the
-default block size::
+For example, the array metadata document below specifies that the compressor is
+the Blosc codec configured with a compression level of 1, byte-wise shuffling
+with a stride of 4, the ``lz4`` compression algorithm and the default block
+size::
 
     {
         "codecs": [{
@@ -96,7 +98,8 @@ default block size::
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,
-                "shuffle": 1,
+                "shuffle": "byte",
+                "typesize": 4,
                 "blocksize": 0
             }
         }],
@@ -113,6 +116,31 @@ header. The format of the encoded buffer is defined in [BLOSC]_. The
 reference implementation is provided by the `c-blosc library
 <https://github.com/Blosc/c-blosc>`_.
 
+
+Comparison to Zarr v2
+=====================
+
+While the binary format is identical, the JSON metadata differs from that used
+by the Zarr v2 ``blosc`` codec in the following ways:
+
+- The `shuffle` mode is now specified more clearly as `null` (0 in Zarr v2),
+  `"bit"` (2 in Zarr v2), or `"byte"` (1 in Zarr v2).  Using these constants
+  rather than numbers makes it much easier to know what shuffle mode will be
+  using from manual inspection of the metadata.
+
+- When shuffling is enabled, the `typesize` must now be specified explicitly in
+  the metadata, rather than determined implicitly from the input data.  This
+  allows Blosc to function as a pure "bytes -> bytes" codec rather than an
+  "array -> bytes" codec.  Zarr implementations MAY allow users to leave this
+  unspecified and have the implementation choose a value automatically based on
+  the array data type and previous codecs in the chain, but MUST record in the
+  metadata the value that is chosen.
+
+- There is no option to choose between bit-wise and byte-wise shuffling
+  automatically, as supported in Zarr v2 via a `shuffle` value of `-1`.  Zarr
+  implementations MAY provide users an option to choose a shuffle mode
+  automatically based on the typesize or other information, but MUST record in
+  the metadata the mode that is chosen.
 
 References
 ==========
