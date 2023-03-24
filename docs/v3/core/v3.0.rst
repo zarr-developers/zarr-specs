@@ -1561,7 +1561,7 @@ Storage transformers
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <storage_transformers_array>`_ name in the `array metadata`_. Storage transformers which do
+:ref:`storage_transformers<storage_transformers_array>` name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1603,15 +1603,15 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ================================================
+=========== ======================= =======================================================
 level       extension               metadata
-=========== ======================= ================================================
+=========== ======================= =======================================================
 array       data type               `data_type`_
 array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers <storage_transformers_array>`_
-=========== ======================= ================================================
+array       storage transformer     :ref:`storage_transformers<storage_transformers_array>`
+=========== ======================= =======================================================
 
 If such extension points are used by groups or arrays, they are required, except
 for data types specifying fallback data types.
