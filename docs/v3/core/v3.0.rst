@@ -502,7 +502,7 @@ mandatory names:
     if there is no more specific fallback available, a raw number of bytes using
     the raw type (``r*``) should be given.
 
-    The default list of fallbacks to put into the metadata should by defined by
+    The default list of fallbacks to put into the metadata should be defined by
     the data type extension, but it may be overridden by the user. *Note for
     implementations*: Silently using a fallback without explicit approval might
     cause problems for users, please consider options to (de-)activate fallback
