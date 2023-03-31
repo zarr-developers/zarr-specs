@@ -86,46 +86,6 @@ programming environments and serve a wide range of applications.
 In particular, we highlight the following areas motivating the
 development of this specification.
 
-
-Distributed storage
--------------------
-
-The Zarr v2 specification was originally developed and implemented for
-use with local filesystem storage only. It then became clear that the
-same format could also be used with distributed storage systems,
-including cloud object stores such as Amazon S3, Google Cloud Storage
-or Azure Blob Storage. However, distributed storage systems have a
-number of important differences from local file systems, both in terms
-of the features they support and their performance
-characteristics. For example, cloud stores have much greater latency
-per request than local file systems, and this means that certain
-operations such as exploring a hierarchy of arrays using the Zarr v2
-format can be unacceptably slow. Workarounds have been developed,
-such as the use of metadata consolidation, but there are opportunities
-for modifications to the core format that address these issues
-directly and work more performantly across a range of underlying
-storage systems with varying features and latency characteristics. For
-example, this specification aims to minimise the number of
-storage requests required when opening and exploring a hierarchy of
-arrays.
-
-
-Interoperability
-----------------
-
-While the Zarr v2 and N5 specifications have each been implemented in
-multiple programming languages, there is currently not feature parity
-across all implementations. This is in part because the feature set
-includes some features that are not easily translated or supported
-across different programming languages. This specification aims to
-define a set of core features that are useful and sufficient to
-address a significant fraction of use cases, but are also
-straightforward to implement fully across different programming
-languages. Additional functionality can then be layered via
-extensions, some of which may aim for wide adoption, some of which may
-be more specialised and have more limited implementation.
-
-
 Extensibility
 -------------
 
@@ -142,6 +102,22 @@ developed and published independently without requiring centralised
 coordination of all specifications.
 
 See :ref:`extension points <extensions_section>` below.
+
+Interoperability
+----------------
+
+While the Zarr v2 and N5 specifications have each been implemented in
+multiple programming languages, there is currently not feature parity
+across all implementations. This is in part because the feature set
+includes some features that are not easily translated or supported
+across different programming languages. This specification aims to
+define a set of core features that are useful and sufficient to
+address a significant fraction of use cases, but are also
+straightforward to implement fully across different programming
+languages. Additional functionality can then be layered via
+extensions, some of which may aim for wide adoption, some of which may
+be more specialised and have more limited implementation.
+
 
 Stability Policy
 ----------------
@@ -170,7 +146,6 @@ and storage transformers from the compatibility of the core specification, as
 well as store support. However, versioned extension points and stores are also
 expected to follow this stability policy.
 
-
 Document conventions
 ====================
 
@@ -185,7 +160,6 @@ uppercase letters in this specification.
 All of the text of this specification is normative except sections
 explicitly marked as non-normative, examples, and notes. Examples in
 this specification are introduced with the words "for example".
-
 
 Concepts and terminology
 ========================
@@ -211,13 +185,6 @@ The following figure illustrates the first part of the terminology:
     path_. The root of a Zarr hierarchy may be either a group_ or an array_.
     In the latter case, the hierarchy consists of just the single array.
 
-.. _group:
-.. _groups:
-
-*Group*
-
-    A group is a node in a hierarchy_ that may have child nodes.
-
 .. _array:
 .. _arrays:
 
@@ -229,32 +196,42 @@ The following figure illustrates the first part of the terminology:
     elements_ in an array conform to the same `data type`_. An array
     may not have child nodes.
 
+.. _group:
+.. _groups:
+
+*Group*
+
+    A group is a node in a hierarchy_ that may have child nodes.
+
 .. _name:
 .. _names:
 
 *Name*
 
-    Each node in a hierarchy_ has a name, which is a string of
+    Each child node of a group has a name, which is a string of
     characters with some additional constraints defined in the section
-    on `node names`_ below. Two sibling nodes cannot have the same
-    name. The root node does not have a name and is the empty string ``""``.
+    on `node names`_ below.  Two sibling nodes cannot have the same
+    name.
 
 .. _path:
 .. _paths:
 
 *Path*
 
-    Each node in a hierarchy_ has a path which uniquely identifies
-    that node and defines its location within the hierarchy_. The path
-    is a string, formed by joining together the "/" character, followed by the
-    name_ of each ancestor node separated by the "/" character,
-    followed by the name_ of the node itself. For example, the path
-    "/foo/bar" identifies a node named "bar", whose parent is named
-    "foo", whose parent is the root of the hierarchy. The path "/"
-    identifies the root node.
+    Each node in a hierarchy_ has a path, a Unicode string that uniquely
+    identifies the node and defines its location within the hierarchy_. The root
+    node has a path of ``/``.  The path of a non-root node is equal the
+    concatenation of:
 
-    A path always starts with ``/`` and cannot end with ``/``,
-    because node names cannot contain ``/``.
+    - the path of its parent node;
+    - the ``/`` character, unless the parent is the root node;
+    - the name_ of the node itself.
+
+    For example, the path ``"/foo/bar"`` identifies a node named ``"bar"``,
+    whose parent is named ``"foo"``, whose parent is the root of the hierarchy.
+
+    A path always starts with ``/``, and a non-root path cannot end with ``/``,
+    because node names_ must be non-empty and cannot contain ``/``.
 
 .. _dimension:
 .. _dimensions:
@@ -325,6 +302,14 @@ The following figure illustrates the first part of the terminology:
     extensions may define other grid types such as
     rectilinear grids.
 
+.. _codec:
+.. _codecs:
+
+*Codec*
+
+    The list of *codecs* specified for an array_ determine the encoded byte
+    representation of each chunk in the store_.
+
 .. _metadata document:
 .. _metadata documents:
 
@@ -354,51 +339,6 @@ The following figure illustrates the first part of the terminology:
     can provide this interface, where keys are resource names, values are
     resource contents, and resources can be read, written or deleted via HTTP.
 
-The following figure illustrates the codec, store and storage transformer
-terminology for a use case of reading from an array:
-
-..
-   The following image was produced with https://excalidraw.com/
-   and can be loaded there, as the source is embedded in the png.
-.. image:: terminology-read.excalidraw.png
-  :width: 600
-
-.. _codec:
-.. _codecs:
-
-*Codec*
-
-    An array_ may be associated with a list of *codecs*.  Each codec specifies a
-    bidirectional transform (an *encode* transform and a *decode* transform).
-
-    Each codec has an *encoded representation* and a *decoded representation*;
-    each of these two representations are defined to be either:
-
-    - a multi-dimensional array of some shape and data type, or
-    - a byte string.
-
-    Logically, a codec ``c`` must define three properties:
-
-    - ``c.compute_encoded_representation_type(decoded_representation_type)``, a
-      procedure that determines the encoded representation based on the decoded
-      representation and any codec parameters.  In the case of a decoded
-      representation that is a multi-dimensional array, the shape and data type
-      of the encoded representation must be computable based only on the shape
-      and data type, but not the actual element values, of the encoded
-      representation.  If the ``decoded_representation_type`` is not supported,
-      this algorithm must fail with an error.
-
-    - ``c.encode(decoded_value)``, a procedure that computes the encoded
-      representation, and is used when writing an array.
-
-    - ``c.decode(encoded_value, decoded_representation_type)``, a procedure that
-      computes the decoded representation, and is used when reading an array.
-
-    If more than one codec is specified for an array, each codec is applied
-    sequentially; when encoding, the encoded output of codec ``i`` serves as the
-    decoded input of codec ``i+1``, and similarly when decoding, the decoded
-    output of codec ``i+1`` serves as the encoded input to codec ``i``.
-
 .. _storage transformer:
 .. _storage transformers:
 
@@ -415,372 +355,81 @@ terminology for a use case of reading from an array:
 
 .. _`storage transformers details`: #storage-transformers-1
 
-Node names
-==========
+The following figure illustrates the codec, store and storage transformer
+terminology for a use case of reading from an array:
 
-The root node does not have a name and is the empty string ``""``.
-Except for the root node, each node in a hierarchy must have a name,
-which is a string of unicode code points. The following constraints
-apply to node names:
+..
+   The following image was produced with https://excalidraw.com/
+   and can be loaded there, as the source is embedded in the png.
+.. image:: terminology-read.excalidraw.png
+  :width: 600
 
-* must not be the empty string (``""``)
-* must not include the character ``"/"``
-* must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
-* must not start with the reserved prefix ``"__"``
+.. _stored-representation:
 
-To ensure consistent behaviour across different storage systems and programming
-languages, we recommend users to only use characters in the sets ``a-z``,
-``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
+Stored representation
+=====================
 
-Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
-identical.
+A Zarr hierarchy_ is represented by the following set of key/value entries in an
+underlying store_:
 
-When using non-ASCII Unicode characters, we recommend users to use
-case-folded NFKC-normalized strings following the
-`General Security Profile for Identifiers of the Unicode Security Mechanisms (Unicode Technical Standard #39) <http://www.unicode.org/reports/tr39/#General_Security_Profile>`_.
-This follows the
-`Recommendations for Programmers (B) of the Unicode Security Considerations (Unicode Technical Report #36) <https://unicode.org/reports/tr36/#Recommendations_General>`_.
+- The array_ or group_ metadata document for the root of a Zarr hierarchy_ is
+  stored under the key ``zarr.json``.
 
-.. note::
-    A storage transformer for unicode normalization might be added later, see
-    https://github.com/zarr-developers/zarr-specs/issues/201.
+- The metadata document of a non-root array or group with hierarchy path ``P``
+  is obtained by stripping the leading ``/`` of the path and appending
+  ``/zarr.json``.  For example, the metadata document of an array or group with
+  path ``/foo/bar`` is ``foo/bar/zarr.json``.
 
-.. note::
-    The underlying store might pose additional restriction on node names,
-    such as the following:
+- All chunk or other data of an array is stored under the key prefix determined
+  by its path.  For a root array, the key prefix is obtained from the metadata
+  document key by stripping the trailing ``zarr.json``.  For example, for a root
+  array, the prefix is the empty string.  For a non-root array with hierarchy
+  path ``/foo/bar``, the prefix is ``foo/bar/``.
 
-    * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
-    * 1,024 bytes UTF8 object key limit for
-      `AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
-      and `GCS <https://cloud.google.com/storage/docs/objects#naming>`_, with
-      additional constraints.
-    * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
-    * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
-
-.. note::
-    If a store requires an explicit byte string representation the default
-    representation is the ``UTF-8`` encoded Unicode string.
-
-.. note::
-    The prefix ``__zarr`` is reserved for core zarr data, and extensions
-    can use other files and folders starting with ``__``.
-
-
-Data types
-==========
-
-A data type describes the set of possible binary values that an array
-element may take, along with some information about how the values
-should be interpreted.
-
-This core specification defines a limited set of data types to
-represent boolean values, integers, and floating point
-numbers. Extensions may define additional data types. All of the data
-types defined here have a fixed size, in the sense that all values
-require the same number of bytes. However, extensions may define
-variable sized data types.
-
-Note that the Zarr specification is intended to enable communication
-of data between a variety of computing environments. The native byte
-order may differ between machines used to write and read the data.
-
-Each data type is associated with an identifier, which can be used in
-metadata documents to refer to the data type. For the data types
-defined in this specification, the identifier is a simple ASCII
-string. However, extensions may use any JSON value to identify a data
-type.
-
-
-Core data types
----------------
-
-.. list-table:: Data types
-   :header-rows: 1
-
-   * - Identifier
-     - Numerical type
-     - Default binary representation
-   * - ``bool``
-     - Boolean
-     - Single byte, with false encoded as ``\\x00`` and true encoded as ``\\x01``.
-   * - ``int8``
-     - Integer in ``[-2^7, 2^7-1]``
-     - 1 byte two's complement
-   * - ``int16``
-     - Integer in ``[-2^15, 2^15-1]``
-     - 2-byte little endian two's complement
-   * - ``int32``
-     - Integer in ``[-2^31, 2^31-1]``
-     - 4-byte little endian two's complement
-   * - ``int64``
-     - Integer in ``[-2^63, 2^63-1]``
-     - 8-byte little endian two's complement
-   * - ``uint8``
-     - Integer in ``[0, 2^8-1]``
-     - 1 byte
-   * - ``uint16``
-     - Integer in ``[0, 2^16-1]``
-     - 2-byte little endian
-   * - ``uint32``
-     - Integer in ``[0, 2^32-1]``
-     - 4-byte little endian
-   * - ``uint64``
-     - Integer in ``[0, 2^64-1]``
-     - 8-byte little endian
-   * - ``float16`` (optionally supported)
-     - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
-     - 2-byte little endian IEEE 754 binary16
-   * - ``float32``
-     - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
-     - 4-byte little endian IEEE 754 binary32
-   * - ``float64``
-     - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
-     - 8-byte little endian IEEE 754 binary64
-   * - ``complex64``
-     - real and complex components are each IEEE 754 single-precision floating point
-     - 2 consecutive 4-byte little endian IEEE 754 binary32 values
-   * - ``complex128``
-     - real and complex components are each IEEE 754 double-precision floating point
-     - 2 consecutive 8-byte little endian IEEE 754 binary64 values
-   * - ``r*`` (Optional)
-     - raw bits,  use for extension type fallbacks
-     - variable, given by ``*``, is limited to be a multiple of 8.
-
-Additionally to these base types, an implementation should also handle the
-raw/opaque pass-through type designated by the lower-case letter ``r`` followed
-by the number of bits, multiple of 8. For example, ``r8``, ``r16``, and ``r24``
-should be understood as fall-back types of respectively 1, 2, and 3 byte length.
-
-Zarr v3 is limited to type sizes that are a multiple of 8 bits but may support
-other type sizes in later versions of this specification.
-
-.. note::
-
-   While the default binary representation is little endian, the :ref:`endian
-   codec<endian-codec-v1>` may be specified to use big endian encoding instead.
-
-.. note::
-
-    We are explicitly looking for more feedback and prototypes of code using the ``r*``,
-    raw bits, for various endianness and whether the spec could be made clearer.
-
-.. note::
-
-    Currently only fixed size elements are supported as a core data type.
-    There are many request for variable length element encoding. There are many
-    ways to encode variable length and we want to keep flexibility. While we seem
-    to agree that for random access the most likely contender is to have two
-    arrays, one with the actual variable length data and one with fixed size
-    (pointer + length) to the variable size data, we do not want to commit to such
-    a structure.
-    See https://github.com/zarr-developers/zarr-specs/issues/62.
-
-
-Chunk grids
-===========
-
-A chunk grid defines a set of chunks which contain the elements of an
-array. The chunks of a grid form a tessellation of the array space,
-which is a space defined by the dimensionality and shape of the
-array. This means that every element of the array is a member of one
-chunk, and there are no gaps or overlaps between chunks.
-
-In general there are different possible types of grids. The core
-specification defines the regular grid type, where all chunks are
-hyperrectangles of the same shape. Extensions may define other grid
-types, such as rectilinear grids where chunks are still
-hyperrectangles but do not all share the same shape.
-
-A grid type must also define rules for constructing an identifier for
-each chunk that is unique within the grid, which is a string of ASCII
-characters that can be used to construct keys to save and retrieve
-chunk data in a store, see also the `Storage`_ section.
-
-Regular grids
--------------
-
-A regular grid is a type of grid where an array is divided into chunks
-such that each chunk is a hyperrectangle of the same shape. The
-dimensionality of the grid is the same as the dimensionality of the
-array. Each chunk in the grid can be addressed by a tuple of positive
-integers (`k`, `j`, `i`, ...) corresponding to the indices of the
-chunk along each dimension.
-
-The origin element of a chunk has coordinates in the array space (`k` *
-`dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
-the chunk sizes along each dimension.
-Thus the origin element of the chunk at grid index (0, 0, 0,
-...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
-grid is aligned with the origin of the array. If the length of any
-array dimension is not perfectly divisible by the chunk length along
-the same dimension, then the grid will overhang the edge of the array
-space.
-
-The shape of the chunk grid will be (ceil(`z` / `dz`), ceil(`y` /
-`dy`), ceil(`x` / `dx`), ...)  where (`z`, `y`, `x`, ...) is the array
-shape, "/" is the division operator and "ceil" is the ceiling
-function. For example, if a 3 dimensional array has shape (10, 200,
-3000), and has chunk shape (5, 20, 400), then the shape of the chunk
-grid will be (2, 10, 8), meaning that there will be 2 chunks along the
-first dimension, 10 along the second dimension, and 8 along the third
-dimension.
-
-.. list-table:: Regular Grid Example
+.. list-table:: Metadata Storage Key example
     :header-rows: 1
 
-    * - Array Shape
-      - Chunk Shape
-      - Chunk Grid Shape
-      - Notes
-    * - (10, 200, 3000)
-      - (5, 20, 400)
-      - (2, 10, 8)
-      - The grid does overhang the edge of the array on the 3rd dimension.
+    * - Type
+      - Path "P"
+      - Key for Metadata at path `P`
+    * - Array (Root)
+      - `/`
+      - `zarr.json`
+    * - Group (Root)
+      - `/`
+      - `zarr.json`
+    * - Group
+      - `/foo`
+      - `foo/zarr.json`
+    * - Array
+      - `/foo`
+      - `foo/zarr.json`
+    * - Group
+      - `/foo/bar`
+      - `foo/bar/zarr.json`
+    * - Array
+      - `/foo/baz`
+      - `foo/baz/zarr.json`
 
-An element of an array with coordinates (`c`, `b`, `a`, ...) will
-occur within the chunk at grid index (`c` // `dz`, `b` // `dy`, `a` //
-`dx`, ...), where "//" is the floor division operator. The element
-will have coordinates (`c` % `dz`, `b` % `dy`, `a` % `dx`, ...) within
-that chunk, where "%" is the modulo operator. For example, if a
-3 dimensional array has shape (10, 200, 3000), and has chunk shape
-(5, 20, 400), then the element of the array with coordinates (7, 150, 900)
-is contained within the chunk at grid index (1, 7, 2) and has coordinates
-(2, 10, 100) within that chunk.
 
-The store key corresponding to a given grid cell is determined based on the
-`chunk_key_encoding`_ member of the `Array metadata`_.
+.. list-table:: Data Storage Key example
+    :header-rows: 1
 
-Note that this specification does not consider the case where the
-chunk grid and the array space are not aligned at the origin vertices
-of the array and the chunk at grid index (0, 0, 0, ...). However,
-extensions may define variations on the regular grid type
-such that the grid indices may include negative integers, and the
-origin element of the array may occur at an arbitrary position within
-any chunk, which is required to allow arrays to be extended by an
-arbitrary length in a "negative" direction along any dimension.
-
-.. note:: Chunks at the border of an array always have the full chunk size, even when
-   the array only covers parts of it. For example, having an array with ``"shape": [30, 30]`` and
-   ``"chunk_shape": [16, 16]``, the chunk ``0,1`` would also contain unused values for the indices
-   ``0-16, 30-31``. When writing such chunks it is recommended to use the current fill value
-   for elements outside the bounds of the array.
-
-Chunk encoding
-==============
-
-Chunks are encoded into a binary representation for storage in a store_, using
-the chain of codecs_ specified by the ``codecs`` metadata field.
-
-Determination of encoded representations
-----------------------------------------
-
-To encode or decode a chunk, the encoded and decoded representations for each
-codec in the chain must first be determined as follows:
-
-1. The initial decoded representation, ``decoded_representation[0]`` is a
-   multi-dimensional array with the same data type as the zarr array, and shape
-   equal to the chunk shape.
-
-2. For each codec ``i``, the encoded representation is equal to the decoded
-   representation ``decoded_representation[i+1]`` of the next codec, and is
-   computed from
-   ``codecs[i].compute_encoded_representation_type(decoded_representation[i])``.
-   If ``compute_encoded_representation_type`` fails because of an incompatible
-   decoded representation, an implementation should indicate an error.
-
-.. _default-array-byte-string-conversion:
-
-Conversion between multi-dimensional array and byte string representations
---------------------------------------------------------------------------
-
-Some codecs operate directly on multi-dimensional arrays of elements,
-e.g. encoding a 3-d array as a multi-channel jpeg image.  Other codecs operate
-at the byte level, e.g. gzip compression.  If a codec that operates at the byte
-level receives as input an array that is not a 1-dimensional uint8 array, it may
-convert the input array to a byte string by concatenating the default binary
-representations of each element in lexicographical order (C order).  Similarly,
-if a codec that expects a multi-dimensional array as input instead receives a
-byte string, it may decode each element in lexicographical order according to
-the default binary representation of each element.
+    * - Path `P` of array
+      - Chunk grid indices
+      - Data key
+    * - `/foo/baz`
+      - `(1, 0)`
+      - `foo/baz/c/1/0`
 
 .. note::
 
-   To encode elements in a different order than the default lexicographical
-   order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
-   be specified.
+   When storing a Zarr hierachy in a filesystem-like store (e.g. the local
+   filesystem or S3) as a sub-directory, it is recommended that the
+   sub-directory name ends with ``.zarr`` to indicate the start of a hierarchy
+   to users.
 
-Encoding procedure
-------------------
-
-Based on the computed ``decoded_representations`` list, a chunk is encoded using
-the following procedure:
-
-1. The initial *encoded chunk* ``EC[0]`` of the type specified by
-   ``decoded_representation[0]`` is equal to the chunk array ``A`` (with a shape
-   equal to the chunk shape, and data type equal to the zarr array data type).
-
-2. For each codec ``codecs[i]`` in ``codecs``, ``EC[i+1] :=
-   codecs[i].encode(EC[i])``.
-
-3. The final encoded chunk representation ``EC_final`` is always a byte string.
-   If ``EC[codecs.length]`` is a byte string, then ``EC_final :=
-   EC[codecs.length]``.  Otherwise, ``EC_final`` is
-   :ref:`converted<default-array-byte-string-conversion>` from
-   ``EC[codecs.length]``.
-
-4. ``EC_final`` is written to the store_.
-
-Decoding procedure
-------------------
-
-Based on the computed ``decoded_representations`` list, a chunk is encoded using
-the following procedure:
-
-1. The encoded chunk representation ``EC_final`` is read from the store_.
-
-2. If ``codecs[codecs.length]`` is a byte string, ``EC[codecs.length] :=
-   EC_final``.  Otherwise, ``EC[codecs.length]`` is
-   :ref:`converted<default-array-byte-string-conversion>` from ``EC_final``.
-
-3. For each codec ``codecs[i]`` in ``codecs``, iterating in reverse order,
-   ``EC[i] := codecs[i].decode(EC[i+1], decoded_representation[i])``.
-
-4. The chunk array ``A`` is equal to ``EC[0]``.
-
-Specifying codecs
------------------
-
-To allow for flexibility to define and implement new codecs, this
-specification does not define any codecs, nor restrict the set of
-codecs that may be used. Each codec must be defined via a separate
-specification. In order to refer to codecs in array metadata
-documents, each codec must have a unique identifier, which is a URI
-that dereferences to a human-readable specification of the codec. A
-codec specification must declare the codec identifier, and describe
-(or cite documents that describe) the encoding and decoding algorithms
-and the format of the encoded data.
-
-A codec may have configuration parameters which modify the behaviour
-of the codec in some way. For example, a compression codec may have a
-compression level parameter, which is an integer that affects the
-resulting compression ratio of the data. Configuration parameters must
-be declared in the codec specification, including a definition of how
-configuration parameters are represented as JSON.
-
-The Zarr core development team maintains a repository of codec
-specifications, which are hosted alongside this specification in the
-`zarr-specs GitHub repository`_, and which are
-published on the `zarr-specs documentation Web site
-<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
-recommended that codec specifications are contributed to the
-zarr-specs GitHub repository. However, codec specifications may be
-maintained by any group or organisation and published in any location
-on the Web. For further details of the process for contributing a
-codec specification to the zarr-specs GitHub repository, see the Zarr
-community process specification.
-
-Further details of how codecs are configured for an array are given in the
-section below on `Array metadata`_.
+.. _metadata:
 
 Metadata
 ========
@@ -853,7 +502,7 @@ mandatory names:
     if there is no more specific fallback available, a raw number of bytes using
     the raw type (``r*``) should be given.
 
-    The default list of fallbacks to put into the metadata should by defined by
+    The default list of fallbacks to put into the metadata should be defined by
     the data type extension, but it may be overridden by the user. *Note for
     implementations*: Silently using a fallback without explicit approval might
     cause problems for users, please consider options to (de-)activate fallback
@@ -1123,6 +772,7 @@ above, but using a (currently made up) extension data type::
    - ``order`` has been replaced by the :ref:`transpose <transpose-codec-v1>` codec,
    - the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field.
 
+.. _group-metadata:
 
 Group metadata
 --------------
@@ -1171,6 +821,407 @@ objects with a ``"must_understand": false`` key-value pair.
    A group does not need a metadata document to exist. (See implicit groups.)
 
 
+Node names
+==========
+
+The root node does not have a name and is the empty string ``""``.
+Except for the root node, each node in a hierarchy must have a name,
+which is a string of unicode code points. The following constraints
+apply to node names:
+
+* must not be the empty string (``""``)
+* must not include the character ``"/"``
+* must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
+* must not start with the reserved prefix ``"__"``
+
+To ensure consistent behaviour across different storage systems and programming
+languages, we recommend users to only use characters in the sets ``a-z``,
+``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
+
+Node names are case sensitive, e.g., the names "foo" and "FOO" are **not**
+identical.
+
+When using non-ASCII Unicode characters, we recommend users to use
+case-folded NFKC-normalized strings following the
+`General Security Profile for Identifiers of the Unicode Security Mechanisms (Unicode Technical Standard #39) <http://www.unicode.org/reports/tr39/#General_Security_Profile>`_.
+This follows the
+`Recommendations for Programmers (B) of the Unicode Security Considerations (Unicode Technical Report #36) <https://unicode.org/reports/tr36/#Recommendations_General>`_.
+
+.. note::
+    A storage transformer for unicode normalization might be added later, see
+    https://github.com/zarr-developers/zarr-specs/issues/201.
+
+.. note::
+    The underlying store might pose additional restriction on node names,
+    such as the following:
+
+    * `260 characters path length limit in Windows <https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation>`_
+    * 1,024 bytes UTF8 object key limit for
+      `AWS S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>`_
+      and `GCS <https://cloud.google.com/storage/docs/objects#naming>`_, with
+      additional constraints.
+    * `Windows paths are case-insensitive by default <https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions>`_
+    * `MacOS paths are case-insensitive by default <https://support.apple.com/guide/disk-utility/file-system-formats-dsku19ed921c/mac>`_
+
+.. note::
+    If a store requires an explicit byte string representation the default
+    representation is the ``UTF-8`` encoded Unicode string.
+
+.. note::
+    The prefix ``__zarr`` is reserved for core zarr data, and extensions
+    can use other files and folders starting with ``__``.
+
+
+Data types
+==========
+
+A data type describes the set of possible binary values that an array
+element may take, along with some information about how the values
+should be interpreted.
+
+This core specification defines a limited set of data types to
+represent boolean values, integers, and floating point
+numbers. Extensions may define additional data types. All of the data
+types defined here have a fixed size, in the sense that all values
+require the same number of bytes. However, extensions may define
+variable sized data types.
+
+Note that the Zarr specification is intended to enable communication
+of data between a variety of computing environments. The native byte
+order may differ between machines used to write and read the data.
+
+Each data type is associated with an identifier, which can be used in
+metadata documents to refer to the data type. For the data types
+defined in this specification, the identifier is a simple ASCII
+string. However, extensions may use any JSON value to identify a data
+type.
+
+
+Core data types
+---------------
+
+.. list-table:: Data types
+   :header-rows: 1
+
+   * - Identifier
+     - Numerical type
+     - Default binary representation
+   * - ``bool``
+     - Boolean
+     - Single byte, with false encoded as ``\\x00`` and true encoded as ``\\x01``.
+   * - ``int8``
+     - Integer in ``[-2^7, 2^7-1]``
+     - 1 byte two's complement
+   * - ``int16``
+     - Integer in ``[-2^15, 2^15-1]``
+     - 2-byte little endian two's complement
+   * - ``int32``
+     - Integer in ``[-2^31, 2^31-1]``
+     - 4-byte little endian two's complement
+   * - ``int64``
+     - Integer in ``[-2^63, 2^63-1]``
+     - 8-byte little endian two's complement
+   * - ``uint8``
+     - Integer in ``[0, 2^8-1]``
+     - 1 byte
+   * - ``uint16``
+     - Integer in ``[0, 2^16-1]``
+     - 2-byte little endian
+   * - ``uint32``
+     - Integer in ``[0, 2^32-1]``
+     - 4-byte little endian
+   * - ``uint64``
+     - Integer in ``[0, 2^64-1]``
+     - 8-byte little endian
+   * - ``float16`` (optionally supported)
+     - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
+     - 2-byte little endian IEEE 754 binary16
+   * - ``float32``
+     - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
+     - 4-byte little endian IEEE 754 binary32
+   * - ``float64``
+     - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
+     - 8-byte little endian IEEE 754 binary64
+   * - ``complex64``
+     - real and complex components are each IEEE 754 single-precision floating point
+     - 2 consecutive 4-byte little endian IEEE 754 binary32 values
+   * - ``complex128``
+     - real and complex components are each IEEE 754 double-precision floating point
+     - 2 consecutive 8-byte little endian IEEE 754 binary64 values
+   * - ``r*`` (Optional)
+     - raw bits,  use for extension type fallbacks
+     - variable, given by ``*``, is limited to be a multiple of 8.
+
+Additionally to these base types, an implementation should also handle the
+raw/opaque pass-through type designated by the lower-case letter ``r`` followed
+by the number of bits, multiple of 8. For example, ``r8``, ``r16``, and ``r24``
+should be understood as fall-back types of respectively 1, 2, and 3 byte length.
+
+Zarr v3 is limited to type sizes that are a multiple of 8 bits but may support
+other type sizes in later versions of this specification.
+
+.. note::
+
+   While the default binary representation is little endian, the :ref:`endian
+   codec<endian-codec-v1>` may be specified to use big endian encoding instead.
+
+.. note::
+
+    We are explicitly looking for more feedback and prototypes of code using the ``r*``,
+    raw bits, for various endianness and whether the spec could be made clearer.
+
+.. note::
+
+    Currently only fixed size elements are supported as a core data type.
+    There are many request for variable length element encoding. There are many
+    ways to encode variable length and we want to keep flexibility. While we seem
+    to agree that for random access the most likely contender is to have two
+    arrays, one with the actual variable length data and one with fixed size
+    (pointer + length) to the variable size data, we do not want to commit to such
+    a structure.
+    See https://github.com/zarr-developers/zarr-specs/issues/62.
+
+
+Chunk grids
+===========
+
+A chunk grid defines a set of chunks which contain the elements of an
+array. The chunks of a grid form a tessellation of the array space,
+which is a space defined by the dimensionality and shape of the
+array. This means that every element of the array is a member of one
+chunk, and there are no gaps or overlaps between chunks.
+
+In general there are different possible types of grids. The core
+specification defines the regular grid type, where all chunks are
+hyperrectangles of the same shape. Extensions may define other grid
+types, such as rectilinear grids where chunks are still
+hyperrectangles but do not all share the same shape.
+
+A grid type must also define rules for constructing an identifier for
+each chunk that is unique within the grid, which is a string of ASCII
+characters that can be used to construct keys to save and retrieve
+chunk data in a store, see also the `Storage`_ section.
+
+Regular grids
+-------------
+
+A regular grid is a type of grid where an array is divided into chunks
+such that each chunk is a hyperrectangle of the same shape. The
+dimensionality of the grid is the same as the dimensionality of the
+array. Each chunk in the grid can be addressed by a tuple of positive
+integers (`k`, `j`, `i`, ...) corresponding to the indices of the
+chunk along each dimension.
+
+The origin element of a chunk has coordinates in the array space (`k` *
+`dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
+the chunk sizes along each dimension.
+Thus the origin element of the chunk at grid index (0, 0, 0,
+...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
+grid is aligned with the origin of the array. If the length of any
+array dimension is not perfectly divisible by the chunk length along
+the same dimension, then the grid will overhang the edge of the array
+space.
+
+The shape of the chunk grid will be (ceil(`z` / `dz`), ceil(`y` /
+`dy`), ceil(`x` / `dx`), ...)  where (`z`, `y`, `x`, ...) is the array
+shape, "/" is the division operator and "ceil" is the ceiling
+function. For example, if a 3 dimensional array has shape (10, 200,
+3000), and has chunk shape (5, 20, 400), then the shape of the chunk
+grid will be (2, 10, 8), meaning that there will be 2 chunks along the
+first dimension, 10 along the second dimension, and 8 along the third
+dimension.
+
+.. list-table:: Regular Grid Example
+    :header-rows: 1
+
+    * - Array Shape
+      - Chunk Shape
+      - Chunk Grid Shape
+      - Notes
+    * - (10, 200, 3000)
+      - (5, 20, 400)
+      - (2, 10, 8)
+      - The grid does overhang the edge of the array on the 3rd dimension.
+
+An element of an array with coordinates (`c`, `b`, `a`, ...) will
+occur within the chunk at grid index (`c` // `dz`, `b` // `dy`, `a` //
+`dx`, ...), where "//" is the floor division operator. The element
+will have coordinates (`c` % `dz`, `b` % `dy`, `a` % `dx`, ...) within
+that chunk, where "%" is the modulo operator. For example, if a
+3 dimensional array has shape (10, 200, 3000), and has chunk shape
+(5, 20, 400), then the element of the array with coordinates (7, 150, 900)
+is contained within the chunk at grid index (1, 7, 2) and has coordinates
+(2, 10, 100) within that chunk.
+
+The store key corresponding to a given grid cell is determined based on the
+`chunk_key_encoding`_ member of the `Array metadata`_.
+
+Note that this specification does not consider the case where the
+chunk grid and the array space are not aligned at the origin vertices
+of the array and the chunk at grid index (0, 0, 0, ...). However,
+extensions may define variations on the regular grid type
+such that the grid indices may include negative integers, and the
+origin element of the array may occur at an arbitrary position within
+any chunk, which is required to allow arrays to be extended by an
+arbitrary length in a "negative" direction along any dimension.
+
+.. note:: Chunks at the border of an array always have the full chunk size, even when
+   the array only covers parts of it. For example, having an array with ``"shape": [30, 30]`` and
+   ``"chunk_shape": [16, 16]``, the chunk ``0,1`` would also contain unused values for the indices
+   ``0-16, 30-31``. When writing such chunks it is recommended to use the current fill value
+   for elements outside the bounds of the array.
+
+Chunk encoding
+==============
+
+Chunks are encoded into a binary representation for storage in a store_, using
+the chain of codecs_ specified by the ``codecs`` metadata field.
+
+Codecs
+------
+
+An array_ may be associated with a list of *codecs*.  Each codec specifies a
+bidirectional transform (an *encode* transform and a *decode* transform).
+
+Each codec has an *encoded representation* and a *decoded representation*;
+each of these two representations are defined to be either:
+
+- a multi-dimensional array of some shape and data type, or
+- a byte string.
+
+Logically, a codec ``c`` must define three properties:
+
+- ``c.compute_encoded_representation_type(decoded_representation_type)``, a
+  procedure that determines the encoded representation based on the decoded
+  representation and any codec parameters.  In the case of a decoded
+  representation that is a multi-dimensional array, the shape and data type
+  of the encoded representation must be computable based only on the shape
+  and data type, but not the actual element values, of the encoded
+  representation.  If the ``decoded_representation_type`` is not supported,
+  this algorithm must fail with an error.
+
+- ``c.encode(decoded_value)``, a procedure that computes the encoded
+  representation, and is used when writing an array.
+
+- ``c.decode(encoded_value, decoded_representation_type)``, a procedure that
+  computes the decoded representation, and is used when reading an array.
+
+If more than one codec is specified for an array, each codec is applied
+sequentially; when encoding, the encoded output of codec ``i`` serves as the
+decoded input of codec ``i+1``, and similarly when decoding, the decoded
+output of codec ``i+1`` serves as the encoded input to codec ``i``.
+
+
+Determination of encoded representations
+----------------------------------------
+
+To encode or decode a chunk, the encoded and decoded representations for each
+codec in the chain must first be determined as follows:
+
+1. The initial decoded representation, ``decoded_representation[0]`` is a
+   multi-dimensional array with the same data type as the zarr array, and shape
+   equal to the chunk shape.
+
+2. For each codec ``i``, the encoded representation is equal to the decoded
+   representation ``decoded_representation[i+1]`` of the next codec, and is
+   computed from
+   ``codecs[i].compute_encoded_representation_type(decoded_representation[i])``.
+   If ``compute_encoded_representation_type`` fails because of an incompatible
+   decoded representation, an implementation should indicate an error.
+
+.. _default-array-byte-string-conversion:
+
+Conversion between multi-dimensional array and byte string representations
+--------------------------------------------------------------------------
+
+Some codecs operate directly on multi-dimensional arrays of elements,
+e.g. encoding a 3-d array as a multi-channel jpeg image.  Other codecs operate
+at the byte level, e.g. gzip compression.  If a codec that operates at the byte
+level receives as input an array that is not a 1-dimensional uint8 array, it may
+convert the input array to a byte string by concatenating the default binary
+representations of each element in lexicographical order (C order).  Similarly,
+if a codec that expects a multi-dimensional array as input instead receives a
+byte string, it may decode each element in lexicographical order according to
+the default binary representation of each element.
+
+.. note::
+
+   To encode elements in a different order than the default lexicographical
+   order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
+   be specified.
+
+Encoding procedure
+------------------
+
+Based on the computed ``decoded_representations`` list, a chunk is encoded using
+the following procedure:
+
+1. The initial *encoded chunk* ``EC[0]`` of the type specified by
+   ``decoded_representation[0]`` is equal to the chunk array ``A`` (with a shape
+   equal to the chunk shape, and data type equal to the zarr array data type).
+
+2. For each codec ``codecs[i]`` in ``codecs``, ``EC[i+1] :=
+   codecs[i].encode(EC[i])``.
+
+3. The final encoded chunk representation ``EC_final`` is always a byte string.
+   If ``EC[codecs.length]`` is a byte string, then ``EC_final :=
+   EC[codecs.length]``.  Otherwise, ``EC_final`` is
+   :ref:`converted<default-array-byte-string-conversion>` from
+   ``EC[codecs.length]``.
+
+4. ``EC_final`` is written to the store_.
+
+Decoding procedure
+------------------
+
+Based on the computed ``decoded_representations`` list, a chunk is encoded using
+the following procedure:
+
+1. The encoded chunk representation ``EC_final`` is read from the store_.
+
+2. If ``codecs[codecs.length]`` is a byte string, ``EC[codecs.length] :=
+   EC_final``.  Otherwise, ``EC[codecs.length]`` is
+   :ref:`converted<default-array-byte-string-conversion>` from ``EC_final``.
+
+3. For each codec ``codecs[i]`` in ``codecs``, iterating in reverse order,
+   ``EC[i] := codecs[i].decode(EC[i+1], decoded_representation[i])``.
+
+4. The chunk array ``A`` is equal to ``EC[0]``.
+
+Specifying codecs
+-----------------
+
+To allow for flexibility to define and implement new codecs, this
+specification does not define any codecs, nor restrict the set of
+codecs that may be used. Each codec must be defined via a separate
+specification. In order to refer to codecs in array metadata
+documents, each codec must have a unique identifier, which is a URI
+that dereferences to a human-readable specification of the codec. A
+codec specification must declare the codec identifier, and describe
+(or cite documents that describe) the encoding and decoding algorithms
+and the format of the encoded data.
+
+A codec may have configuration parameters which modify the behaviour
+of the codec in some way. For example, a compression codec may have a
+compression level parameter, which is an integer that affects the
+resulting compression ratio of the data. Configuration parameters must
+be declared in the codec specification, including a definition of how
+configuration parameters are represented as JSON.
+
+The Zarr core development team maintains a repository of codec
+specifications, which are hosted alongside this specification in the
+`zarr-specs GitHub repository`_, and which are
+published on the `zarr-specs documentation Web site
+<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
+recommended that codec specifications are contributed to the
+zarr-specs GitHub repository. However, codec specifications may be
+maintained by any group or organisation and published in any location
+on the Web. For further details of the process for contributing a
+codec specification to the zarr-specs GitHub repository, see
+`ZEP 0<https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
+the process for Zarr specification changes.
+
+Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
 
 Stores
 ======
@@ -1396,64 +1447,6 @@ storage keys used to store encoded chunks.
 Note that any non-root hierarchy path will have ancestor paths that
 identify ancestor nodes in the hierarchy. For example, the path
 "/foo/bar" has ancestor paths "/foo" and "/".
-
-.. _storage-keys:
-
-Storage keys
-------------
-
-The array or group metadata document for the root of a Zarr hierarchy is stored
-under the key ``zarr.json``.
-
-The metadata document of a non-root array or group with hierarchy path ``P`` is
-obtained by stripping the leading ``/`` of the path and appending
-``/zarr.json``.  For example, the metadata document of an array or group with
-path ``/foo/bar`` is ``foo/bar/zarr.json``.
-
-All chunk or other data of an array is stored under the key prefix determined by
-its path.  For a root array, the key prefix is obtained from the metadata
-document key by stripping the trailing "zarr.json".  For example, for a root
-array, the prefix is the empty string.  For a non-root array with hierarchy path
-``/foo/bar``, the prefix is ``foo/bar/``.
-
-.. list-table:: Metadata Storage Key example
-    :header-rows: 1
-
-    * - Type
-      - Path "P"
-      - Key for Metadata at path `P`
-    * - Array (Root)
-      - `/`
-      - `zarr.json`
-    * - Group (Root)
-      - `/`
-      - `zarr.json`
-    * - Group
-      - `/foo`
-      - `foo/zarr.json`
-    * - Array
-      - `/foo`
-      - `foo/zarr.json`
-    * - Group
-      - `/foo/bar`
-      - `foo/bar/zarr.json`
-    * - Array
-      - `/foo/baz`
-      - `foo/baz/zarr.json`
-
-
-.. list-table:: Data Storage Key example
-    :header-rows: 1
-
-    * - Path `P` of array
-      - Chunk grid indices
-      - Data key
-    * - `/foo/baz`
-      - `(1, 0)`
-      - `foo/baz/c/1/0`
-
-It is recommended that the root of a Zarr fileset ends with ``.zarr``
-to indicate the start of a hierarchy to users.
 
 
 Operations
@@ -1703,7 +1696,6 @@ Below is a summary of the key differences between this specification
 
 - The set of data types specified in v3 is less than in v2. Additional
   data types will be defined via extensions.
-
 
 References
 ==========
