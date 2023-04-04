@@ -77,9 +77,8 @@ introduced with the words "for example".
 Configuration parameters
 ========================
 
-Sharding can be configured per array in the :ref:`array-metadata` as follows:
+Sharding can be configured per array in the :ref:`array-metadata` as follows::
 
-.. code-block::
     {
       codecs: [
         {
@@ -129,12 +128,12 @@ referencing them. The index is placed at the end of the file and has a size of
 ``16 bytes * 4 = 1024 bytes`` for shard shape of ``[64, 64]`` and inner chunk 
 shape of ``[32, 32]``. The index holds an `offset, nbytes` pair of little-endian 
 uint64 per chunk, the chunks-order in the index is row-major (C) order. Given 
-the example of 2x2 inner chunks in a shard, the index would look like:
+the example of 2x2 inner chunks in a shard, the index would look like::
 
-.. code-block::
     | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |
     | offset | nbytes | offset | nbytes | offset | nbytes | offset | nbytes |
     | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 |
+
 Empty chunks are denoted by setting both offset and nbytes to ``2^64 - 1``. 
 Empty chunks are interpreted as being filled with the fill value. The index 
 always has the full shape of all possible chunks per shard, even if they extend
@@ -177,7 +176,7 @@ common optimizations.
   relevant bytes that belong to the requested chunk. The relevant bytes are 
   determined by the `offset,nbytes` pair in the shard index. This bytestream
   then needs to be decoded with the inner codecs as specified in the sharding
-  configuration applying the :ref:`_decoding_procedure`. This is similar to how
+  configuration applying the :ref:`decoding_procedure`. This is similar to how
   an implementation would access a sub-slice of a chunk.
 
   When reading all chunks of a shard at once, a useful optimization would be to 
@@ -192,7 +191,7 @@ common optimizations.
   bytestream, then, needs to be decoded as above. 
 
 * **Encoding**: A simple implementation to encode a chunk in a shard would (a)
-  encode the new chunk per :ref:`_encoding_procedure` in a byte buffer using the 
+  encode the new chunk per :ref:`encoding_procedure` in a byte buffer using the 
   shard's inner codecs, (b) read an existing shard from the store, (c) create a 
   new bytestream with all encoded chunks of that shard including the overwritten 
   chunk, (d) generate a new shard index that is appended to the chunk bytestream 

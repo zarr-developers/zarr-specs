@@ -348,9 +348,9 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of `predefined storage transformers`_ can be
-    registered and stacked. In contrast to codecs, storage transformers can
-    act on the a complete array, rather than individual chunks. See the
+    transformer. Any number of storage transformers can be registered and 
+    stacked. In contrast to codecs, storage transformers can act on the a 
+    complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
 .. _`storage transformers details`: #storage-transformers-1
