@@ -149,7 +149,7 @@ chunks may be expected. Some writing strategies might be
   order). When replacing existing chunks larger or equal-sized chunks may be
   replaced in-place, leaving unused space up to an upper limit that might
   possibly be specified. Please note that, for regular-sized uncompressed data,
-  all chunks have the same size and can therefore be replaced in-place. > *
+  all chunks have the same size and can therefore be replaced in-place.
 * **Append-only**: Any chunk to write is appended to the existing shard,
   followed by an updated index. If previous chunks are updated, their storage
   space becomes unused, as well as the previous index. This might be useful for
