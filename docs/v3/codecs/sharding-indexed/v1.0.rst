@@ -85,12 +85,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
         {
           "name": "sharding_indexed"
           "configuration": {
-            "chunk_grid": {
-              "name": "regular",
-              "configuration": {
-                "chunk_shape": [32, 32]
-              }
-            }
+            "chunk_shape": [32, 32],
             "codecs": [
               {
                 "name": "gzip",
@@ -104,16 +99,17 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows:
       ]
     }
 
-``chunk_grid``
+``chunk_shape``
 
-    Specifies the chunk grid of the inner chunks. The value must be an object, 
-    as specified in the :ref:`_array-metadata`. 
-    Currently, only the ``"regular"`` chunk grid is supported for inner chunks.
-    Each integer of the inner ``chunk_shape`` must by divisible by the shape of
-    the shard (i.e, ``chunk_shape`` of the array for regular chunk grids). 
+    An array of integers providing the shape of inner chunks in a shard for each 
+    dimension of the Zarr array. The length of the array must match the length
+    of the array metadata ``shape`` entry. The each integer must by divisible by 
+    the ``chunk_shape`` of the array as defined in the ``chunk_grid`` 
+    :ref:`_array-metadata`. 
     For example, an inner chunk shape of ``[32, 2]`` with an outer chunk shape 
     ``[64, 64]`` indicates that 64 chunks are combined in one shard, 2 along the 
     first dimension, and for each of those 32 along the second dimension.
+    Currently, only the ``regular`` chunk grid is supported.
 
 ``codecs``
 
