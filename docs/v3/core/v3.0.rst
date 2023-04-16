@@ -1222,7 +1222,7 @@ zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
 on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see
-`ZEP 0<https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
+`ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
 the process for Zarr specification changes.
 
 Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
