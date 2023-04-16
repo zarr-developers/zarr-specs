@@ -104,7 +104,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
     dimension of the Zarr array. The length of the array must match the length
     of the array metadata ``shape`` entry. The each integer must by divisible by 
     the ``chunk_shape`` of the array as defined in the ``chunk_grid`` 
-    :ref:`_array-metadata`. 
+    :ref:`array-metadata`. 
     For example, an inner chunk shape of ``[32, 2]`` with an outer chunk shape 
     ``[64, 64]`` indicates that 64 chunks are combined in one shard, 2 along the 
     first dimension, and for each of those 32 along the second dimension.
@@ -114,7 +114,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
 
     Specifies a list of codecs to be used for encoding and decoding inner chunks. 
     The value must be an array of objects, as specified in the 
-    :ref:`_array-metadata`. An absent ``codecs`` member is equivalent to 
+    :ref:`array-metadata`. An absent ``codecs`` member is equivalent to 
     specifying an empty list of codecs.
 
 
