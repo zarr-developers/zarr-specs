@@ -348,9 +348,9 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of `predefined storage transformers`_ can be
-    registered and stacked. In contrast to codecs, storage transformers can
-    act on the a complete array, rather than individual chunks. See the
+    transformer. Any number of storage transformers can be registered and 
+    stacked. In contrast to codecs, storage transformers can act on the a 
+    complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
 .. _`storage transformers details`: #storage-transformers-1
@@ -652,8 +652,8 @@ The following members are optional:
     specification. An absent ``codecs`` member is equivalent to specifying an
     empty list of codecs.
 
-``storage_transformers`` (array)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``storage_transformers``
+^^^^^^^^^^^^^^^^^^^^^^^^
 
     Specifies a stack of `storage transformers`_. Each value in the list must be
     an object containing the names ``name`` and optionally ``configuration``.
@@ -1150,6 +1150,8 @@ the default binary representation of each element.
    order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
    be specified.
 
+.. _encoding_procedure:
+
 Encoding procedure
 ------------------
 
@@ -1170,6 +1172,8 @@ the following procedure:
    ``EC[codecs.length]``.
 
 4. ``EC_final`` is written to the store_.
+
+.. _decoding_procedure:
 
 Decoding procedure
 ------------------
@@ -1218,7 +1222,7 @@ zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
 on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see
-`ZEP 0<https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
+`ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
 the process for Zarr specification changes.
 
 Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
@@ -1559,7 +1563,7 @@ Storage transformers
 A Zarr storage transformer allows to change the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <storage_transformers (array)_>`_ name in the `array metadata`_. Storage transformers which do
+`storage_transformers <storage_transformers_>`_ name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1585,13 +1589,6 @@ Storage transformers may be stacked to combine different functionalities:
       end
       t3 --> Store
 
-A fixed set of storage providers is recommended for implementation with this specification:
-
-
-Predefined storage transformers
--------------------------------
-
-- :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
 
 .. _extensions_section:
 
@@ -1608,7 +1605,7 @@ array       data type               `data_type`_
 array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers (array)`_
+array       storage transformer     `storage_transformers`_
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
