@@ -72,7 +72,7 @@ order:
 Format and algorithm
 ====================
 
-This is an ``array -> array` codec.
+This is an ``array -> array`` codec.
 
 Given a chunk array ``A`` with shape ``A_shape`` as the decoded representation,
 the encoded representation is an array ``B`` with the same data type as ``A``
