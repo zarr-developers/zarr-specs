@@ -131,7 +131,7 @@ implementing a specification ``X.Y`` can be considered compatible with all
 datasets which only use features contained in version ``X.Y``.
 
 For example, spec ``X.1`` adds core feature "foo" compared to ``X.0``. Assuming
-implementation A implements ``X.0`` and implementation B implements ``X.1``.
+implementation A implements ``X.1`` and implementation B implements ``X.0``.
 Data using feature "foo" can only be read with implementation A. B fails to open
 it, as the key "foo" is unknown.
 
@@ -349,7 +349,7 @@ The following figure illustrates the first part of the terminology:
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
     transformer. Any number of storage transformers can be registered and 
-    stacked. In contrast to codecs, storage transformers can act on the a 
+    stacked. In contrast to codecs, storage transformers can act on the
     complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
@@ -612,7 +612,7 @@ mandatory names:
 
     If the ``data_type`` of an array is defined in a ``data_type`` extension,
     then said extension is responsible for interpreting the value of
-    ``fill_value`` and return a suitable type that can be used.
+    ``fill_value`` and returning a suitable type that can be used.
 
     For core data types for which fill values are not permitted in JSON or
     for which decimal representation could be lossy, a string representing of
@@ -1178,7 +1178,7 @@ the following procedure:
 Decoding procedure
 ------------------
 
-Based on the computed ``decoded_representations`` list, a chunk is encoded using
+Based on the computed ``decoded_representations`` list, a chunk is decoded using
 the following procedure:
 
 1. The encoded chunk representation ``EC_final`` is read from the store_.
@@ -1310,9 +1310,9 @@ A **writeable store** supports the following operations:
 ``set_partial_values`` - Store `values` at a given `key`, starting at byte `range_start`.
 
     | Parameters: `key_start_values`: set of `key`,
-    |   `range_start`, `value` triples, a `key` may occur multiple
-    |   times with different `range_starts`, `range_starts` with
-    |   length of the respective `value` must not specify overlapping
+    |   `range_start`, `values` triples, a `key` may occur multiple
+    |   times with different `range_starts`, `range_starts` (considering
+    |   the length of the respective `values`) must not specify overlapping
     |   ranges for the same `key`
     | Output: none
 
@@ -1560,7 +1560,7 @@ Let "+" be the string concatenation operator.
 Storage transformers
 ====================
 
-A Zarr storage transformer allows to change the zarr-compatible data before storing it.
+A Zarr storage transformer allows changing the zarr-compatible data before storing it.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
 `storage_transformers <storage_transformers_>`_ name in the `array metadata`_. Storage transformers which do
@@ -1657,8 +1657,8 @@ In general, arrays can be resized for writable (and if necessary deletable)
 stores. In the most basic case, two scenarios can be considered, shrinking along
 an array dimension, or increasing its size.
 
-When shrinking, implementations can consider to delete chunks if the store
-allows this, or keep them. This should either be configurable, or be
+When shrinking, implementations can consider whether to delete chunks if the
+store allows this, or keep them. This should either be configurable, or be
 communicated to the user appropriately.
 
 When increasing an array along a dimension, chunks may or may not have existed
