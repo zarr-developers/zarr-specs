@@ -98,7 +98,7 @@ size::
             "configuration": {
                 "cname": "lz4",
                 "clevel": 1,
-                "shuffle": "byte",
+                "shuffle": "shuffle",
                 "typesize": 4,
                 "blocksize": 0
             }
@@ -123,8 +123,8 @@ Comparison to Zarr v2
 While the binary format is identical, the JSON metadata differs from that used
 by the Zarr v2 ``blosc`` codec in the following ways:
 
-- The `shuffle` mode is now specified more clearly as `null` (0 in Zarr v2),
-  `"bit"` (2 in Zarr v2), or `"byte"` (1 in Zarr v2).  Using these constants
+- The `shuffle` mode is now specified more clearly as `noshuffle` (0 in Zarr v2),
+  `"bitshuffle"` (2 in Zarr v2), or `"shuffle"` (1 in Zarr v2).  Using these constants
   rather than numbers makes it much easier to know what shuffle mode will be
   using from manual inspection of the metadata.
 
