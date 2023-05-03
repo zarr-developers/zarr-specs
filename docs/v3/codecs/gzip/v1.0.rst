@@ -24,8 +24,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This specification defines an implementation of the Zarr abstract
-store API using a file system.
+Defines a ``bytes -> bytes`` codec that applies gzip compression.
 
 
 Status of this document
@@ -78,6 +77,8 @@ the Gzip codec configured with a compression level of 1::
 
 Format and algorithm
 ====================
+
+This is a ``bytes -> bytes`` codec.
 
 Encoding and decoding is performed using the algorithm defined in
 [RFC1951]_.

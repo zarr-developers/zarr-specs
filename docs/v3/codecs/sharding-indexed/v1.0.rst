@@ -27,8 +27,7 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Abstract
 ========
 
-This specification defines an implementation of the Zarr codec specification 
-for sharding.
+This specification defines a Zarr ``array -> bytes`` codec for sharding.
 
 Sharding logically splits chunks ("shards") into sub-chunks ("inner chunks") 
 that can be individually compressed and accessed. This allows to colocate 
@@ -120,6 +119,8 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
 
 Binary shard format
 ===================
+
+This is an ``array -> bytes`` codec.
 
 In the ``sharding_indexed`` binary format, chunks are written successively in a 
 shard, where unused space between them is allowed, followed by an index 
