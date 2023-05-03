@@ -77,10 +77,19 @@ shuffle:
     - ``"shuffle"``, to indicate byte-wise shuffling;
     - ``"bitshuffle"``, to indicate bit-wise shuffling.
 
+    Zarr implementations MAY provide users an option to choose a shuffle mode
+    automatically based on the typesize or other information, but MUST record in
+    the metadata the mode that is chosen.
+
 typesize:
     Positive integer specifying the stride in bytes over which shuffling is
     performed.  Required unless ``shuffle`` is ``"noshuffle"``, in which case the value
     is ignored.
+
+    Zarr implementations MAY allow users to leave this unspecified and have the
+    implementation choose a value automatically based on the array data type and
+    previous codecs in the chain, but MUST record in the metadata the value that
+    is chosen.
 
 blocksize:
     An integer giving the size in bytes of blocks into which a
@@ -126,21 +135,15 @@ by the Zarr v2 ``blosc`` codec in the following ways:
 - The `shuffle` mode is now specified more clearly as `noshuffle` (0 in Zarr v2),
   `"bitshuffle"` (2 in Zarr v2), or `"shuffle"` (1 in Zarr v2).  Using these constants
   rather than numbers makes it much easier to know what shuffle mode will be
-  using from manual inspection of the metadata.
+  used from manual inspection of the metadata.
 
 - When shuffling is enabled, the `typesize` must now be specified explicitly in
   the metadata, rather than determined implicitly from the input data.  This
   allows Blosc to function as a pure "bytes -> bytes" codec rather than an
-  "array -> bytes" codec.  Zarr implementations MAY allow users to leave this
-  unspecified and have the implementation choose a value automatically based on
-  the array data type and previous codecs in the chain, but MUST record in the
-  metadata the value that is chosen.
+  "array -> bytes" codec.
 
 - There is no option to choose between bit-wise and byte-wise shuffling
-  automatically, as supported in Zarr v2 via a `shuffle` value of `-1`.  Zarr
-  implementations MAY provide users an option to choose a shuffle mode
-  automatically based on the typesize or other information, but MUST record in
-  the metadata the mode that is chosen.
+  automatically, as supported in Zarr v2 via a `shuffle` value of `-1`.
 
 References
 ==========
