@@ -1555,7 +1555,7 @@ Let "+" be the string concatenation operator.
 Storage transformers
 ====================
 
-A Zarr storage transformer allows a store to change zarr-compatible data before storing it.
+"A Zarr storage transformer modifies a request to read or write data before passing that request to the following transformer or store."
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
 `storage_transformers <storage_transformers (array)_>`_ name in the `array metadata`_. Storage transformers which do
