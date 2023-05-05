@@ -55,35 +55,34 @@ Introduction
 
 This specification defines a format for multidimensional array data. This
 type of data is common in scientific and numerical computing
-applications. Many domains are facing computational challenges as
+applications. Many domains face computational challenges as
 increasingly large volumes of data are being generated, for example,
 via high resolution microscopy, remote sensing imagery, genome
 sequencing or numerical simulation. The primary motivation for the
-development of Zarr has been to help address this challenge by
+development of Zarr is to address this challenge by
 enabling the storage of large multidimensional arrays in a way that is
 compatible with parallel and/or distributed computing applications.
 
-This specification is intended to supersede the `Zarr storage
+This specification supersedes the `Zarr storage
 specification version 2
 <https://zarr.readthedocs.io/en/stable/spec/v2.html>`_ (Zarr v2). The
-Zarr v2 specification has been implemented in several programming
-languages and has been used successfully to store and analyse large
-scientific datasets from a variety of domains. However, as experience
-has been gained, it has become clear that there are several
-opportunities for modest but useful improvements to be made in the
-format, and for establishing a foundation that allows for greater
-interoperability, whilst also enabling a variety of more advanced and
-specialised features to be explored and developed.
+Zarr v2 specification is implemented in several programming
+languages and is used to store and analyse large
+scientific datasets from a variety of domains. However, it has become 
+clear that there are several opportunities for modest but useful 
+improvements to be made in the format, and for establishing a foundation 
+that allows for greater interoperability, whilst also enabling a variety 
+of more advanced and specialised features to be explored and developed.
 
 This specification also draws heavily on the `N5 API and
 file-system specification <https://github.com/saalfeldlab/n5>`_, which
-was developed in parallel to Zarr v2 and has many of the same design
+was developed in parallel to Zarr v2 with similar
 goals and features. This specification defines a core set of features
 at the intersection of both Zarr v2 and N5, and so aims to provide a
 common target that can be fully implemented across multiple
 programming environments and serve a wide range of applications.
 
-In particular, we highlight the following areas motivating the
+We highlight the following areas motivating the
 development of this specification.
 
 Extensibility
@@ -124,7 +123,7 @@ Stability Policy
 
 This core specification adheres to a ``MAJOR.MINOR`` version
 number format. When incrementing the minor version, only additional features
-can be added. Breaking changes require to increment the major version.
+can be added. Breaking changes require incrementing the major version.
 
 A zarr implementation that provides the read and write API by
 implementing a specification ``X.Y`` can be considered compatible with all
@@ -252,14 +251,14 @@ The following figure illustrates the first part of the terminology:
     example, if an array_ has 2 dimensions_, where the length of the
     first dimension_ is 100 and the length of the second dimension_ is
     20, then the shape of the array_ is (100, 20). A shape can be the empty
-    tuple in the case of zero-dimension arrays (scalar)
+    tuple in the case of zero-dimension arrays (scalars).
 
 .. _element:
 .. _elements:
 
 *Element*
 
-    An array_ contains zero or more elements. Each element can be
+    An array_ contains zero or more elements. Each element is
     identified by a tuple of integer coordinates, one for each
     dimension_ of the array_. If all dimensions_ of an array_ have
     finite length, then the number of elements in the array_ is given
@@ -289,7 +288,7 @@ The following figure illustrates the first part of the terminology:
     within the chunk) is the product of its interval lengths.
 
     The chunk shape elements are non-zero when the corresponding dimensions of
-    the arrays are of non-zero length.
+    the arrays have non-zero length.
 
 .. _grid:
 .. _grids:
@@ -973,7 +972,7 @@ other type sizes in later versions of this specification.
 .. note::
 
     Currently only fixed size elements are supported as a core data type.
-    There are many request for variable length element encoding. There are many
+    There are many requests for variable length element encoding. There are many
     ways to encode variable length and we want to keep flexibility. While we seem
     to agree that for random access the most likely contender is to have two
     arrays, one with the actual variable length data and one with fixed size
@@ -1610,7 +1609,8 @@ Let "+" be the string concatenation operator.
 Storage transformers
 ====================
 
-A Zarr storage transformer allows changing the zarr-compatible data before storing it.
+A Zarr storage transformer modifies a request to read or write data before passing
+that request to the following transformer or store.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
 `storage_transformers <storage_transformers_>`_ name in the `array metadata`_. Storage transformers which do
@@ -1703,8 +1703,8 @@ Implementations may choose to never use implicit groups to avoid this.
 Resizing
 --------
 
-In general, arrays can be resized for writable (and if necessary deletable)
-stores. In the most basic case, two scenarios can be considered, shrinking along
+In general, arrays can be resized for writable (and, if necessary, deletable)
+stores. In the most basic case, two scenarios can be considered: shrinking along
 an array dimension, or increasing its size.
 
 When shrinking, implementations can consider whether to delete chunks if the
