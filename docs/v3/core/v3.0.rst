@@ -130,7 +130,7 @@ implementing a specification ``X.Y`` can be considered compatible with all
 datasets which only use features contained in version ``X.Y``.
 
 For example, spec ``X.1`` adds core feature "foo" compared to ``X.0``. Assuming
-implementation A implements ``X.0`` and implementation B implements ``X.1``.
+implementation A implements ``X.1`` and implementation B implements ``X.0``.
 Data using feature "foo" can only be read with implementation A. B fails to open
 it, as the key "foo" is unknown.
 
@@ -347,9 +347,9 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of `predefined storage transformers`_ can be
-    registered and stacked. In contrast to codecs, storage transformers can
-    act on the a complete array, rather than individual chunks. See the
+    transformer. Any number of storage transformers can be registered and 
+    stacked. In contrast to codecs, storage transformers can act on the
+    complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
 
 .. _`storage transformers details`: #storage-transformers-1
@@ -611,7 +611,7 @@ mandatory names:
 
     If the ``data_type`` of an array is defined in a ``data_type`` extension,
     then said extension is responsible for interpreting the value of
-    ``fill_value`` and return a suitable type that can be used.
+    ``fill_value`` and returning a suitable type that can be used.
 
     For core data types for which fill values are not permitted in JSON or
     for which decimal representation could be lossy, a string representing of
@@ -651,8 +651,8 @@ The following members are optional:
     specification. An absent ``codecs`` member is equivalent to specifying an
     empty list of codecs.
 
-``storage_transformers`` (array)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``storage_transformers``
+^^^^^^^^^^^^^^^^^^^^^^^^
 
     Specifies a stack of `storage transformers`_. Each value in the list must be
     an object containing the names ``name`` and optionally ``configuration``.
@@ -1088,6 +1088,36 @@ each of these two representations are defined to be either:
 - a multi-dimensional array of some shape and data type, or
 - a byte string.
 
+Based on the input and output representations for the encode transform,
+codecs can be classified as one of three kinds:
+
+- ``array -> array``
+- ``array -> bytes``
+- ``bytes -> bytes``
+
+.. note::
+
+   ``bytes -> array`` codecs, where after encoding an array as a byte
+   string, it is subsequently transformed back into an array, to then later
+   be transformed back into a byte string, are not currently allowed, due to
+   the lack of a clear use case.
+
+If multiple codecs are specified for an array, each codec is applied
+sequentially; when encoding, the encoded output of codec ``i`` serves as the
+decoded input of codec ``i+1``, and similarly when decoding, the decoded output
+of codec ``i+1`` serves as the encoded input to codec ``i``.  Since ``bytes ->
+array`` codecs are not supported, it follows that the list of codecs must be of
+the following form:
+
+- zero or more ``array -> array`` codecs; followed by
+- at most one ``array -> bytes`` codec; followed by
+- zero or more ``bytes -> bytes`` codecs.
+
+If no ``array -> bytes`` codec is specified, then the default byte
+representation for the data type of the array is used.  For all data types
+currently defined by the core spec, that is equivalent to the ``endian`` codec
+with an endianness of ``little``.
+
 Logically, a codec ``c`` must define three properties:
 
 - ``c.compute_encoded_representation_type(decoded_representation_type)``, a
@@ -1105,11 +1135,31 @@ Logically, a codec ``c`` must define three properties:
 - ``c.decode(encoded_value, decoded_representation_type)``, a procedure that
   computes the decoded representation, and is used when reading an array.
 
-If more than one codec is specified for an array, each codec is applied
-sequentially; when encoding, the encoded output of codec ``i`` serves as the
-decoded input of codec ``i+1``, and similarly when decoding, the decoded
-output of codec ``i+1`` serves as the encoded input to codec ``i``.
+Implementations MAY support partial decoding for certain codecs
+(e.g. sharding, blosc).  Logically, partial decoding may be defined in terms
+of an additional operation:
 
+- ``c.partial_decode(input_handle, decoded_representation_type,
+  decoded_regions)``, where:
+
+  - ``input_handle`` provides an interface for requesting partial reads of
+    the encoded representation and itself supports the same
+    ``partial_decode`` interface;
+  - ``decoded_representation_type`` is the same as for ``c.decode``;
+  - ``decoded_regions`` specifies the regions of the decoded representation
+    that must be returned.
+
+  If the encoded representation is a multi-dimensional array, then
+  ``decoded_regions`` specifies a subset of the array's domain.  If the
+  encoded representation is a byte string, then ``decoded_regions``
+  specifies a list of byte ranges.
+
+.. note::
+
+   If ``partial_decode`` is not supported by a particular codec, it can
+   always be implemented in terms of ``decode`` by simply decoding in full
+   and then satisfying any ``decoded_regions`` requests directly from the
+   cached decoded representation.
 
 Determination of encoded representations
 ----------------------------------------
@@ -1149,6 +1199,8 @@ the default binary representation of each element.
    order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
    be specified.
 
+.. _encoding_procedure:
+
 Encoding procedure
 ------------------
 
@@ -1170,10 +1222,12 @@ the following procedure:
 
 4. ``EC_final`` is written to the store_.
 
+.. _decoding_procedure:
+
 Decoding procedure
 ------------------
 
-Based on the computed ``decoded_representations`` list, a chunk is encoded using
+Based on the computed ``decoded_representations`` list, a chunk is decoded using
 the following procedure:
 
 1. The encoded chunk representation ``EC_final`` is read from the store_.
@@ -1217,7 +1271,7 @@ zarr-specs GitHub repository. However, codec specifications may be
 maintained by any group or organisation and published in any location
 on the Web. For further details of the process for contributing a
 codec specification to the zarr-specs GitHub repository, see
-`ZEP 0<https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
+`ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
 the process for Zarr specification changes.
 
 Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
@@ -1305,9 +1359,9 @@ A **writeable store** supports the following operations:
 ``set_partial_values`` - Store `values` at a given `key`, starting at byte `range_start`.
 
     | Parameters: `key_start_values`: set of `key`,
-    |   `range_start`, `value` triples, a `key` may occur multiple
-    |   times with different `range_starts`, `range_starts` with
-    |   length of the respective `value` must not specify overlapping
+    |   `range_start`, `values` triples, a `key` may occur multiple
+    |   times with different `range_starts`, `range_starts` (considering
+    |   the length of the respective `values`) must not specify overlapping
     |   ranges for the same `key`
     | Output: none
 
@@ -1555,10 +1609,11 @@ Let "+" be the string concatenation operator.
 Storage transformers
 ====================
 
-"A Zarr storage transformer modifies a request to read or write data before passing that request to the following transformer or store."
+A Zarr storage transformer modifies a request to read or write data before passing
+that request to the following transformer or store.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <storage_transformers (array)_>`_ name in the `array metadata`_. Storage transformers which do
+`storage_transformers <storage_transformers_>`_ name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
@@ -1584,13 +1639,6 @@ Storage transformers may be stacked to combine different functionalities:
       end
       t3 --> Store
 
-A fixed set of storage providers is recommended for implementation with this specification:
-
-
-Predefined storage transformers
--------------------------------
-
-- :ref:`sharding-storage-transformer-v1` (pending, part of `ZEP 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_)
 
 .. _extensions_section:
 
@@ -1607,7 +1655,7 @@ array       data type               `data_type`_
 array       chunk grid              `chunk_grid`_
 array       chunk key encoding      `chunk_key_encoding`_
 array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers (array)`_
+array       storage transformer     `storage_transformers`_
 =========== ======================= ================================================
 
 If such extension points are used by groups or arrays, they are required, except
@@ -1659,8 +1707,8 @@ In general, arrays can be resized for writable (and, if necessary, deletable)
 stores. In the most basic case, two scenarios can be considered: shrinking along
 an array dimension, or increasing its size.
 
-When shrinking, implementations can consider to delete chunks if the store
-allows this, or keep them. This should either be configurable, or be
+When shrinking, implementations can consider whether to delete chunks if the
+store allows this, or keep them. This should either be configurable, or be
 communicated to the user appropriately.
 
 When increasing an array along a dimension, chunks may or may not have existed
