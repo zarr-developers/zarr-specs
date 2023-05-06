@@ -1303,9 +1303,9 @@ that an implementation of this specification could be modular and
 allow for different store implementations to be used.
 
 The store interface defines a set of operations involving `keys` and
-`values`. In the context of this interface, a `key` is any string
-containing only characters in the ranges ``a-z``, ``A-Z``, ``0-9``, or
-in the set ``/.-_``, where the final character is **not** a ``/``
+`values`. In the context of this interface, a `key` is a string, more
+precisely a concatenation of the `node_names`_ using ``/`` as the
+delimiter. Especially, the final character is **not** a ``/``
 character. In general, a `value` is a sequence of bytes. Specific stores
 may choose more specific storage formats, which must be stated in the
 specification of the respective store. E.g. a database store might
@@ -1346,8 +1346,8 @@ A **readable store** supports the following operations:
 
     | Parameters: `key_ranges`: ordered set of `key`, `range` pairs,
     |   a `key` may occur multiple times with different `ranges`
-    | Output: list of `values`, in the order of the `key_ranges`, may contain none
-    |   for missing keys
+    | Output: list of `values`, in the order of the `key_ranges`,
+    |   may contain null/none for missing keys
 
 A **writeable store** supports the following operations:
 
