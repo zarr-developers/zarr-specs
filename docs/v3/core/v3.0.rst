@@ -819,7 +819,7 @@ objects with a ``"must_understand": false`` key-value pair.
 
    A group does not need a metadata document to exist. (See implicit groups.)
 
-.. _node_names:
+.. _node-names:
 
 Node names
 ==========
@@ -1304,10 +1304,9 @@ that an implementation of this specification could be modular and
 allow for different store implementations to be used.
 
 The store interface defines a set of operations involving `keys` and
-`values`. In the context of this interface, a `key` is a string, more
-precisely a concatenation of the `node_names`_ using ``/`` as the
-delimiter. Especially, the final character is **not** a ``/``
-character. In general, a `value` is a sequence of bytes. Specific stores
+`values`. In the context of this interface, a `key` is a Unicode
+string, where the final character is **not** a ``/`` character.
+In general, a `value` is a sequence of bytes. Specific stores
 may choose more specific storage formats, which must be stated in the
 specification of the respective store. E.g. a database store might
 encode values of ``*.json`` keys with a database-native json type.
