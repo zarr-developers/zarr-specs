@@ -819,7 +819,6 @@ objects with a ``"must_understand": false`` key-value pair.
 
    A group does not need a metadata document to exist. (See implicit groups.)
 
-.. _node-names:
 
 Node names
 ==========
