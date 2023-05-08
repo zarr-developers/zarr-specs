@@ -55,6 +55,12 @@ explicitly marked as non-normative, examples, and notes. Examples in
 this specification are introduced with the words "for example".
 
 
+Codec name
+==========
+
+The value of the ``name`` member in the codec object MUST be ``endian``.
+
+
 Configuration parameters
 ========================
 
