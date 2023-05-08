@@ -68,10 +68,10 @@ specification version 2
 <https://zarr.readthedocs.io/en/stable/spec/v2.html>`_ (Zarr v2). The
 Zarr v2 specification is implemented in several programming
 languages and is used to store and analyse large
-scientific datasets from a variety of domains. However, it has become 
-clear that there are several opportunities for modest but useful 
-improvements to be made in the format, and for establishing a foundation 
-that allows for greater interoperability, whilst also enabling a variety 
+scientific datasets from a variety of domains. However, it has become
+clear that there are several opportunities for modest but useful
+improvements to be made in the format, and for establishing a foundation
+that allows for greater interoperability, whilst also enabling a variety
 of more advanced and specialised features to be explored and developed.
 
 This specification also draws heavily on the `N5 API and
@@ -347,7 +347,7 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of storage transformers can be registered and 
+    transformer. Any number of storage transformers can be registered and
     stacked. In contrast to codecs, storage transformers can act on the
     complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
@@ -597,30 +597,57 @@ mandatory names:
     Provides an element value to use for uninitialised portions of the
     Zarr array.
 
-    If the data type of the Zarr array is Boolean then the value must
-    be the literal ``false`` or ``true``. If the data type is one of
-    the integer data types defined in this specification, then the
-    value must be a number with no fraction or exponent part and must
-    be within the range of the data type.
+    The permitted values depend on the data type:
 
-    For any data type, the ``fill_value`` is required. The literal
-    ``null`` is not permitted. The fill value needs to be defined
-    so that the data is independent of implementation details. Internally
-    implementations may provide a default ``fill_value``, but that must
-    be converted to a fixed value in the stored metadata.
+    ``bool``
+      The value must be a JSON boolean (``false`` or ``true``).
 
-    If the ``data_type`` of an array is defined in a ``data_type`` extension,
-    then said extension is responsible for interpreting the value of
-    ``fill_value`` and returning a suitable type that can be used.
+    Integers (``{uint,int}{8,16,32,64}``)
+      The value must be a JSON number with no fraction or exponent part that is
+      within the representable range of the data type.
 
-    For core data types for which fill values are not permitted in JSON or
-    for which decimal representation could be lossy, a string representing of
-    the binary (starting with ``0b``) or hexadecimal value (starting with
-    ``0x``) is accepted. This string must include all leading or trailing
-    zeroes necessary to match the given type size. The string values ``"NaN"``,
-    ``"+Infinity"`` and ``"-Infinity"`` are also understood for floating point
-    data types.
+    IEEE 754 floating point numbers (``float{16,32,64}``)
+      The value may be either:
 
+      - A JSON number, that will be rounded to the nearest representable value.
+
+      - A JSON string of the form:
+
+        - ``"inf"``, denoting positive infinity;
+        - ``"-inf"``, denoting negative infinity;
+        - ``"nan"`` or ``"-nan"``, equivalent to ``"nan(0x1)"`` and
+          ``"-nan(0x1)"`` respectively;
+        - ``"nan(0xYYYY)"`` or ``"-nan(0xYYYY)"``, specifying a NaN value with
+          positive or negative sign bit and payload indicated by ``YYYY``, where
+          ``YYYY`` is the base-16 representation of a *non-zero* integer
+          indicating the NaN payload.  The NaN payload ``YYYY``` specifies the
+          mantissa bits in the NaN representation in reverse order; that is, the
+          least significant bit of ``0xYYYY`` is the most significant bit of the
+          mantissa.  According to IEEE 754-2019, a quiet NaN has a payload with
+          a least significant bit of 1 (most significant bit of the mantissa
+          equal to 1), while a signaling NaN has a payload with a least
+          significant bit of 0 (most significant bit of the mantissa equal to
+          0).  This is consistent with x86 and ARM, but not consistent with MIPS
+          where the behavior may depend on a flag.
+
+        .. warning::
+
+           While this NaN syntax is consistent with the syntax accepted by the
+           C99 ``strtod`` function, C99 leaves the meaning of the NaN payload
+           string implementation defined, which may not match the Zarr
+           definition.
+
+    Complex numbers (``complex{64,128}``)
+      The value must be a two-element array, specifying the real and imaginary
+      components respectively, where each component is specified as defined
+      above for floating point number.
+
+      For example, ``[1, 2]`` indicates ``1 + 2i`` and ``["-inf", "nan(0x7)"]``
+      indicates a complex number with real component of -inf and imaginary
+      component of positive NaN with payload of ``0x7``.
+
+    Extensions to the spec that define new data types must also define the JSON
+    fill value representation.
 
 The following members are optional:
 
@@ -717,7 +744,7 @@ compressed using gzip compression prior to storage::
                 "level": 1
             }
         }],
-        "fill_value": "NaN",
+        "fill_value": "nan(0x7)",
         "extensions": [],
         "attributes": {
             "foo": 42,
@@ -1578,7 +1605,7 @@ Let "+" be the string concatenation operator.
     To discover all nodes in a hierarchy, one should discover the children of
     the root of the hierarchy and then recursively list children of child
     groups.
-    
+
     For hierarchies without group storage transformers one may also call
     ``list_prefix("/")``. All ``zarr.json`` keys represent either explicit
     groups or arrays. All intermediate prefixes ending in a ``/`` are implicit
