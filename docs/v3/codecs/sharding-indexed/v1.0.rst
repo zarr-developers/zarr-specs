@@ -105,15 +105,14 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
 
 ``chunk_shape``
 
-    An array of integers providing the shape of inner chunks in a shard for each 
-    dimension of the Zarr array. The length of the array must match the length
-    of the array metadata ``shape`` entry. The each integer must by divisible by 
-    the ``chunk_shape`` of the array as defined in the ``chunk_grid`` 
-    :ref:`array-metadata`. 
-    For example, an inner chunk shape of ``[32, 2]`` with an outer chunk shape 
-    ``[64, 64]`` indicates that 64 chunks are combined in one shard, 2 along the 
-    first dimension, and for each of those 32 along the second dimension.
-    Currently, only the ``regular`` chunk grid is supported.
+    An array of integers specifying the size of the inner chunks in a shard
+    along each dimension of the outer array.  The length of the ``chunk_shape``
+    array must match the number of dimensions of the outer chunk to which this
+    sharding codec is applied, and the chunk size along each dimension must
+    evenly divide the size of the outer chunk.  For example, an inner chunk
+    shape of ``[32, 2]`` with an outer chunk shape ``[64, 64]`` indicates that
+    64 chunks are combined in one shard, 2 along the first dimension, and for
+    each of those 32 along the second dimension.
 
 ``codecs``
 
@@ -130,16 +129,38 @@ This is an ``array -> bytes`` codec.
 
 In the ``sharding_indexed`` binary format, chunks are written successively in a 
 shard, where unused space between them is allowed, followed by an index 
-referencing them. The index is placed at the end of the file and has a size of 
-16 bytes multiplied by the number of chunks in a shard, for example 
-``16 bytes * 4 = 1024 bytes`` for shard shape of ``[64, 64]`` and inner chunk 
-shape of ``[32, 32]``. The index holds an `offset, nbytes` pair of little-endian 
-uint64 per chunk, the chunks-order in the index is row-major (C) order. Given 
-the example of 2x2 inner chunks in a shard, the index would look like::
+referencing them.
 
-    | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |
-    | offset | nbytes | offset | nbytes | offset | nbytes | offset | nbytes |
-    | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 |
+The index is placed at the end of the file and has a size of ``16 * n + 4``
+bytes, where ``n`` is the number of chunks in the shard, i.e. the product of the
+sizes specified in ``chunk_shape``.  For example, ``16 * 4 + 4 = 68 bytes`` for a
+shard shape of ``[64, 64]`` and inner chunk shape of ``[32, 32]``.
+
+The index format is:
+
+- ``offset[0] : uint64le``
+- ``nbytes[0] : uint64le``
+- ``offset[1] : uint64le``
+- ``nbytes[1] : uint64le``
+- ...
+- ``offset[n-1] : uint64le``
+- ``nbytes[n-1] : uint64le``
+- ``checksum : uint32le``
+
+The final 4 bytes of the index is the CRC-32C checksum of the first ``16 * n``
+bytes of the index (everything except the final checksum).
+
+The chunks are listed in the index in row-major (C) order.
+
+The ``offset[i]`` specifies the byte offset within the shard at which the
+encoded representation of chunk ``i`` begins, and ``nbytes[i]`` specifies the
+encoded length in bytes.
+
+Given the example of 2x2 inner chunks in a shard, the index would look like::
+
+    | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |          |
+    | offset | nbytes | offset | nbytes | offset | nbytes | offset | nbytes | checksum |
+    | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint64 | uint32   |
 
 Empty chunks are denoted by setting both offset and nbytes to ``2^64 - 1``. 
 Empty chunks are interpreted as being filled with the fill value. The index 
