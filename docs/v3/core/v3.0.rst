@@ -613,22 +613,16 @@ mandatory names:
 
       - A JSON string of the form:
 
-        - ``"inf"``, denoting positive infinity;
-        - ``"-inf"``, denoting negative infinity;
-        - ``"nan"`` or ``"-nan"``, equivalent to ``"nan(0x1)"`` and
-          ``"-nan(0x1)"`` respectively;
-        - ``"nan(0xYYYY)"`` or ``"-nan(0xYYYY)"``, specifying a NaN value with
-          positive or negative sign bit and payload indicated by ``YYYY``, where
-          ``YYYY`` is the base-16 representation of a *non-zero* integer
-          indicating the NaN payload.  The NaN payload ``YYYY``` specifies the
-          mantissa bits in the NaN representation in reverse order; that is, the
-          least significant bit of ``0xYYYY`` is the most significant bit of the
-          mantissa.  According to IEEE 754-2019, a quiet NaN has a payload with
-          a least significant bit of 1 (most significant bit of the mantissa
-          equal to 1), while a signaling NaN has a payload with a least
-          significant bit of 0 (most significant bit of the mantissa equal to
-          0).  This is consistent with x86 and ARM, but not consistent with MIPS
-          where the behavior may depend on a flag.
+        - ``"+Infinity"``, denoting positive infinity;
+        - ``"-Infinity"``, denoting negative infinity;
+        - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
+          0 (positive), the most significant bit (MSB) of the mantissa is 1, and
+          all other bits of the mantissa are zero;
+        - ``"0xYYYYYYYY"``, specifying the byte representation of the floating
+          point number as an unsigned integer.  For example, for ``float32``,
+          ``"NaN"`` is equivalent to ``"0x7fc00000"``.  This representation is
+          the only way to specify a NaN value other than the specific NaN value
+          denoted by ``"NaN"``.
 
         .. warning::
 
@@ -646,8 +640,20 @@ mandatory names:
       indicates a complex number with real component of -inf and imaginary
       component of positive NaN with payload of ``0x7``.
 
+    Raw data types (``r<N>``)
+      An array of integers, with length equal to ``<N>``, where each integer is
+      in the range ``[0, 255]``.
+
     Extensions to the spec that define new data types must also define the JSON
     fill value representation.
+
+    .. note::
+
+       The ``fill_value`` metadata field is required, but Zarr implementations
+       may provide an interface for creating a new array with which users can
+       leave the fill value unspecified, in which case a default fill value for
+       the data type will be chosen.  However, the default fill value that is
+       chosen MUST be recorded in the metadata.
 
 The following members are optional:
 
