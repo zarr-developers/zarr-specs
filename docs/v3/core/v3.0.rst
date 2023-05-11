@@ -68,10 +68,10 @@ specification version 2
 <https://zarr.readthedocs.io/en/stable/spec/v2.html>`_ (Zarr v2). The
 Zarr v2 specification is implemented in several programming
 languages and is used to store and analyse large
-scientific datasets from a variety of domains. However, it has become 
-clear that there are several opportunities for modest but useful 
-improvements to be made in the format, and for establishing a foundation 
-that allows for greater interoperability, whilst also enabling a variety 
+scientific datasets from a variety of domains. However, it has become
+clear that there are several opportunities for modest but useful
+improvements to be made in the format, and for establishing a foundation
+that allows for greater interoperability, whilst also enabling a variety
 of more advanced and specialised features to be explored and developed.
 
 This specification also draws heavily on the `N5 API and
@@ -347,7 +347,7 @@ The following figure illustrates the first part of the terminology:
     storage transformers may intercept and alter the storage keys and bytes
     of an array_ before they reach the underlying physical storage.
     Upon retrieval, the original keys and bytes are restored within the
-    transformer. Any number of storage transformers can be registered and 
+    transformer. Any number of storage transformers can be registered and
     stacked. In contrast to codecs, storage transformers can act on the
     complete array, rather than individual chunks. See the
     `storage transformers details`_ below.
@@ -718,7 +718,6 @@ compressed using gzip compression prior to storage::
             }
         }],
         "fill_value": "NaN",
-        "extensions": [],
         "attributes": {
             "foo": 42,
             "bar": "apples",
@@ -1577,7 +1576,7 @@ Let "+" be the string concatenation operator.
     To discover all nodes in a hierarchy, one should discover the children of
     the root of the hierarchy and then recursively list children of child
     groups.
-    
+
     For hierarchies without group storage transformers one may also call
     ``list_prefix("/")``. All ``zarr.json`` keys represent either explicit
     groups or arrays. All intermediate prefixes ending in a ``/`` are implicit
