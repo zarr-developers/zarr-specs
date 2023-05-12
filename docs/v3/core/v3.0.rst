@@ -613,7 +613,7 @@ mandatory names:
 
       - A JSON string of the form:
 
-        - ``"+Infinity"``, denoting positive infinity;
+        - ``"Infinity"``, denoting positive infinity;
         - ``"-Infinity"``, denoting negative infinity;
         - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
           0 (positive), the most significant bit (MSB) of the mantissa is 1, and
