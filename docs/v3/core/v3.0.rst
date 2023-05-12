@@ -636,9 +636,9 @@ mandatory names:
       components respectively, where each component is specified as defined
       above for floating point number.
 
-      For example, ``[1, 2]`` indicates ``1 + 2i`` and ``["-inf", "nan(0x7)"]``
+      For example, ``[1, 2]`` indicates ``1 + 2i`` and ``["-Infinity", "NaN"]``
       indicates a complex number with real component of -inf and imaginary
-      component of positive NaN with payload of ``0x7``.
+      component of NaN.
 
     Raw data types (``r<N>``)
       An array of integers, with length equal to ``<N>``, where each integer is
@@ -750,7 +750,7 @@ compressed using gzip compression prior to storage::
                 "level": 1
             }
         }],
-        "fill_value": "nan(0x7)",
+        "fill_value": "NaN",
         "extensions": [],
         "attributes": {
             "foo": 42,
