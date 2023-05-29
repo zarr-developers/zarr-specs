@@ -194,7 +194,7 @@ common optimizations.
   chunks can be optimized. In that case, the shard index can be read from the
   store by requesting the ``n`` last bytes, where ``n`` is 16 bytes multiplied 
   by the number of chunks in a shard. After parsing the shard index, single
-  chunks can be requested from the store by specifing the byte range. The 
+  chunks can be requested from the store by specifying the byte range. The 
   bytestream, then, needs to be decoded as above. 
 
 * **Encoding**: A simple implementation to encode a chunk in a shard would (a)

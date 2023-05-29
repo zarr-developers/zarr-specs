@@ -423,7 +423,7 @@ underlying store_:
 
 .. note::
 
-   When storing a Zarr hierachy in a filesystem-like store (e.g. the local
+   When storing a Zarr hierarchy in a filesystem-like store (e.g. the local
    filesystem or S3) as a sub-directory, it is recommended that the
    sub-directory name ends with ``.zarr`` to indicate the start of a hierarchy
    to users.
