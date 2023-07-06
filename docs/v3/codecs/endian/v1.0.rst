@@ -74,20 +74,54 @@ Format and algorithm
 This is an ``array -> bytes`` codec.
 
 Each element of the array is encoded using the specified endian variant of its
-default binary representation.  Array elements are encoded in lexicographical
-order.  For example, with ``endian`` specified as ``big``, the ``int32`` data
-type is encoded as a 4-byte big endian two's complement integer, and the
-``complex128`` data type is encoded as two consecutive 8-byte big endian IEEE
-754 binary64 values.
+binary representation listed below.  Array elements are encoded in
+lexicographical order.  For example, with ``endian`` specified as ``big``, the
+``int32`` data type is encoded as a 4-byte big endian two's complement integer,
+and the ``complex128`` data type is encoded as two consecutive 8-byte big endian
+IEEE 754 binary64 values.
+
+.. list-table:: Supported data types
+   :header-rows: 1
+
+   * - Identifier
+     - Binary representation
+   * - ``bool``
+     - Single byte, with false encoded as ``\\x00`` and true encoded as
+       ``\\x01``.  Does not depend on ``endian`` parameter.
+   * - ``int8``
+     - 1 byte two's complement.  Does not depend on ``endian`` parameter.
+   * - ``int16``
+     - 2-byte two's complement
+   * - ``int32``
+     - 4-byte two's complement
+   * - ``int64``
+     - 8-byte two's complement
+   * - ``uint8``
+     - 1 byte.  Does not depend on ``endian`` parameter.
+   * - ``uint16``
+     - 2-byte
+   * - ``uint32``
+     - 4-byte
+   * - ``uint64``
+     - 8-byte
+   * - ``float16`` (optionally supported)
+     - 2-byte IEEE 754 binary16
+   * - ``float32``
+     - 4-byte IEEE 754 binary32
+   * - ``float64``
+     - 8-byte IEEE 754 binary64
+   * - ``complex64``
+     - 2 consecutive 4-byte IEEE 754 binary32 values (real component followed by imaginary component)
+   * - ``complex128``
+     - 2 consecutive 8-byte IEEE 754 binary64 values (real component followed by imaginary component)
+   * - ``r*``
+     - number of bits, which must be a multiple of 8, given by ``*``.
 
 .. note::
 
-   Since the default binary representation of all data types is little endian,
-   specifying this codec with ``endian`` equal to ``"little"`` is equivalent to
-   omitting this codec, because if this codec is omitted, the default binary
-   representation of the data type, which is always little endian, is used
-   instead.
-
+   To encode elements in a different order than lexicographical order (C
+   order/row major), the :ref:`transpose codec<transpose-codec-v1>` may be
+   specified.
 
 References
 ==========
