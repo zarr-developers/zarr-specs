@@ -3,16 +3,15 @@
 ==========================================
 Sharding codec (version 1.0)
 ==========================================
------------------------------
- Editor's draft 23 03 2023
------------------------------
+
+  **Editor's draft 17 July 2023**
 
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/v1.0.html
-
+Corresponding ZEP:
+    `ZEP 2 — Sharding codec <https://zarr.dev/zeps/draft/ZEP0002.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`-
-
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/v1.0.rst>`_
 
@@ -188,13 +187,13 @@ beyond the array shape.
 The index is placed at the end of the file and encoded into binary representations 
 using the specified index codecs. The byte size of the index is determined by the 
 number of inner chunks in the shard ``n``, i.e. the product of the sizes specified in 
-``chunk_shape``, and the choice of index codecs. For a combination of little-endian 
-codec and crc32c checksum codec, the index has a size of ``16 * n + 4``. For example, 
-``16 * 4 + 4 = 68 bytes`` for a shard shape of ``[64, 64]`` and inner chunk shape of 
-``[32, 32]``.
+``chunk_shape``, and the choice of index codecs.
 
-Given the example of 2x2 inner chunks in a shard and recommended index codecs, i.e. 
-little-endian codec followed by crc32c checksum codec, the index would look like::
+For an example, consider a shard shape of ``[64, 64]``, an inner chunk shape of 
+``[32, 32]`` and an index codec combination of a little-endian codec followed by 
+a crc32c checksum codec. The size of the corresponding index is 
+``16 (2x uint64) * 4 (chunks per shard) + 4 (crc32c checksum) = 68 bytes``.
+The index would look like::
 
     | chunk (0, 0)    | chunk (0, 1)    | chunk (1, 0)    | chunk (1, 1)    |          |
     | offset | nbytes | offset | nbytes | offset | nbytes | offset | nbytes | checksum |
