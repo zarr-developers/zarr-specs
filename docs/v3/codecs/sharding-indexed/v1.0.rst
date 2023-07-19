@@ -186,8 +186,8 @@ beyond the array shape.
 
 The index is placed at the end of the file and encoded into binary representations 
 using the specified index codecs. The byte size of the index is determined by the 
-number of inner chunks in the shard ``n``, i.e. the product of the sizes specified in 
-``chunk_shape``, and the choice of index codecs.
+number of inner chunks in the shard ``n``, i.e. the product of chunks per shard, and 
+the choice of index codecs.
 
 For an example, consider a shard shape of ``[64, 64]``, an inner chunk shape of 
 ``[32, 32]`` and an index codec combination of a little-endian codec followed by 
