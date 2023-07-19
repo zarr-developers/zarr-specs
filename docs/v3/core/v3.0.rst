@@ -1186,6 +1186,11 @@ of an additional operation:
   encoded representation is a byte string, then ``decoded_regions``
   specifies a list of byte ranges.
 
+- ``c.compute_encoded_size(input_size)``, a procedure that determines the byte 
+  size of the encoded representation given a byte size of the decoded representation.
+  This procedure cannot be implemented for codecs that produce variable-sized
+  encoded representations, such as compression algorithms.
+
 .. note::
 
    If ``partial_decode`` is not supported by a particular codec, it can
