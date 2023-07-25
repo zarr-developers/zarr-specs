@@ -69,7 +69,7 @@ None.
 Format and algorithm
 ====================
 
-This is an ``bytes -> bytes`` codec.
+This is a ``bytes -> bytes`` codec.
 
 The codec computes the CRC32C checksum as defined in [RFC3720]_ of the input
 bytestream. The output bytestream is composed of the unchanged input byte 
