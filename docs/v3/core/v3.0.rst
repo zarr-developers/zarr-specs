@@ -1186,10 +1186,19 @@ of an additional operation:
   encoded representation is a byte string, then ``decoded_regions``
   specifies a list of byte ranges.
 
-- ``c.compute_encoded_size(input_size)``, a procedure that determines the byte 
-  size of the encoded representation given a byte size of the decoded representation.
+- ``c.compute_encoded_size(input_size)``, a procedure that determines the 
+  size of the encoded representation given a size of the decoded representation.
   This procedure cannot be implemented for codecs that produce variable-sized
-  encoded representations, such as compression algorithms.
+  encoded representations, such as compression algorithms. Depending on the 
+  type of the codec, the signature could differ:
+
+  - ``c.compute_encoded_size(array_size, dtype) -> (array_size, dtpye)`` 
+    for ``array -> array`` codecs, where ``array_size`` is the number of items 
+    in the array, i.e., the product of the components of the array's shape;
+  - ``c.compute_encoded_size(array_size, dtype) -> byte_size`` 
+    for ``array -> bytes`` codecs;
+  - ``c.compute_encoded_size(byte_size) -> byte_size`` 
+    for ``bytes -> bytes`` codecs.
 
 .. note::
 
