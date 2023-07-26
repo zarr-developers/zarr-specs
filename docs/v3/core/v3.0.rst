@@ -1192,10 +1192,10 @@ of an additional operation:
   encoded representations, such as compression algorithms. Depending on the 
   type of the codec, the signature could differ:
 
-  - ``c.compute_encoded_size(array_size, dtype) -> (array_size, dtpye)`` 
+  - ``c.compute_encoded_size(array_size, data_type) -> (array_size, data_type)`` 
     for ``array -> array`` codecs, where ``array_size`` is the number of items 
     in the array, i.e., the product of the components of the array's shape;
-  - ``c.compute_encoded_size(array_size, dtype) -> byte_size`` 
+  - ``c.compute_encoded_size(array_size, data_type) -> byte_size`` 
     for ``array -> bytes`` codecs;
   - ``c.compute_encoded_size(byte_size) -> byte_size`` 
     for ``bytes -> bytes`` codecs.
