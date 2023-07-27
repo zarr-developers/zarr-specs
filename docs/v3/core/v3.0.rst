@@ -269,12 +269,10 @@ The following figure illustrates the first part of the terminology:
 *Data type*
 
     A data type defines the set of possible values that an array_ may
-    contain, and a default binary representation (i.e., sequence of bytes) for
-    each possible value. For example, the 32-bit signed
-    integer data type defines binary representations for all integers
-    in the range −2,147,483,648 to 2,147,483,647. This specification
-    only defines a limited set of data types, but extensions
-    may define other data types.
+    contain. For example, the 32-bit signed integer data type defines binary
+    representations for all integers in the range −2,147,483,648 to
+    2,147,483,647. This specification only defines a limited set of data types,
+    but extensions may define other data types.
 
 .. _chunk:
 .. _chunks:
@@ -655,6 +653,17 @@ mandatory names:
        the data type will be chosen.  However, the default fill value that is
        chosen MUST be recorded in the metadata.
 
+``codecs``
+^^^^^^^^^^
+
+    Specifies a list of codecs to be used for encoding and decoding chunks. The
+    value must be an array of objects, each object containing a member with
+    ``name`` whose value is a string referring to a v3 codec specification. The
+    codec object may also contain a ``configuration`` object which consists of
+    the parameter names and values as defined by the corresponding codec
+    specification.  Since an ``array -> bytes`` codec must be specified, the
+    list cannot be empty.
+
 The following members are optional:
 
 ``attributes``
@@ -672,17 +681,6 @@ The following members are optional:
   .. note::
     A proposal to specify metadata conventions (ZEP 4) is being discussed in
     https://github.com/zarr-developers/zeps/pull/28.
-
-``codecs``
-^^^^^^^^^^
-
-    Specifies a list of codecs to be used for encoding and decoding chunks. The
-    value must be an array of objects, each object containing a member with
-    ``name`` whose value is a string referring to a v3 codec specification. The
-    codec object may also contain a ``configuration`` object which consists of
-    the parameter names and values as defined by the corresponding codec
-    specification. An absent ``codecs`` member is equivalent to specifying an
-    empty list of codecs.
 
 ``storage_transformers``
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -936,52 +934,36 @@ Core data types
 
    * - Identifier
      - Numerical type
-     - Default binary representation
    * - ``bool``
      - Boolean
-     - Single byte, with false encoded as ``\\x00`` and true encoded as ``\\x01``.
    * - ``int8``
      - Integer in ``[-2^7, 2^7-1]``
-     - 1 byte two's complement
    * - ``int16``
      - Integer in ``[-2^15, 2^15-1]``
-     - 2-byte little endian two's complement
    * - ``int32``
      - Integer in ``[-2^31, 2^31-1]``
-     - 4-byte little endian two's complement
    * - ``int64``
      - Integer in ``[-2^63, 2^63-1]``
-     - 8-byte little endian two's complement
    * - ``uint8``
      - Integer in ``[0, 2^8-1]``
-     - 1 byte
    * - ``uint16``
      - Integer in ``[0, 2^16-1]``
-     - 2-byte little endian
    * - ``uint32``
      - Integer in ``[0, 2^32-1]``
-     - 4-byte little endian
    * - ``uint64``
      - Integer in ``[0, 2^64-1]``
-     - 8-byte little endian
    * - ``float16`` (optionally supported)
      - IEEE 754 half-precision floating point: sign bit, 5 bits exponent, 10 bits mantissa
-     - 2-byte little endian IEEE 754 binary16
    * - ``float32``
      - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
-     - 4-byte little endian IEEE 754 binary32
    * - ``float64``
      - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
-     - 8-byte little endian IEEE 754 binary64
    * - ``complex64``
      - real and complex components are each IEEE 754 single-precision floating point
-     - 2 consecutive 4-byte little endian IEEE 754 binary32 values
    * - ``complex128``
      - real and complex components are each IEEE 754 double-precision floating point
-     - 2 consecutive 8-byte little endian IEEE 754 binary64 values
    * - ``r*`` (Optional)
      - raw bits,  use for extension type fallbacks
-     - variable, given by ``*``, is limited to be a multiple of 8.
 
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass-through type designated by the lower-case letter ``r`` followed
@@ -990,11 +972,6 @@ should be understood as fall-back types of respectively 1, 2, and 3 byte length.
 
 Zarr v3 is limited to type sizes that are a multiple of 8 bits but may support
 other type sizes in later versions of this specification.
-
-.. note::
-
-   While the default binary representation is little endian, the :ref:`endian
-   codec<endian-codec-v1>` may be specified to use big endian encoding instead.
 
 .. note::
 
@@ -1111,7 +1088,7 @@ the chain of codecs_ specified by the ``codecs`` metadata field.
 Codecs
 ------
 
-An array_ may be associated with a list of *codecs*.  Each codec specifies a
+An array_ has an associated list of *codecs*.  Each codec specifies a
 bidirectional transform (an *encode* transform and a *decode* transform).
 
 Each codec has an *encoded representation* and a *decoded representation*;
@@ -1142,13 +1119,8 @@ array`` codecs are not supported, it follows that the list of codecs must be of
 the following form:
 
 - zero or more ``array -> array`` codecs; followed by
-- at most one ``array -> bytes`` codec; followed by
+- exactly one ``array -> bytes`` codec; followed by
 - zero or more ``bytes -> bytes`` codecs.
-
-If no ``array -> bytes`` codec is specified, then the default byte
-representation for the data type of the array is used.  For all data types
-currently defined by the core spec, that is equivalent to the ``endian`` codec
-with an endianness of ``little``.
 
 Logically, a codec ``c`` must define three properties:
 
@@ -1224,27 +1196,6 @@ codec in the chain must first be determined as follows:
    If ``compute_encoded_representation_type`` fails because of an incompatible
    decoded representation, an implementation should indicate an error.
 
-.. _default-array-byte-string-conversion:
-
-Conversion between multi-dimensional array and byte string representations
---------------------------------------------------------------------------
-
-Some codecs operate directly on multi-dimensional arrays of elements,
-e.g. encoding a 3-d array as a multi-channel jpeg image.  Other codecs operate
-at the byte level, e.g. gzip compression.  If a codec that operates at the byte
-level receives as input an array that is not a 1-dimensional uint8 array, it may
-convert the input array to a byte string by concatenating the default binary
-representations of each element in lexicographical order (C order).  Similarly,
-if a codec that expects a multi-dimensional array as input instead receives a
-byte string, it may decode each element in lexicographical order according to
-the default binary representation of each element.
-
-.. note::
-
-   To encode elements in a different order than the default lexicographical
-   order (C order/row major), the :ref:`transpose codec<transpose-codec-v1>` may
-   be specified.
-
 .. _encoding_procedure:
 
 Encoding procedure
@@ -1260,11 +1211,9 @@ the following procedure:
 2. For each codec ``codecs[i]`` in ``codecs``, ``EC[i+1] :=
    codecs[i].encode(EC[i])``.
 
-3. The final encoded chunk representation ``EC_final`` is always a byte string.
-   If ``EC[codecs.length]`` is a byte string, then ``EC_final :=
-   EC[codecs.length]``.  Otherwise, ``EC_final`` is
-   :ref:`converted<default-array-byte-string-conversion>` from
-   ``EC[codecs.length]``.
+3. The final encoded chunk representation ``EC_final := EC[codecs.length]``.
+   This is always a byte string due to the requirement that the list of codecs
+   include an ``array -> bytes`` codec.
 
 4. ``EC_final`` is written to the store_.
 
@@ -1278,9 +1227,7 @@ the following procedure:
 
 1. The encoded chunk representation ``EC_final`` is read from the store_.
 
-2. If ``codecs[codecs.length]`` is a byte string, ``EC[codecs.length] :=
-   EC_final``.  Otherwise, ``EC[codecs.length]`` is
-   :ref:`converted<default-array-byte-string-conversion>` from ``EC_final``.
+2. ``EC[codecs.length] := EC_final``.
 
 3. For each codec ``codecs[i]`` in ``codecs``, iterating in reverse order,
    ``EC[i] := codecs[i].decode(EC[i+1], decoded_representation[i])``.
@@ -1807,6 +1754,16 @@ Change log
 All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
+
+Changes after Provisional Acceptance
+------------------------------------
+
+- It is now required to specify an ``array -> bytes`` codec in the ``codecs``
+  array metadata field.  `PR #249
+  <https://github.com/zarr-developers/zarr-specs/pull/249>`_
+- The representation of fill values for floating point numbers was changed to
+  avoid ambiguity.  `PR #236
+  <https://github.com/zarr-developers/zarr-specs/pull/236>`_
 
 Draft Changes
 --------------------------
