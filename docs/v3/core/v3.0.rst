@@ -1747,6 +1747,9 @@ Changes after Provisional Acceptance
 - It is now required to specify an ``array -> bytes`` codec in the ``codecs``
   array metadata field.  `PR #249
   <https://github.com/zarr-developers/zarr-specs/pull/249>`_
+- The representation of fill values for floating point numbers was changed to
+  avoid ambiguity.  `PR #236
+  <https://github.com/zarr-developers/zarr-specs/pull/236>`_
 
 Draft Changes
 --------------------------
