@@ -84,7 +84,7 @@ Configuration parameters
 Sharding can be configured per array in the :ref:`array-metadata` as follows::
 
     {
-      codecs: [
+      "codecs": [
         {
           "name": "sharding_indexed"
           "configuration": {
@@ -110,7 +110,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
                   "endian": "little",
                 }
               },
-              { "name": "crc32c"} 
+              { "name": "crc32c" } 
             ]
           }
         }
@@ -235,7 +235,7 @@ common optimizations.
   read the entire value from the store into a byte buffer, (b) parse the shard
   index as specified above from the end of the buffer and (c) cut out the 
   relevant bytes that belong to the requested chunk. The relevant bytes are 
-  determined by the `offset,nbytes` pair in the shard index. This bytestream
+  determined by the ``offset,nbytes`` pair in the shard index. This bytestream
   then needs to be decoded with the inner codecs as specified in the sharding
   configuration applying the :ref:`decoding_procedure`. This is similar to how
   an implementation would access a sub-slice of a chunk.
