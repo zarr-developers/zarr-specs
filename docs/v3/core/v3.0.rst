@@ -485,25 +485,11 @@ mandatory names:
 
     The ``data_type`` value is an extension point and may be defined by a data
     type extension. If the data type is defined by an extension, then the value
-    must be an object containing the names ``name`` and optionally
-    ``configuration`` and ``fallback``. The ``name`` is required and its value
-    must refer to a v3 data type specification. ``configuration`` is optional
-    and its value is defined by the extension. The ``fallback`` is optional and,
-    if provided, its value must be one or a list of the data type identifiers
-    defined in this specification or an extension. Fallback extension datatypes
-    are specified as an object with ``name`` and (optionally) ``configuration``.
-
-    If an implementation does not recognise the extension or specific data type,
-    but a ``fallback`` is present, then the implementation may proceed using the
-    first known ``fallback`` value as the data type. For fixed-sized data types,
-    if there is no more specific fallback available, a raw number of bytes using
-    the raw type (``r*``) should be given.
-
-    The default list of fallbacks to put into the metadata should be defined by
-    the data type extension, but it may be overridden by the user. *Note for
-    implementations*: Silently using a fallback without explicit approval might
-    cause problems for users, please consider options to (de-)activate fallback
-    behavior and/or appropriate warnings.
+    may be either a plain string or an object containing the members ``name``
+    and optionally ``configuration``.  A plain string is equivalent to
+    specifying an object with just a ``name`` member.  The ``name`` is required
+    and its value must refer to a v3 data type specification. ``configuration``
+    is optional and its value is defined by the extension.
 
 ``chunk_grid``
 ^^^^^^^^^^^^^^
@@ -767,8 +753,7 @@ above, but using a (currently made up) extension data type::
             "name": "datetime",
             "configuration": {
                 "unit": "ns"
-            },
-            "fallback": "int64"
+            }
         },
         "chunk_grid": {
             "name": "regular",
@@ -963,7 +948,7 @@ Core data types
    * - ``complex128``
      - real and complex components are each IEEE 754 double-precision floating point
    * - ``r*`` (Optional)
-     - raw bits,  use for extension type fallbacks
+     - raw bits, variable size given by ``*``, limited to be a multiple of 8
 
 Additionally to these base types, an implementation should also handle the
 raw/opaque pass-through type designated by the lower-case letter ``r`` followed
@@ -1650,8 +1635,7 @@ array       codecs                  `codecs`_
 array       storage transformer     `storage_transformers`_
 =========== ======================= ================================================
 
-If such extension points are used by groups or arrays, they are required, except
-for data types specifying fallback data types.
+If such extension points are used by groups or arrays, they are required.
 
 See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
 potential extensions.
@@ -1758,6 +1742,8 @@ by time.
 Changes after Provisional Acceptance
 ------------------------------------
 
+- Fallback data type support was removed.  `PR #248
+  <https://github.com/zarr-developers/zarr-specs/pull/248/>`_
 - It is now required to specify an ``array -> bytes`` codec in the ``codecs``
   array metadata field.  `PR #249
   <https://github.com/zarr-developers/zarr-specs/pull/249>`_
