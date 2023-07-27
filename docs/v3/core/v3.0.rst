@@ -1744,7 +1744,7 @@ by time.
 Changes after Provisional Acceptance
 ------------------------------------
 
-- It is now required to specify a ``bytes -> bytes`` codec in the ``codecs``
+- It is now required to specify an ``array -> bytes`` codec in the ``codecs``
   array metadata field.  `PR #249
   <https://github.com/zarr-developers/zarr-specs/pull/249>`_
 
