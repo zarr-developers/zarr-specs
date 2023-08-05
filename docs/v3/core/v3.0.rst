@@ -590,7 +590,7 @@ mandatory names:
       The value must be a JSON number with no fraction or exponent part that is
       within the representable range of the data type.
 
-    IEEE 754 floating point numbers (``float{16,32,64}``)
+    Floating point numbers (``float{16,32,64}``, ``bfloat16``)
       The value may be either:
 
       - A JSON number, that will be rounded to the nearest representable value.
@@ -599,7 +599,7 @@ mandatory names:
 
         - ``"Infinity"``, denoting positive infinity;
         - ``"-Infinity"``, denoting negative infinity;
-        - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
+        - ``"NaN"``, denoting the not-a-number (NaN) value where the sign bit is
           0 (positive), the most significant bit (MSB) of the mantissa is 1, and
           all other bits of the mantissa are zero;
         - ``"0xYYYYYYYY"``, specifying the byte representation of the floating
@@ -943,6 +943,10 @@ Core data types
      - IEEE 754 single-precision floating point: sign bit, 8 bits exponent, 23 bits mantissa
    * - ``float64``
      - IEEE 754 double-precision floating point: sign bit, 11 bits exponent, 52 bits mantissa
+   * - ``bfloat16`` (optionally supported)
+     - `bfloat16 floating-point
+       format<https://en.wikipedia.org/wiki/Bfloat16_floating-point_format>`_:
+       sign bit, 5 bits exponent, 10 bits mantissa
    * - ``complex64``
      - real and complex components are each IEEE 754 single-precision floating point
    * - ``complex128``
