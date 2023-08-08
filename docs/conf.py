@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Zarr specs'
-copyright = '2019, Zarr Developers'
+copyright = '2023, Zarr Developers'
 author = 'Zarr Developers'
 
 
@@ -30,7 +30,6 @@ author = 'Zarr Developers'
 extensions = [
   'sphinx.ext.todo',
   'sphinxcontrib.mermaid',
-  'sphinxmark',
   'sphinx_reredirects',
 ]
 
@@ -41,10 +40,6 @@ html_js_files = [
 
 # Display todos by setting to True
 todo_include_todos = True
-
-sphinxmark_enable = True
-sphinxmark_div = 'bd-article-container'
-sphinxmark_image = 'draft-watermark.png'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

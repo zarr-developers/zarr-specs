@@ -4,7 +4,6 @@
 
 <img src="https://github.com/zarr-developers/zarr-logo/releases/download/2022-04-28/zarr-pink-stacked-transparent.png" alt="drawing" height="200"/>
 
-**:warning: The zarr v3 spec is currently a draft and subject to changes.**
 For the v1 and v2 specs, please see
 https://github.com/zarr-developers/zarr-python/tree/main/docs/spec.
 
