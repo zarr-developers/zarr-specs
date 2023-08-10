@@ -32,6 +32,8 @@ Defines an ``bytes -> bytes`` codec that appends a CRC32C checksum of the input 
 Status of this document
 =======================
 
+.. rst-class:: draft
+
 .. warning::
     This document is a draft for review and subject to changes.
     It will become final when the `Zarr Enhancement Proposal (ZEP) 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_

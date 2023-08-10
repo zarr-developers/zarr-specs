@@ -5,8 +5,6 @@
  Zarr core specification (version 3.0)
 ======================================
 
-  **Editor's draft 25 May 2022**
-
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html
 
@@ -16,16 +14,13 @@ Editors:
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 
 Corresponding ZEP:
-    `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    `ZEP 0001 — Zarr specification version 3 <https://zarr.dev/zeps/active/ZEP0001.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
 
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/v3.0.rst>`_
-
-Suggest extensions or other changes as a Zarr Enhancement Proposal (ZEP):
-    `ZEP 0 — Purpose and process <https://zarr.dev/zeps/active/ZEP0000.html>`_
 
 Copyright 2019-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -44,10 +39,7 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-.. warning::
-    This document is a draft for review and subject to changes.
-    It will become final when the `Zarr Enhancement Proposal (ZEP) 1 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
-    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
+ZEP0001 was accepted on May 13th, 2023.
 
 
 Introduction

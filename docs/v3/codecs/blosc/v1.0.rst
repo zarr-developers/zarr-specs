@@ -30,10 +30,7 @@ Defines a ``bytes -> bytes`` codec that uses the blosc container format.
 Status of this document
 =======================
 
-.. warning::
-    This document is a draft for review and subject to changes.
-    It will become final when the `Zarr Enhancement Proposal (ZEP) 1 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
-    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
+ZEP0001 was accepted on May 13th, 2023.
 
 
 Document conventions
