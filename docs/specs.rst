@@ -14,6 +14,12 @@ Specifications
 
 .. toctree::
    :maxdepth: 1
+   :caption: Conventions
+
+   Conventions <conventions/conventions.rst>
+
+.. toctree::
+   :maxdepth: 1
    :caption: v2
 
    Zarr spec v2 <https://zarr.readthedocs.io/en/stable/spec/v2.html>

@@ -6,3 +6,5 @@ docs/_build
 
 # pycharm
 .idea
+
+.DS_Store
