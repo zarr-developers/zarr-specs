@@ -1,7 +1,7 @@
-.. _endian-codec-v1:
+.. _bytes-codec-v1:
 
 ============================
- Endian codec (version 1.0)
+ Bytes codec (version 1.0)
 ============================
 
   **Editor's draft 26 July 2019**
