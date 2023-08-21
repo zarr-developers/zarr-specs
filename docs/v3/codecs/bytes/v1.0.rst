@@ -7,13 +7,13 @@
   **Editor's draft 26 July 2019**
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/endian/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/bytes/v1.0.html
 Corresponding ZEP:
     `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/endian/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/bytes/v1.0.rst>`_
 
 Copyright 2020 `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
@@ -27,7 +27,8 @@ Abstract
 ========
 
 Defines an ``array -> bytes`` codec that encodes arrays of fixed-size numeric
-data types as little endian or big endian in lexicographical order.
+data types as a sequence of bytes in lexicographical order. For multi-byte data
+types, it encodes the array either in little endian or big endian.
 
 
 Status of this document
@@ -55,14 +56,14 @@ this specification are introduced with the words "for example".
 Codec name
 ==========
 
-The value of the ``name`` member in the codec object MUST be ``endian``.
+The value of the ``name`` member in the codec object MUST be ``bytes``.
 
 
 Configuration parameters
 ========================
 
 endian:
-    Required.  A string equal to either ``"big"`` or ``"little"``.
+    Required for multi-byte data types.  A string equal to either ``"big"`` or ``"little"``.
 
 
 Format and algorithm
@@ -131,4 +132,5 @@ References
 Change log
 ==========
 
-No changes yet.
+- ``endian`` codec was renamed to ``bytes`` codec.  `PR #263
+  <https://github.com/zarr-developers/zarr-specs/pull/263/>`_

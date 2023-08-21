@@ -1734,6 +1734,8 @@ by time.
 Changes after Provisional Acceptance
 ------------------------------------
 
+- ``endian`` codec was renamed to ``bytes`` codec.  `PR #263
+  <https://github.com/zarr-developers/zarr-specs/pull/263/>`_
 - Fallback data type support was removed.  `PR #248
   <https://github.com/zarr-developers/zarr-specs/pull/248/>`_
 - It is now required to specify an ``array -> bytes`` codec in the ``codecs``
