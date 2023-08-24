@@ -9,14 +9,13 @@
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/transpose/v1.0.html
 Corresponding ZEP:
-    `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/transpose/v1.0.rst>`_
 
-Copyright 2020 `Zarr core development team
-<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
+Copyright 2020-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License
 <https://creativecommons.org/licenses/by/3.0/>`_.
 
@@ -33,7 +32,7 @@ array.
 Status of this document
 =======================
 
-ZEP0001 was accepted on May 13th, 2023.
+ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
 
 
 Document conventions
