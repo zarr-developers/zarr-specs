@@ -65,15 +65,9 @@ Configuration parameters
 ========================
 
 order:
-    Required.  Must be one of:
-
-    - An array of integers specifying a permutation of ``0``, ``1``, ...,
-      ``n-1``, where ``n`` is the number of dimensions in the decoded chunk
-      representation provided as input to this codec.
-    - The string ``"C"``, equivalent to specifying the identity permutation
-      ``0``, ``1``, ..., ``n-1``.  This makes the codec a no-op.
-    - The string ``"F"``, equivalent to specifying the permutation ``n-1``, ...,
-      ``1``, ``0``.
+    Required.  Must be an array of integers specifying a permutation of ``0``, ``1``, ...,
+    `n-1``, where ``n`` is the number of dimensions in the decoded chunk
+    representation provided as input to this codec.
 
 Format and algorithm
 ====================
@@ -105,4 +99,8 @@ References
 Change log
 ==========
 
-No changes yet.
+Changes after acceptance of ZEP 1
+---------------------------------
+
+The ``order`` configuration parameter no longer supports the constants ``"C"``
+or ``"F"`` and must instead always be specified as an explicit permutation.
