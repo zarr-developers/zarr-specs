@@ -540,7 +540,7 @@ mandatory names:
          will consist of the string ``c``.
 
       .. note:: In the ``default`` ``chunk_key_encoding`` described above, 
-         chunk keys are stored under the prefix ``c```, which separates chunk keys from 
+         chunk keys are stored under the prefix ``c``, which separates chunk keys from 
          the keys for metadata documents. This is a performance optimization that 
          allows applications to find Zarr metadata documents without traversing a 
          potentially large number of chunk keys.
