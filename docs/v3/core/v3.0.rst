@@ -839,7 +839,7 @@ apply to node names:
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 * must not start with the reserved prefix ``"__"``
 
-To ensure consistent behaviour across different storage systems and programming
+To ensure consistent behavior across different storage systems and programming
 languages, we recommend users to only use characters in the sets ``a-z``,
 ``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
 
@@ -1223,7 +1223,7 @@ codec specification must declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
 and the format of the encoded data.
 
-A codec may have configuration parameters which modify the behaviour
+A codec may have configuration parameters which modify the behavior
 of the codec in some way. For example, a compression codec may have a
 compression level parameter, which is an integer that affects the
 resulting compression ratio of the data. Configuration parameters must
@@ -1350,11 +1350,11 @@ A **writeable store** supports the following operations:
 
 .. note::
 
-   Some KV stores do allow creation and update of keys, but not deletion. For
+   Some stores allow creatiing and updating keys, but not deleting them. For
    example, Zip archives do not allow removal of content without recreating the
    full archive.
 
-   Inability to delete can affect ability to rename keys as well, as a rename
+   Inability to delete can impair the ability to rename keys, as a rename
    is often a sequence or atomic combination of a deletion and a creation.
 
 A **listable store** supports any one or more of the following
@@ -1592,8 +1592,8 @@ adding them to the array metadata.
 A storage transformer serves the same `abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,
 but instead propagates this to the next storage transformer or the final store.
-From the perspective of an array or a previous stage transformer both store and storage transformer follow the same
-protocol and can be interchanged regarding the protocol. The behaviour can still be different,
+From the perspective of an array or a previous stage transformer, both store and storage transformer follow the same
+protocol and can be interchanged regarding the protocol. The behavior can still be different,
 e.g. requests may be cached or the form of the underlying data can change.
 
 Storage transformers may be stacked to combine different functionalities:
@@ -1649,23 +1649,23 @@ Implementation Notes
 This section is non-normative and presents notes from implementers about cases
 that need to be carefully considered but do not strictly fall into the spec.
 
-Explicit vs implicit group
+Explicit vs implicit groups
 --------------------------
 
-While this Zarr spec v3 defines implicit and explicit groups, implementations may
-decide to create an explicit group for all implicit groups they encounter; in
+This specification defines both implicit and explicit groups, but implementations may
+create an explicit group for all implicit groups they encounter, in
 particular when using a hierarchical storage.
 
 Erasure of an implicit group may automatically erase any empty parent. For
 example on a S3 store where the namespace is flat, erasure of the last key with
-a prefix will erase all the implicit group in the prefix.
+a prefix will erase all implicit groups in the prefix.
 
-Care must thus be taken when erasing an array or a group if the parent needs to
+Care must be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
 A race-condition arises if a client writes an array at path ``P``,
-and another concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
-Implementations may choose to never use implicit groups to avoid this.
+and another client concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
+Implementations can avoid this race condition by exclusively using explicit groups.
 
 Resizing
 --------
