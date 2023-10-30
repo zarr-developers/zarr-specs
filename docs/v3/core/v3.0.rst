@@ -839,7 +839,7 @@ apply to node names:
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 * must not start with the reserved prefix ``"__"``
 
-To ensure consistent behavior across different storage systems and programming
+To ensure consistent behaviour across different storage systems and programming
 languages, we recommend users to only use characters in the sets ``a-z``,
 ``A-Z``, ``0-9``, ``-``, ``_``, ``.``.
 
@@ -1223,7 +1223,7 @@ codec specification must declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
 and the format of the encoded data.
 
-A codec may have configuration parameters which modify the behavior
+A codec may have configuration parameters which modify the behaviour
 of the codec in some way. For example, a compression codec may have a
 compression level parameter, which is an integer that affects the
 resulting compression ratio of the data. Configuration parameters must
@@ -1373,7 +1373,7 @@ operations:
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
-    Note: the behavior of ``list_prefix`` is undefined if ``prefix`` does not end
+    Note: the behaviour of ``list_prefix`` is undefined if ``prefix`` does not end
     with a trailing slash ``/`` and the store can assume there is at least one key
     that starts with ``prefix``.
 
@@ -1593,7 +1593,7 @@ A storage transformer serves the same `abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,
 but instead propagates this to the next storage transformer or the final store.
 From the perspective of an array or a previous stage transformer, both store and storage transformer follow the same
-protocol and can be interchanged regarding the protocol. The behavior can still be different,
+protocol and can be interchanged regarding the protocol. The behaviour can still be different,
 e.g. requests may be cached or the form of the underlying data can change.
 
 Storage transformers may be stacked to combine different functionalities:
@@ -1687,7 +1687,7 @@ was not deleted when shrinking the array, this data will be shown by default.
 The latter case should be signalled to the user appropriately. An implementation
 can also allow the user to choose to delete previous data explicitly when
 increasing the array (by writing the fill value into partial chunks and deleting
-others), but this should not be the default behavior.
+others), but this should not be the default behaviour.
 
 
 Comparison with Zarr v2
@@ -1745,7 +1745,7 @@ Changes after Provisional Acceptance
 Draft Changes
 --------------------------
 
-- Removed `extensions` field and clarified extension point behavior, changing the config format of
+- Removed `extensions` field and clarified extension point behaviour, changing the config format of
   data-types, chunk-grid, storage-transformers and codecs. `PR #204
   <https://github.com/zarr-developers/zarr-specs/pull/204>`_
 - Changed `format_version` to the int ``3``, added key ``node_type`` to group and array metadata. `PR #204
