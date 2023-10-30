@@ -1350,7 +1350,7 @@ A **writeable store** supports the following operations:
 
 .. note::
 
-   Some stores allow creatiing and updating keys, but not deleting them. For
+   Some stores allow creating and updating keys, but not deleting them. For
    example, Zip archives do not allow removal of content without recreating the
    full archive.
 
