@@ -37,7 +37,7 @@ Notes about design decisions for the native File System Store
 =============================================================
 
 The original file system store is designed for simplicity and easy manipulation
-and transfer  by external tools not aware of the store structure. In particular
+and transfer  by external tools not aware of the store structure. In particular,
 tools like ``gsutil`` can be use to transfer a local directory store to cloud
 base storage, hence the keys choices will be conserved.
 
@@ -163,7 +163,7 @@ in the section above.
   each descendant file path ``fp``.
 
 * ``list_dir(prefix)`` : Obtain a file system path by calling
-  ``key_to_fspath(prefix)``. If the result is a director path, list
+  ``key_to_fspath(prefix)``. If the result is a directory path, list
   the directory children. Return a set of keys obtained by calling
   ``fspath_to_key(fp)`` for each child file path ``fp``, and a set of
   prefixes obtained by calling ``fspath_to_key(dp)`` for each child
