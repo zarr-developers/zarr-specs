@@ -4,7 +4,7 @@
 Sharding codec (version 1.0)
 ==========================================
 
-  **Editor's draft 17 July 2023**
+  **Editor's draft 02 November 2023**
 
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/v1.0.html
@@ -25,12 +25,12 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 Status of this document
 =======================
 
-.. rst-class:: draft
+ZEP0002 was accepted on November 1st, 2023 via https://github.com/zarr-developers/zarr-specs/issues/254.
 
 .. warning::
-    This document is a draft for review and subject to changes.
+    This document is subject to changes.
     It will become final when the `Zarr Enhancement Proposal (ZEP) 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_
-    is approved via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
+    is finalized via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
 
 
 Abstract
@@ -121,7 +121,8 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
                 }
               },
               { "name": "crc32c" } 
-            ]
+            ],
+            "index_location": "end"
           }
         }
       ]
@@ -155,6 +156,11 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
     be used for index codecs. It is RECOMMENDED to use a little-endian codec 
     followed by a crc32c checksum as index codecs.
 
+``index_location``
+
+    Specifies whether the shard index is located at the beginning or end of the 
+    file. The parameter value must be either the string ``start`` or ``end``.
+    
 Definitions
 ===========
 
@@ -194,10 +200,11 @@ Empty inner chunks are interpreted as being filled with the fill value. The inde
 always has the full shape of all possible inner chunks per shard, even if they extend
 beyond the array shape.
 
-The index is placed at the end of the file and encoded into binary representations 
-using the specified index codecs. The byte size of the index is determined by the 
-number of inner chunks in the shard ``n``, i.e. the product of chunks per shard, and 
-the choice of index codecs.
+The index is either placed at the end of the file or at the beginning of the file,
+as configured by the ``index_location`` parameter. The index is encoded into binary 
+representations using the specified index codecs. The byte size of the index is 
+determined by the number of inner chunks in the shard ``n``, i.e. the product of 
+chunks per shard, and the choice of index codecs.
 
 For an example, consider a shard shape of ``[64, 64]``, an inner chunk shape of 
 ``[32, 32]`` and an index codec combination of a little-endian codec followed by 
@@ -243,12 +250,13 @@ common optimizations.
 
 * **Decoding**: A simple implementation to decode inner chunks in a shard would (a) 
   read the entire value from the store into a byte buffer, (b) parse the shard
-  index as specified above from the end of the buffer and (c) cut out the 
-  relevant bytes that belong to the requested chunk. The relevant bytes are 
-  determined by the ``offset,nbytes`` pair in the shard index. This bytestream
-  then needs to be decoded with the inner codecs as specified in the sharding
-  configuration applying the :ref:`decoding_procedure`. This is similar to how
-  an implementation would access a sub-slice of a chunk.
+  index as specified above from the beginning or end (according to the 
+  ``index_location``) of the buffer and (c) cut out the relevant bytes that belong 
+  to the requested chunk. The relevant bytes are determined by the 
+  ``offset,nbytes`` pair in the shard index. This bytestream then needs to be 
+  decoded with the inner codecs as specified in the sharding configuration applying 
+  the :ref:`decoding_procedure`. This is similar to how an implementation would 
+  access a sub-slice of a chunk.
 
   The size of the index can be determined by applying ``c.compute_encoded_size``
   for each index codec recursively. The initial size is the byte size of the index 
@@ -260,24 +268,30 @@ common optimizations.
 
   If the underlying store supports partial reads, the decoding of single inner
   chunks can be optimized. In that case, the shard index can be read from the
-  store by requesting the ``n`` last bytes, where ``n`` is the size of the index
-  as determined by the number of inner chunks in the shard and choice of index 
-  codecs. After parsing the shard index, single inner chunks can be requested from 
-  the store by specifying the byte range. The bytestream, then, needs to be 
-  decoded as above. 
+  store by requesting the ``n`` first or last bytes (according to the 
+  ``index_location``), where ``n`` is the size of the index as determined by 
+  the number of inner chunks in the shard and choice of index codecs. After 
+  parsing the shard index, single inner chunks can be requested from the store 
+  by specifying the byte range. The bytestream, then, needs to be decoded as above. 
 
 * **Encoding**: A simple implementation to encode a chunk in a shard would (a)
   encode the new chunk per :ref:`encoding_procedure` in a byte buffer using the 
   shard's inner codecs, (b) read an existing shard from the store, (c) create a 
   new bytestream with all encoded inner chunks of that shard including the overwritten 
-  chunk, (d) generate a new shard index that is appended to the chunk bytestream 
-  and (e) writes the shard to the store. If there was no existing shard, an 
-  empty shard is assumed. When writing entire inner chunks, reading the existing shard 
-  first may be skipped.
+  chunk, (d) generate a new shard index that is prepended or appended (according 
+  to the ``index_location``) to the chunk bytestream and (e) writes the shard to 
+  the store. If there was no existing shard, an empty shard is assumed. When 
+  writing entire inner chunks, reading the existing shard first may be skipped.
 
   When working with inner chunks that have a fixed byte size (e.g., uncompressed) and 
   a store that supports partial writes, a optimization would be to replace the
   new chunk by writing to the store at the specified byte range.
+
+  On stores with random-write capabilities, it may be useful to (a) place the shard 
+  index at the beginning of the file, (b) write out inner chunks in 
+  application-specific order, and (c) update the shard index accordingly. 
+  Synchronization of parallelly written inner chunks needs to be handled by the
+  application.
 
   Other use case-specific optimizations may be available, e.g., for append-only
   workloads.
