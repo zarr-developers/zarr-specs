@@ -307,5 +307,6 @@ References
 Change log
 ==========
 
-This section is a placeholder for keeping a log of the snapshots of this
-document that are tagged in GitHub and what changed between them.
+* Adds ``index_location`` parameter. `PR 280 <https://github.com/zarr-developers/zarr-specs/pull/280>`_
+
+* ZEP0002 was accepted. `Issue 254 <https://github.com/zarr-developers/zarr-specs/pull/254>`_
