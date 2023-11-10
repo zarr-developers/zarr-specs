@@ -159,7 +159,8 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
 ``index_location``
 
     Specifies whether the shard index is located at the beginning or end of the 
-    file. The parameter value must be either the string ``start`` or ``end``.
+    file. The parameter value must be either the string ``start`` or ``end``. 
+    If the parameter is not present, the value defaults to ``end``.
     
 Definitions
 ===========
