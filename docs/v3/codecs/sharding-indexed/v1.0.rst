@@ -4,14 +4,16 @@
 Sharding codec (version 1.0)
 ==========================================
 
-  **Editor's draft 02 November 2023**
-
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/v1.0.html
+Editors:
+    * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
+    * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds
+    * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 Corresponding ZEP:
-    `ZEP 2 — Sharding codec <https://zarr.dev/zeps/draft/ZEP0002.html>`_
+    `ZEP0002 — Sharding codec <https://zarr.dev/zeps/accepted/ZEP0002.html>`_
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`-
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`_
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/v1.0.rst>`_
 
@@ -21,16 +23,6 @@ is licensed under a `Creative Commons Attribution 3.0 Unported License
 <https://creativecommons.org/licenses/by/3.0/>`_.
 
 ----
-
-Status of this document
-=======================
-
-ZEP0002 was accepted on November 1st, 2023 via https://github.com/zarr-developers/zarr-specs/issues/254.
-
-.. warning::
-    This document is subject to changes.
-    It will become final when the `Zarr Enhancement Proposal (ZEP) 2 <https://zarr.dev/zeps/draft/ZEP0002.html>`_
-    is finalized via the `ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_.
 
 
 Abstract
@@ -42,6 +34,10 @@ Sharding logically splits chunks ("shards") into sub-chunks ("inner chunks")
 that can be individually compressed and accessed. This allows to colocate 
 multiple chunks within one storage object, bundling them in shards.
 
+Status of this document
+======================
+
+ZEP0002 was accepted on November 1st, 2023 via https://github.com/zarr-developers/zarr-specs/issues/254.
 
 Motivation
 ==========
