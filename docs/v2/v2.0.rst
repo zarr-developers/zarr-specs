@@ -548,7 +548,7 @@ initially published to clarify ambiguities and add some missing information.
   subarray shapes and/or with nested structured data types are encoded
   in array metadata (`#111
   <https://github.com/zarr-developers/zarr-python/issue/111/>`_, `#296
-  <https://github.com/zarr-developers/zarr-python/issue/296/>`_).
+  <https://github.com/zarr-developers/zarr-python/issues/296/>`_).
 
 * Clarified the key/value pairs of custom attributes as "arbitrary" rather than
   "simple".
