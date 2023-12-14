@@ -128,8 +128,7 @@ Data type encoding
 ~~~~~~~~~~~~~~~~~~
 
 Simple data types are encoded within the array metadata as a string,
-following the :ref:`NumPy array protocol type string (typestr) format
-<numpy:arrays.interface>`. The format
+following the `NumPy array protocol type string (typestr) format <https://numpy.org/doc/stable/reference/arrays.interface.html#the-array-interface-protocol>`_. The format
 consists of 3 parts:
 
 * One character describing the byteorder of the data (``"<"``: little-endian;
@@ -147,14 +146,12 @@ The byte order MUST be specified. E.g., ``"<f8"``, ``">i4"``, ``"|b1"`` and
 
 For datetime64 ("M") and timedelta64 ("m") data types, these MUST also include the
 units within square brackets. A list of valid units and their definitions are given in
-the :ref:`NumPy documentation on Datetimes and Timedeltas
-<numpy:arrays.dtypes.dateunits>`.
+the `NumPy documentation on Datetimes and Timedeltas <https://numpy.org/doc/stable/reference/arrays.datetime.html#datetime-units>`_.
 For example, ``"<M8[ns]"`` specifies a datetime64 data type with nanosecond time units.
 
 Structured data types (i.e., with multiple named fields) are encoded
-as a list of lists, following :ref:`NumPy array protocol type descriptions
-(descr)
-<numpy:arrays.interface>`. Each
+as a list of lists, following `NumPy array protocol type descriptions
+(descr) <https://numpy.org/doc/stable/reference/arrays.interface.html#the-array-interface-protocol>`_. Each
 sub-list has the form ``[fieldname, datatype, shape]`` where ``shape``
 is optional. ``fieldname`` is a string, ``datatype`` is a string
 specifying a simple data type (see above), and ``shape`` is a list of
@@ -532,13 +529,13 @@ initially published to clarify ambiguities and add some missing information.
 
 * The specification now describes how bytes fill values should be encoded and
   decoded for arrays with a fixed-length byte string data type (`#165
-  <https://github.com/zarr-developers/zarr-python/issue/165/>`_, `#176
-  <https://github.com/zarr-developers/zarr-python/issue/176/>`_).
+  <https://github.com/zarr-developers/zarr-python/issues/165/>`_, `#176
+  <https://github.com/zarr-developers/zarr-python/issues/176/>`_).
 
 * The specification now clarifies that units must be specified for datetime64 and
   timedelta64 data types (`#85
-  <https://github.com/zarr-developers/zarr-python/issue/85/>`_, `#215
-  <https://github.com/zarr-developers/zarr-python/issue/215/>`_).
+  <https://github.com/zarr-developers/zarr-python/issues/85/>`_, `#215
+  <https://github.com/zarr-developers/zarr-python/issues/215/>`_).
 
 * The specification now clarifies that the '.zattrs' key does not have to be present for
   either arrays or groups, and if absent then custom attributes should be treated as
@@ -547,7 +544,7 @@ initially published to clarify ambiguities and add some missing information.
 * The specification now describes how structured datatypes with
   subarray shapes and/or with nested structured data types are encoded
   in array metadata (`#111
-  <https://github.com/zarr-developers/zarr-python/issue/111/>`_, `#296
+  <https://github.com/zarr-developers/zarr-python/issues/111/>`_, `#296
   <https://github.com/zarr-developers/zarr-python/issues/296/>`_).
 
 * Clarified the key/value pairs of custom attributes as "arbitrary" rather than
