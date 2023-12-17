@@ -7,14 +7,13 @@
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/stores/filesystem/v1.0.html
 Corresponding ZEP:
-    `ZEP 1 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/stores-filesystem-v1.0>`_
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/stores/filesystem/v1.0.rst>`_
 
-Copyright 2019 `Zarr core development team
-<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work is
+Copyright 2019-Present Zarr core development team. This work is
 licensed under a `Creative Commons Attribution 3.0 Unported License
 <https://creativecommons.org/licenses/by/3.0/>`_.
 
@@ -31,14 +30,14 @@ store API using a file system.
 Status of this document
 =======================
 
-ZEP0001 was accepted on May 13th, 2023.
+ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
 
 
 Notes about design decisions for the native File System Store 
 =============================================================
 
 The original file system store is designed for simplicity and easy manipulation
-and transfer  by external tools not aware of the store structure. In particular
+and transfer  by external tools not aware of the store structure. In particular,
 tools like ``gsutil`` can be use to transfer a local directory store to cloud
 base storage, hence the keys choices will be conserved.
 
@@ -164,7 +163,7 @@ in the section above.
   each descendant file path ``fp``.
 
 * ``list_dir(prefix)`` : Obtain a file system path by calling
-  ``key_to_fspath(prefix)``. If the result is a director path, list
+  ``key_to_fspath(prefix)``. If the result is a directory path, list
   the directory children. Return a set of keys obtained by calling
   ``fspath_to_key(fp)`` for each child file path ``fp``, and a set of
   prefixes obtained by calling ``fspath_to_key(dp)`` for each child

@@ -14,7 +14,7 @@ Editors:
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
 
 Corresponding ZEP:
-    `ZEP 0001 — Zarr specification version 3 <https://zarr.dev/zeps/active/ZEP0001.html>`_
+    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
@@ -22,8 +22,7 @@ Issue tracking:
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/v3.0.rst>`_
 
-Copyright 2019-Present `Zarr core development team
-<https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
+Copyright 2019-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License
 <https://creativecommons.org/licenses/by/3.0/>`_.
 
@@ -39,7 +38,7 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-ZEP0001 was accepted on May 13th, 2023.
+ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
 
 
 Introduction
@@ -117,7 +116,7 @@ This core specification adheres to a ``MAJOR.MINOR`` version
 number format. When incrementing the minor version, only additional features
 can be added. Breaking changes require incrementing the major version.
 
-A zarr implementation that provides the read and write API by
+A Zarr implementation that provides the read and write API by
 implementing a specification ``X.Y`` can be considered compatible with all
 datasets which only use features contained in version ``X.Y``.
 
@@ -322,7 +321,7 @@ The following figure illustrates the first part of the terminology:
     hierarchy_ are held in a store as raw bytes. To enable a variety
     of different store types to be used, this specification defines an
     `Abstract store interface`_ which is a common set of operations that stores
-    may provide. For example, a directory in a file system can be a zarr store,
+    may provide. For example, a directory in a file system can be a Zarr store,
     where keys are file names, values are file contents, and files can be read,
     written, listed or deleted via the operating system. Equally, an S3 bucket
     can provide this interface, where keys are resource names, values are
@@ -530,7 +529,8 @@ mandatory names:
 
       For example, in a 3 dimensional array, with a separator of ``/`` the identifier
       for the chunk at grid index (1, 23, 45) is the string ``"c/1/23/45"``.  With a
-      separator of ``.``, the identifier is the string ``"c.1.23.45"``.
+      separator of ``.``, the identifier is the string ``"c.1.23.45"``. The initial prefix 
+      ``c`` ensures that metadata documents and chunks have separate prefixes.
 
       .. note:: A main difference with spec v2 is that the default chunk separator
          changed from ``.`` to ``/``, as in N5.  This decreases the maximum number of
@@ -679,18 +679,18 @@ The following members are optional:
     unnamed dimension is indicated by the null object.  If ``dimension_names`` is
     not specified, all dimensions are unnamed.
 
-    For compatibility with zarr implementations and applications that support
+    For compatibility with Zarr implementations and applications that support
     using dimension names to uniquely identify dimensions, it is recommended but
     not required that all non-null dimension names are distinct (no two
     dimensions have the same non-empty name).
 
     This specification also does not place any restrictions on the use of the
-    same dimension name across multiple arrays within the same zarr hierarchy,
+    same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
 The array metadata object must not contain any other names.
 Those are reserved for future versions of this specification.
-An implementation must fail to open zarr hierarchies, groups
+An implementation must fail to open Zarr hierarchies, groups
 or arrays with unknown metadata fields, with the exception of
 objects with a ``"must_understand": false`` key-value pair.
 
@@ -770,7 +770,7 @@ above, but using a (currently made up) extension data type::
 
 .. note::
 
-   Comparison with zarr spec v2:
+   Comparison with Zarr spec v2:
 
    - ``dtype`` has been renamed to ``data_type``,
    - ``chunks`` has been replaced with ``chunk_grid``,
@@ -874,7 +874,7 @@ This follows the
     representation is the ``UTF-8`` encoded Unicode string.
 
 .. note::
-    The prefix ``__zarr`` is reserved for core zarr data, and extensions
+    The prefix ``__zarr`` is reserved for core Zarr data, and extensions
     can use other files and folders starting with ``__``.
 
 
@@ -1163,7 +1163,7 @@ To encode or decode a chunk, the encoded and decoded representations for each
 codec in the chain must first be determined as follows:
 
 1. The initial decoded representation, ``decoded_representation[0]`` is a
-   multi-dimensional array with the same data type as the zarr array, and shape
+   multi-dimensional array with the same data type as the Zarr array, and shape
    equal to the chunk shape.
 
 2. For each codec ``i``, the encoded representation is equal to the decoded
@@ -1183,7 +1183,7 @@ the following procedure:
 
 1. The initial *encoded chunk* ``EC[0]`` of the type specified by
    ``decoded_representation[0]`` is equal to the chunk array ``A`` (with a shape
-   equal to the chunk shape, and data type equal to the zarr array data type).
+   equal to the chunk shape, and data type equal to the Zarr array data type).
 
 2. For each codec ``codecs[i]`` in ``codecs``, ``EC[i+1] :=
    codecs[i].encode(EC[i])``.
@@ -1351,11 +1351,11 @@ A **writeable store** supports the following operations:
 
 .. note::
 
-   Some KV stores do allow creation and update of keys, but not deletion. For
+   Some stores allow creating and updating keys, but not deleting them. For
    example, Zip archives do not allow removal of content without recreating the
    full archive.
 
-   Inability to delete can affect ability to rename keys as well, as a rename
+   Inability to delete can impair the ability to rename keys, as a rename
    is often a sequence or atomic combination of a deletion and a creation.
 
 A **listable store** supports any one or more of the following
@@ -1374,7 +1374,7 @@ operations:
     For example, if a store contains the keys "a/b", "a/c/d" and
     "e/f/g", then ``list_prefix("a/")`` would return "a/b" and "a/c/d".
 
-    Note: the behavior of ``list_prefix`` is undefined if ``prefix`` does not end
+    Note: the behaviour of ``list_prefix`` is undefined if ``prefix`` does not end
     with a trailing slash ``/`` and the store can assume there is at least one key
     that starts with ``prefix``.
 
@@ -1593,7 +1593,7 @@ adding them to the array metadata.
 A storage transformer serves the same `abstract store interface`_ as the store_.
 However, it should not persistently store any information necessary to restore the original data,
 but instead propagates this to the next storage transformer or the final store.
-From the perspective of an array or a previous stage transformer both store and storage transformer follow the same
+From the perspective of an array or a previous stage transformer, both store and storage transformer follow the same
 protocol and can be interchanged regarding the protocol. The behaviour can still be different,
 e.g. requests may be cached or the form of the underlying data can change.
 
@@ -1650,23 +1650,23 @@ Implementation Notes
 This section is non-normative and presents notes from implementers about cases
 that need to be carefully considered but do not strictly fall into the spec.
 
-Explicit vs implicit group
---------------------------
+Explicit vs implicit groups
+---------------------------
 
-While this zarr spec v3 defines implicit and explicit groups, implementations may
-decide to create an explicit group for all implicit groups they encounter; in
+This specification defines both implicit and explicit groups, but implementations may
+create an explicit group for all implicit groups they encounter, in
 particular when using a hierarchical storage.
 
 Erasure of an implicit group may automatically erase any empty parent. For
 example on a S3 store where the namespace is flat, erasure of the last key with
-a prefix will erase all the implicit group in the prefix.
+a prefix will erase all implicit groups in the prefix.
 
-Care must thus be taken when erasing an array or a group if the parent needs to
+Care must be taken when erasing an array or a group if the parent needs to
 be converted into an explicit group.
 
 A race-condition arises if a client writes an array at path ``P``,
-and another concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
-Implementations may choose to never use implicit groups to avoid this.
+and another client concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
+Implementations can avoid this race condition by exclusively using explicit groups.
 
 Resizing
 --------
@@ -1688,7 +1688,7 @@ was not deleted when shrinking the array, this data will be shown by default.
 The latter case should be signalled to the user appropriately. An implementation
 can also allow the user to choose to delete previous data explicitly when
 increasing the array (by writing the fill value into partial chunks and deleting
-others), but this should not be the default behavior.
+others), but this should not be the default behaviour.
 
 
 Comparison with Zarr v2
@@ -1748,7 +1748,7 @@ Changes after Provisional Acceptance
 Draft Changes
 --------------------------
 
-- Removed `extensions` field and clarified extension point behavior, changing the config format of
+- Removed `extensions` field and clarified extension point behaviour, changing the config format of
   data-types, chunk-grid, storage-transformers and codecs. `PR #204
   <https://github.com/zarr-developers/zarr-specs/pull/204>`_
 - Changed `format_version` to the int ``3``, added key ``node_type`` to group and array metadata. `PR #204
