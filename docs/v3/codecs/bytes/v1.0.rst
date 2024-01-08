@@ -62,7 +62,11 @@ Configuration parameters
 ========================
 
 endian:
-    Required for multi-byte data types.  A string equal to either ``"big"`` or ``"little"``.
+    Required for data types for which endianness is applicable. For example, 
+    this includes multi-byte data types, such as ``uint16`` and ``int32``, 
+    but not single-byte data types, such as ``uint8`` or ``bool``. 
+    If present, the value MUST be a string equal to either ``"big"`` or 
+    ``"little"``.
 
 
 Format and algorithm
