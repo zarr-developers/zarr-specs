@@ -6,3 +6,9 @@ docs/_build
 
 # pycharm
 .idea
+
+# virtual environments
+.venv
+
+# visual studio code
+.vscode

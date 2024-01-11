@@ -16,10 +16,10 @@ Specifications
    :maxdepth: 1
    :caption: v2
 
-   Zarr spec v2 <https://zarr.readthedocs.io/en/stable/spec/v2.html>
+   Zarr spec v2 <v2/v2.0.rst>
 
 .. toctree::
    :maxdepth: 1
    :caption: v1
 
-   Zarr spec v1 <https://zarr.readthedocs.io/en/stable/spec/v1.html>
+   Zarr spec v1 <v1/v1.0.rst>
