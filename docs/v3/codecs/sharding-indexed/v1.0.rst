@@ -97,7 +97,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
             "chunk_shape": [32, 32],
             "codecs": [
               { 
-                "name": "endian",
+                "name": "bytes",
                 "configuration": {
                   "endian": "little",
                 }
@@ -111,7 +111,7 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
             ],
             "index_codecs": [
               { 
-                "name": "endian",
+                "name": "bytes",
                 "configuration": {
                   "endian": "little",
                 }

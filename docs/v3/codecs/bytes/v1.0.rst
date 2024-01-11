@@ -1,19 +1,19 @@
-.. _endian-codec-v1:
+.. _bytes-codec-v1:
 
 ============================
- Endian codec (version 1.0)
+ Bytes codec (version 1.0)
 ============================
 
   **Editor's draft 26 July 2019**
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/endian/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/bytes/v1.0.html
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/endian/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/bytes/v1.0.rst>`_
 
 Copyright 2020-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License
@@ -26,7 +26,8 @@ Abstract
 ========
 
 Defines an ``array -> bytes`` codec that encodes arrays of fixed-size numeric
-data types as little endian or big endian in lexicographical order.
+data types as a sequence of bytes in lexicographical order. For multi-byte data
+types, it encodes the array either in little endian or big endian.
 
 
 Status of this document
@@ -54,14 +55,18 @@ this specification are introduced with the words "for example".
 Codec name
 ==========
 
-The value of the ``name`` member in the codec object MUST be ``endian``.
+The value of the ``name`` member in the codec object MUST be ``bytes``.
 
 
 Configuration parameters
 ========================
 
 endian:
-    Required.  A string equal to either ``"big"`` or ``"little"``.
+    Required for data types for which endianness is applicable. For example, 
+    this includes multi-byte data types, such as ``uint16`` and ``int32``, 
+    but not single-byte data types, such as ``uint8`` or ``bool``. 
+    If present, the value MUST be a string equal to either ``"big"`` or 
+    ``"little"``.
 
 
 Format and algorithm
@@ -130,4 +135,5 @@ References
 Change log
 ==========
 
-No changes yet.
+- ``endian`` codec was renamed to ``bytes`` codec.  `PR #263
+  <https://github.com/zarr-developers/zarr-specs/pull/263/>`_
