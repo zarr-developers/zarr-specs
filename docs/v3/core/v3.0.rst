@@ -1106,7 +1106,7 @@ Logically, a codec ``c`` must define three properties:
   representation and any codec parameters.  In the case of a decoded
   representation that is a multi-dimensional array, the shape and data type
   of the encoded representation must be computable based only on the shape
-  and data type, but not the actual element values, of the encoded
+  and data type, but not the actual element values, of the decoded
   representation.  If the ``decoded_representation_type`` is not supported,
   this algorithm must fail with an error.
 
