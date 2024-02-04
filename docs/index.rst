@@ -7,7 +7,7 @@ A good starting point is the :ref:`zarr-core-specification-v3.0`.
 .. toctree::
 
    Home <https://zarr.dev>
-   specs
+   conventions
    ZEPs <https://zarr.dev/zeps>
    Implementations <https://github.com/zarr-developers/zarr_implementations>
 

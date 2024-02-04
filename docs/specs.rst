@@ -16,7 +16,7 @@ Specifications
    :maxdepth: 1
    :caption: Conventions
 
-   Conventions <conventions/conventions.rst>
+   Conventions <conventions/index.rst>
 
 .. toctree::
    :maxdepth: 1

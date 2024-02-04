@@ -137,3 +137,5 @@ Any new conventions accepted by the `ZEP <https://zarr.dev/zeps/active/ZEP0000.h
    :titlesonly:
    :caption: Contents:
 
+   xarray
+
