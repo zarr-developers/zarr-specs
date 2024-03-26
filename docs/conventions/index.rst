@@ -50,7 +50,7 @@ For example, a group metadata JSON document with conventions present might look 
       "zarr_format": 3,
       "node_type": "group",
       "attributes": {
-         "zarr_conventions": ["units-v1", "foo],
+         "zarr_conventions": ["units-v1", "foo"],
       }
    }
 
