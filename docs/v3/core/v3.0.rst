@@ -813,7 +813,7 @@ For example, the JSON document below defines an explicit group::
         "node_type": "group",
         "attributes": {
             "spam": "ham",
-            "eggs": 42,
+            "eggs": 42
         }
     }
 
