@@ -1515,7 +1515,7 @@ Let "+" be the string concatenation operator.
 **Retrieve chunk data in an array**
 
     To retrieve chunk data in an array at path `P` and chunk coordinate (`i`,
-    `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
+    `j`, ...), perform ``get(data_key(P, j, i, ...))``. The returned
     value is the serialisation of the corresponding chunk, encoded according to
     the array metadata stored at ``meta_key(P)``.
 
