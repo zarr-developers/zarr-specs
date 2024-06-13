@@ -303,14 +303,11 @@ The following figure illustrates the first part of the terminology:
 
 *Metadata document*
 
-    Each array_ in a hierarchy_ is represented by a metadata document,
+    Each array_ or group_ in a hierarchy_ is represented by a metadata document,
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
-    metadata document will specify the number of dimensions_, shape_,
+    metadata document specifies the number of dimensions_, shape_,
     `data type`_, grid_, and codec_ for that array_.
-
-    Groups can have an optional metadata document which provides extra
-    information about a group.
 
 .. _store:
 .. _stores:
