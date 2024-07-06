@@ -721,9 +721,9 @@ compressed using gzip compression prior to storage::
             }
         },
         "codecs": [{
-            "name": "gzip",
+            "name": "bytes",
             "configuration": {
-                "level": 1
+                "endian": "big"
             }
         }],
         "fill_value": "NaN",
@@ -760,9 +760,9 @@ above, but using a (currently made up) extension data type::
             }
         },
         "codecs": [{
-            "name": "gzip",
+            "name": "bytes",
             "configuration": {
-                "level": 1
+                "endian": "big"
             }
         }],
         "fill_value": null,
