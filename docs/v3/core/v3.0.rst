@@ -1549,7 +1549,7 @@ Let "+" be the string concatenation operator.
     groups.
 
     For hierarchies without group storage transformers one may also call
-    ``list_prefix("/")``. All ``zarr.json`` keys represent either explicit
+    ``list_prefix("")``. All ``zarr.json`` keys represent either explicit
     groups or arrays. All intermediate prefixes ending in a ``/`` are implicit
     groups.
 
