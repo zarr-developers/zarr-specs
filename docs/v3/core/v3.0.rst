@@ -408,7 +408,7 @@ underlying store_:
       - Data key
     * - `/foo/baz`
       - `(1, 0)`
-      - `foo/baz/c/1/0`
+      - `foo/baz/1/0`
 
 .. note::
 
