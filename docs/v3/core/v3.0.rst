@@ -1697,7 +1697,7 @@ by time.
 Changes after Provisional Acceptance
 ------------------------------------
 - Support for implicit groups was removed. `PR #292
-  <https://github.com/zarr-developers/zarr-specs/pull/XXX/>`_
+  <https://github.com/zarr-developers/zarr-specs/pull/292/>`_
 - ``endian`` codec was renamed to ``bytes`` codec.  `PR #263
   <https://github.com/zarr-developers/zarr-specs/pull/263/>`_
 - Fallback data type support was removed.  `PR #248
