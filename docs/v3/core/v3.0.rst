@@ -718,9 +718,9 @@ compressed using gzip compression prior to storage::
             }
         },
         "codecs": [{
-            "name": "gzip",
+            "name": "bytes",
             "configuration": {
-                "level": 1
+                "endian": "big"
             }
         }],
         "fill_value": "NaN",
@@ -757,9 +757,9 @@ above, but using a (currently made up) extension data type::
             }
         },
         "codecs": [{
-            "name": "gzip",
+            "name": "bytes",
             "configuration": {
-                "level": 1
+                "endian": "big"
             }
         }],
         "fill_value": null,
@@ -810,7 +810,7 @@ For example, the JSON document below defines a group::
         "node_type": "group",
         "attributes": {
             "spam": "ham",
-            "eggs": 42,
+            "eggs": 42
         }
     }
 
@@ -1506,7 +1506,7 @@ Let "+" be the string concatenation operator.
 **Retrieve chunk data in an array**
 
     To retrieve chunk data in an array at path `P` and chunk coordinate (`i`,
-    `j`, ...), perform ``get(data_key(P, j, i, ...), value)``. The returned
+    `j`, ...), perform ``get(data_key(P, j, i, ...))``. The returned
     value is the serialisation of the corresponding chunk, encoded according to
     the array metadata stored at ``meta_key(P)``.
 
@@ -1540,8 +1540,7 @@ Let "+" be the string concatenation operator.
     groups.
 
     For hierarchies without group storage transformers one may also call
-    ``list_prefix("/")``. All ``zarr.json`` keys represent either
-    groups or arrays.
+    ``list_prefix("/")``. All ``zarr.json`` keys represent either groups or arrays.
 
 **Erase a group or array**
 
