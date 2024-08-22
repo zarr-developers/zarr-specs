@@ -1214,9 +1214,22 @@ the following procedure:
 Specifying codecs
 -----------------
 
-To allow for flexibility to define and implement new codecs, this
-specification does not define any codecs, nor restrict the set of
-codecs that may be used. Each codec must be defined via a separate
+Core codecs
+-----------
+
+This specification depends on a set of core codecs which all Zarr implementations must implement.
+The specifications of these core codecs are host alongside this specification in the
+`zarr-specs GitHub repository`_, and which are
+published on the `zarr-specs documentation Web site
+<https://zarr-specs.readthedocs.io/>`_. The list of core codecs can be changed via the same mechanism used for 
+changing this specification document. Because supporting all of the core codecs is required for Zarr implementations,
+changes to the list of core codecs must be made in close collaboration with extant Zarr v3 implementations. In practice, 
+this means that active Zarr v3 implementations must first implement changes
+
+Non-core codecs
+---------------
+
+Each codec must be defined via a separate
 specification. In order to refer to codecs in array metadata
 documents, each codec must have a unique identifier, which is a URI
 that dereferences to a human-readable specification of the codec. A
@@ -1230,19 +1243,6 @@ compression level parameter, which is an integer that affects the
 resulting compression ratio of the data. Configuration parameters must
 be declared in the codec specification, including a definition of how
 configuration parameters are represented as JSON.
-
-The Zarr core development team maintains a repository of codec
-specifications, which are hosted alongside this specification in the
-`zarr-specs GitHub repository`_, and which are
-published on the `zarr-specs documentation Web site
-<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
-recommended that codec specifications are contributed to the
-zarr-specs GitHub repository. However, codec specifications may be
-maintained by any group or organisation and published in any location
-on the Web. For further details of the process for contributing a
-codec specification to the zarr-specs GitHub repository, see
-`ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
-the process for Zarr specification changes.
 
 Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
 
