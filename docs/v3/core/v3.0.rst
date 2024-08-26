@@ -821,6 +821,10 @@ Optional keys:
     must_understand const ``False``            The boolean literal ``False``. Indicates that the field is not required to load the Zarr hierarchy.
     =============== =========================  ===================================================================================================
 
+    Note that *all* children Arrays and Groups should be included in
+    consolidated metadata, not just the nodes immediately below the root Group.
+    Children nested inside other groups should be included too.
+
     Consolidated metadata can help reduce the time needed to load the metadata
     for an entire hierarchy, especially when the metadata is being served over a
     network. Without consolidated metadata, opening an entire hierarchy over the
