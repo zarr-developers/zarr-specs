@@ -1210,8 +1210,12 @@ the following procedure:
 
 4. The chunk array ``A`` is equal to ``EC[0]``.
 
+.. _codec-specification:
+
 Specifying codecs
 -----------------
+
+.. _core-codecs:
 
 Core codecs
 -----------
