@@ -295,7 +295,7 @@ The following figure illustrates the first part of the terminology:
 
 *Codec*
 
-    The list of *codecs* specified for an array_ determine the encoded byte
+    The list of *codecs* specified for an array_ determines the encoded byte
     representation of each chunk in the store_.
 
 .. _metadata document:
@@ -634,13 +634,12 @@ mandatory names:
 ``codecs``
 ^^^^^^^^^^
 
-    Specifies a list of codecs to be used for encoding and decoding chunks. The
-    value must be an array of objects, each object containing a member with
-    ``name`` whose value is a string referring to a v3 codec specification. The
-    codec object may also contain a ``configuration`` object which consists of
-    the parameter names and values as defined by the corresponding codec
-    specification.  Since an ``array -> bytes`` codec must be specified, the
-    list cannot be empty.
+    Specifies a list of codecs to be used for encoding and decoding chunks.  The
+    value MUST be an array of objects, where each object contains a member with the name
+    ``name`` whose value is a string. The ``name`` member identifies the specification for the codec.  A
+    codec object MAY contain a member named ``configuration``, which is an object defined by the respective codec
+    specification.  Because ``codecs`` MUST contain an ``array -> bytes`` codec, the
+    list cannot be empty (See :ref:`codecs <codecs>`).
 
 The following members are optional:
 
@@ -1217,34 +1216,32 @@ Specifying codecs
 Core codecs
 -----------
 
-This specification depends on a set of core codecs which all Zarr implementations must implement.
-The specifications of these core codecs are host alongside this specification in the
-`zarr-specs GitHub repository`_, and which are
-published on the `zarr-specs documentation Web site
-<https://zarr-specs.readthedocs.io/>`_. The list of core codecs can be changed via the same mechanism used for 
-changing this specification document. Because supporting all of the core codecs is required for Zarr implementations,
-changes to the list of core codecs must be made in close collaboration with extant Zarr v3 implementations. In practice, 
-this means that active Zarr v3 implementations must first implement changes
+This spec defines a set of codecs ("core codecs") which all Zarr implementations MUST implement. 
+This requirement is intended to ensure a minimal level of interoperability between Zarr implementations.
+Core codecs are each defined by specification documents which are hosted in the
+`zarr-specs GitHub repository`_, and are published on the `zarr-specs documentation web site
+<https://zarr-specs.readthedocs.io/>`_. The list of core codecs is part of the Zarr v3 specification. 
+Changes to the list of core codecs MUST be made via the same protocol used for 
+changing the Zarr v3 specification. Changes to the list of core codecs SHOULD be made carefully and
+in close collaboration with extant Zarr v3 implementations. A new core codec SHOULD be added to the 
+list when a sufficient number of Zarr implementations support or intend to support that codec. 
+An existing core codec SHOULD be removed from the list when a sufficient number of implementation 
+developers and Zarr users deem the codec worth removing, e.g. because of a technical flaw in the 
+algorithm underlying the codec.
 
-Non-core codecs
----------------
+Community codecs
+----------------
 
-Each codec must be defined via a separate
-specification. In order to refer to codecs in array metadata
-documents, each codec must have a unique identifier, which is a URI
-that dereferences to a human-readable specification of the codec. A
-codec specification must declare the codec identifier, and describe
-(or cite documents that describe) the encoding and decoding algorithms
-and the format of the encoded data.
+Zarr implementations MAY support a codec that is not in the list of core codecs 
+(hereafter termed a "community codec"), provided the community codec does not use an identifier 
+that is already used by a core codec, as the identifiers of core codecs are reserved.
 
-A codec may have configuration parameters which modify the behaviour
-of the codec in some way. For example, a compression codec may have a
-compression level parameter, which is an integer that affects the
-resulting compression ratio of the data. Configuration parameters must
-be declared in the codec specification, including a definition of how
-configuration parameters are represented as JSON.
-
-Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
+This specification places no other constraints on community codecs. It is possible that separate 
+developers may define distinct codecs that use the same identifier. 
+To minimize the impact of such name collisions, codec developers are strongly encouraged 
+to publish their codec specifications as additions to the "community codecs" section of Zarr v3 specification. 
+Publication in the "community codecs" section does not confer primacy or an official designation to a codec. 
+The list of community codecs exists expressly as a tool to enable coordinated codec development.
 
 Stores
 ======
