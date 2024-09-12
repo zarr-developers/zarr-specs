@@ -1220,8 +1220,8 @@ Specifying codecs
 Core codecs
 -----------
 
-This spec defines a set of codecs ("core codecs") which all Zarr implementations MUST implement. 
-This requirement is intended to ensure a minimal level of interoperability between Zarr implementations.
+This spec defines a set of codecs ("core codecs") which all Zarr implementations SHOULD implement in 
+order to ensure a minimal level of interoperability between Zarr implementations.
 Core codecs are each defined by specification documents which are hosted in the
 `zarr-specs GitHub repository`_, and are published on the `zarr-specs documentation web site
 <https://zarr-specs.readthedocs.io/>`_. The list of core codecs is part of the Zarr v3 specification. 
