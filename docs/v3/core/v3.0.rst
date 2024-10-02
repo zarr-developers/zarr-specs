@@ -303,14 +303,11 @@ The following figure illustrates the first part of the terminology:
 
 *Metadata document*
 
-    Each array_ in a hierarchy_ is represented by a metadata document,
+    Each array_ or group_ in a hierarchy_ is represented by a metadata document,
     which is a machine-readable document containing essential
     processing information about the node. For example, an array_
-    metadata document will specify the number of dimensions_, shape_,
+    metadata document specifies the number of dimensions_, shape_,
     `data type`_, grid_, and codec_ for that array_.
-
-    Groups can have an optional metadata document which provides extra
-    information about a group.
 
 .. _store:
 .. _stores:
@@ -806,7 +803,6 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
-
 ``consolidated_metadata``
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -844,7 +840,7 @@ Optional keys:
 Example Group Metadata
 ----------------------
 
-For example, the JSON document below defines an explicit group::
+For example, the JSON document below defines a group::
 
     {
         "zarr_format": 3,
@@ -859,10 +855,6 @@ The group metadata object must not contain any other names. Those are reserved
 for future versions of this specification. An implementation must fail to open
 zarr hierarchies or groups with unknown metadata fields, with the exception of
 objects with a ``"must_understand": false`` key-value pair.
-
-.. note::
-
-   A group does not need a metadata document to exist. (See implicit groups.)
 
 
 Node names
@@ -1527,12 +1519,10 @@ Let "+" be the string concatenation operator.
 
 **Create a group**
 
-    To create an explicit group at hierarchy path `P`, perform
+    To create a group at hierarchy path `P`, perform
     ``set(meta_key(P), value)``, where `value` is the
-    serialization of a valid group metadata document.
-
-    Creating a group at path `P` implies
-    the existence of groups at all ancestor paths of `P`.
+    serialization of a valid group metadata document, and
+    ensure the existence of groups at all ancestor paths of `P`.
 
 **Create an array**
 
@@ -1587,16 +1577,14 @@ Let "+" be the string concatenation operator.
     groups.
 
     For hierarchies without group storage transformers one may also call
-    ``list_prefix("")``. All ``zarr.json`` keys represent either explicit
-    groups or arrays. All intermediate prefixes ending in a ``/`` are implicit
-    groups.
+    ``list_prefix("/")``. All ``zarr.json`` keys represent either groups or arrays.
 
 **Erase a group or array**
 
     To erase an array at path `P`, erase the metadata document and array data
     for the array, ``erase_prefix(P + "/")``.
 
-    To erase an explicit or implicit group at path `P`: erase all nodes under
+    To erase a group at path `P`: erase all nodes under
     this group and its metadata document - it should be sufficient to perform
     ``erase_prefix(P + "/")``
 
@@ -1605,9 +1593,7 @@ Let "+" be the string concatenation operator.
     To determine if a node exists at path ``P``, try in the following order
 
     - ``get(meta_key(P))``
-      (success implies an array or explicit group at ``P``);
-    - ``list_dir(P + "/")``
-      (non-empty result set implies an implicit group at ``P``).
+      (success implies an array or group at ``P``);
 
     .. note::
         For listable stores, ``list_dir(parent(P))`` can be an alternative.
@@ -1688,23 +1674,6 @@ Implementation Notes
 This section is non-normative and presents notes from implementers about cases
 that need to be carefully considered but do not strictly fall into the spec.
 
-Explicit vs implicit groups
----------------------------
-
-This specification defines both implicit and explicit groups, but implementations may
-create an explicit group for all implicit groups they encounter, in
-particular when using a hierarchical storage.
-
-Erasure of an implicit group may automatically erase any empty parent. For
-example on a S3 store where the namespace is flat, erasure of the last key with
-a prefix will erase all implicit groups in the prefix.
-
-Care must be taken when erasing an array or a group if the parent needs to
-be converted into an explicit group.
-
-A race-condition arises if a client writes an array at path ``P``,
-and another client concurrently assumes ``P`` is an implicit group and writes subgroups or arrays into it.
-Implementations can avoid this race condition by exclusively using explicit groups.
 
 Resizing
 --------
@@ -1740,13 +1709,6 @@ Below is a summary of the key differences between this specification
 - v3 has explicit support for extensions via defined
   extension points and mechanisms.
 
-- v3 allows for greater flexibility in how groups and arrays are
-  created. In particular, v3 supports implicit groups, which are
-  groups that do not have a metadata document but whose existence is
-  implied by descendant nodes. This change enables multiple arrays to
-  be created in parallel without generating race conditions for the
-  metadata when creating parent groups.
-
 - The set of data types specified in v3 is less than in v2. Additional
   data types will be defined via extensions.
 
@@ -1771,7 +1733,8 @@ by time.
 
 Changes after Provisional Acceptance
 ------------------------------------
-
+- Support for implicit groups was removed. `PR #292
+  <https://github.com/zarr-developers/zarr-specs/pull/292/>`_
 - ``endian`` codec was renamed to ``bytes`` codec.  `PR #263
   <https://github.com/zarr-developers/zarr-specs/pull/263/>`_
 - Fallback data type support was removed.  `PR #248
