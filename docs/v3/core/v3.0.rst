@@ -849,7 +849,7 @@ Optional keys:
     would have the keys ``"x", "y"``.
 
     Consolidated Metadata is optional. If present, then readers should use the
-    consolidated metadata when . When not present, readers should use the
+    consolidated metadata. When not present, readers should use the
     non-consolidated metadata located in the Store to load the data.
 
     The ``kind`` field indicates that consolidated metadata is stored inline in
