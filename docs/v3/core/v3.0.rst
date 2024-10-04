@@ -1240,8 +1240,8 @@ Zarr implementations MAY support a codec that is not in the list of core codecs
 (hereafter termed a "community codec"), provided the community codec does not use an identifier 
 that is already used by a core codec, as the identifiers of core codecs are reserved.
 
-This specification places no other constraints on community codecs. It is possible that separate 
-developers may define distinct codecs that use the same identifier. 
+This specification places no other constraints on community codecs. It is possible, through discouraged,
+that separate  developers may define distinct codecs that use the same identifier. 
 To minimize the impact of such name collisions, codec developers are strongly encouraged 
 to publish their codec specifications as additions to the "community codecs" section of Zarr v3 specification. 
 Publication in the "community codecs" section does not confer primacy or an official designation to a codec. 
