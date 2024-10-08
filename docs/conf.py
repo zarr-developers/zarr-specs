@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Zarr specs'
-copyright = '2019, Zarr Developers'
+copyright = '2024, Zarr Developers'
 author = 'Zarr Developers'
 
 
@@ -63,9 +63,9 @@ html_theme_options = {
   "twitter_url": "https://twitter.com/zarr_dev/",
   "icon_links": [
     {
-      "name": "Gitter",
-      "url": "https://gitter.im/zarr-developers/community",
-      "icon": "fa-brands fa-gitter",
+      "name": "Zulip",
+      "url": "https://ossci.zulipchat.com/",
+      "icon": "fas fa-comments",
     },
   ],
   "show_prev_next": False,
