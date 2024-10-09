@@ -775,7 +775,7 @@ above, but using a (currently made up) extension data type::
    - ``chunks`` has been replaced with ``chunk_grid``,
    - ``dimension_separator`` has been replaced with ``chunk_key_encoding``,
    - ``order`` has been replaced by the :ref:`transpose <transpose-codec-v1>` codec,
-   - the separate ``filters`` and ``compressor`` fields been combined into the single ``codecs`` field.
+   - the separate ``filters`` and ``compressor`` fields have been combined into the single ``codecs`` field.
 
 .. _group-metadata:
 
