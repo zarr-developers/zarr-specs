@@ -1226,7 +1226,7 @@ Each core codec is each defined by specification documents which are hosted in t
 `zarr-specs GitHub repository`_, and are published on the `zarr-specs documentation web site
 <https://zarr-specs.readthedocs.io/>`_. The list of core codecs is part of the Zarr v3 specification. 
 Changes to the list of core codecs MUST be made via the same protocol used for 
-changing the Zarr v3 specification. Changes to the list of core codecs SHOULD be made carefully and
+changing the Zarr v3 specification. Changes to the list of core codecs SHOULD be made 
 in close collaboration with extant Zarr v3 implementations. A new core codec SHOULD be added to the 
 list when a sufficient number of Zarr implementations support or intend to support that codec. 
 An existing core codec SHOULD be removed from the list when a sufficient number of implementation 
