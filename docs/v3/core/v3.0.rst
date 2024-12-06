@@ -720,7 +720,7 @@ compressed using gzip compression prior to storage::
         "codecs": [{
             "name": "bytes",
             "configuration": {
-                "endian": "big"
+                "endian": "little"
             }
         }],
         "fill_value": "NaN",
