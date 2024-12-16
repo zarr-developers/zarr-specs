@@ -1271,7 +1271,7 @@ when opening a Zarr hierarchy to automatically determine the appropriate store.
 Abstract store interface
 ------------------------
 
-(This subsection is not normative.)
+(This subsection is not normative. It is intended only as a recommendation for API design, but does not need to be strictly followed like the specification for the on-disk storage does.)
 
 The store interface is intended to be simple to implement using a
 variety of different underlying storage technologies. It is defined in
