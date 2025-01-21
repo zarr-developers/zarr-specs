@@ -166,7 +166,7 @@ Definitions
 * **Inner chunk** is a chunk within the shard.
 * **Shard shape** is the chunk shape of the outer array.
 * **Inner chunk shape** is defined by the ``chunk_shape`` configuration of the codec.
-  The inner chunk shape needs to have the same dimensions as the shard shape and the 
+  The inner chunk shape needs to have the same number of dimensions as the shard shape and the
   inner chunk shape along each dimension must evenly divide the size of the shard shape.
 * **Chunks per shard** is the element-wise division of the shard shape by the 
   inner chunk shape.
