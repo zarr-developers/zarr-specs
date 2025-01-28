@@ -33,11 +33,6 @@ extensions = [
   'sphinx_reredirects',
 ]
 
-mermaid_version = ""
-html_js_files = [
-   'js/mermaid.js',  # v9.4.0
-]
-
 # Display todos by setting to True
 todo_include_todos = True
 
