@@ -1719,7 +1719,9 @@ by time.
 ---
 
 - Clarification of extensions. `PR #TODO
-  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_
+  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_. With this change,
+  it is now possible to register new names for extension objects as well as use
+  URI.
 
 Changes after Provisional Acceptance
 ------------------------------------
