@@ -351,13 +351,13 @@ terminology for a use case of reading from an array:
 
 *Extension points*
 
-    Locations within a `metadata_document_` where extension-related
+    Locations within a `metadata document_` where extension-related
     metadata can be found. Current extension points are listed in the core spec,
     e.g. `codecs`, `data_type`. See :ref:`extension points <extensions_section>` below.
 
 *Extensions*
 
-    Components defined in a `metadata_document`_ to
+    Components defined in a `metadata document`_ to
     configure how metadata are interpreted by implementations. These
     components include codecs, data types, chunk key encodings, chunk grids and
     storage transformers. See :ref:`extension points <extensions_section>` below.
