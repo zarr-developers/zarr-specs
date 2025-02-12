@@ -1697,6 +1697,12 @@ All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
 
+3.1
+---
+
+- Clarification of extensions. `PR #TODO
+  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_
+
 Changes after Provisional Acceptance
 ------------------------------------
 - Support for implicit groups was removed. `PR #292
@@ -1713,7 +1719,7 @@ Changes after Provisional Acceptance
   <https://github.com/zarr-developers/zarr-specs/pull/236>`_
 
 Draft Changes
---------------------------
+-------------
 
 - Removed `extensions` field and clarified extension point behaviour, changing the config format of
   data-types, chunk-grid, storage-transformers and codecs. `PR #204
@@ -1750,15 +1756,5 @@ Draft Changes
   `PR #134 <https://github.com/zarr-developers/zarr-specs/pull/134>`_
 - The changelog is incomplete before 2022, please refer to the commits on
   GitHub.
-
-@@tag@@
--------
-
-Links: `view spec
-<https://zarr-specs.readthedocs.io/en/@@tag@@/core/v3.0.html>`_;
-`view source
-<https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/core/v3.0.rst>`_
-
-@@TODO summary of changes since previous tag.
 
 .. _zarr-specs GitHub repository: https://github.com/zarr-developers/zarr-specs
