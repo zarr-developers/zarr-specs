@@ -263,7 +263,7 @@ The following figure illustrates the first part of the terminology:
     contain. For example, the 32-bit signed integer data type defines binary
     representations for all integers in the range −2,147,483,648 to
     2,147,483,647. This specification only defines a limited set of data types,
-    but extensions may define other data types.
+    but :ref:`extensions<extensions_section>` may define other data types.
 
 .. _chunk:
 .. _chunks:
@@ -287,7 +287,7 @@ The following figure illustrates the first part of the terminology:
     The chunks_ of an array_ are organised into a grid. This
     specification only considers the case where all chunks_ have the
     same chunk shape and the chunks form a regular grid. However,
-    extensions may define other grid types such as
+    :ref:`extensions<extensions_section>` may define other grid types such as
     rectilinear grids.
 
 .. _codec:
