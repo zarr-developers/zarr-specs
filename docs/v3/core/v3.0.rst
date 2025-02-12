@@ -1619,9 +1619,14 @@ Storage transformers may be stacked to combine different functionalities:
 
 .. _extensions_section:
 
-Extension points
-================
+Extensions
+==========
 
+This section describes how additional functionality can defined
+for Zarr datasets by extended the `metadata documents`_.
+
+Extension points
+----------------
 
 Different types of extensions can exist and they can be grouped as follows:
 
@@ -1637,20 +1642,103 @@ array       storage transformer     `storage_transformers`_
 
 If such extension points are used by groups or arrays, they are required.
 
-See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
-potential extensions.
+New extension points may be proposed to the Zarr community through the ZEP
+process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more information.
 
-Specifications for new extensions are recommended to be published in the
-https://github.com/zarr-developers/zarr-specs repository via the
-`ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_. If a specification
-is published decentralized (e.g. for initial experimentation or due to a very
-specialized scope), it must use a URL in the `name` key of its metadata, which
-identifies the publishing organization or individual, and should point to the
-specification of the extension.
+Extension definition
+--------------------
 
-Future versions of this specification may also add new core features by adding new top-level
-metadata keys. Such features are required by default. However, if the value of an unknown feature
-is an object containing the key-value pair ``"must_understand": false``, it can be ignored.
+Extensions are defined in `metadata documents`_ either as objects or as
+short-hand names. If using an objection definition, the following pattern
+MUST be followed::
+
+    {
+        "name": "<name>",
+        "configuration": { ... } # optional
+    }
+
+If such an object is present, the field `must_understand` is implicitly set to
+`True` and an object can explicitly set `must_understand=False` if
+implementations can ignore its presence, following the current guidelines in
+the v3 specification.
+
+Instead of extension objects, short-hand names may continue to be used if no
+configuration metadata is required. They would be equivalent to extension
+objects with just a `name` key.
+
+Extension naming
+----------------
+
+The identifier used in the `name` field of the extension definition can follow one of two forms:
+
+1. **Raw names** MUST be assigned within a central repository and follow the
+   compatibility and versioning [v3 stability
+   policy](https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html#stability-policy).
+   The name assignment is managed through the [`zarr-developers` Github
+   organization](https://github.com/zarr-developers), where each extension is
+   listed and either contains a spec document or links to a spec document.
+   Names are never unassigned or reassigned. The ZSC or by delegation a
+   maintainer team reserves the right to refuse name assignment at its own
+   discretion.
+
+   - **Example:** `zstd`
+   - **Acceptd regex:** `^[a-z0-9-_.]+$`
+
+2. **URI-based names** can be used by anyone without further coordination
+   though the assumption is that users reasonably "own" the URI. The URL SHOULD
+   resolve to a human-readable explanation of the extension, but
+   implementations SHOULD NOT attempt to resolve the URL during processing.
+   There are no guarantees in terms of versioning or compatibility. However,
+   preserving backwards-compatibility is strongly encouraged. See the
+   [versioning section](#Versioning-and-spec-evolution) below.
+
+   - **Example:** `https://example.com/zarr3/consolidated-metadata`
+   - **Accepted regex:** `^https?:\/\/[^/?#]+[^?#]*$`
+
+Extension example
+-----------------
+
+The following example represents an Array showing many of the proposed changes
+described above::
+
+    {
+        "zarr_format": 3,
+        "data_type": "https://example.com/zarr/string", // URI-based name, short-hand name
+        "chunk_key_encoding": {
+            "name": "default", // core
+            "configuration": { "separator": "." }
+        },
+        "codecs": [
+            {
+                "name": "https://numcodecs.dev/vlen-utf8" // URI-based name
+            },
+            {
+                "name": "zstd", // raw name
+                "configuration": { ... }
+            }
+        ],
+        "chunk_grid": {
+            "name": "regular", // core
+            "configuration": { "chunk_shape": [ 32 ] }
+        },
+        "shape": [ 128 ],
+        "dimension_names": [ "x" ],
+        "attributes": { ... },
+        "storage_transformers": []
+    }
+
+Extension specifications
+------------------------
+
+There is no strict requirement for extensions to have a formal specification.
+However, for adoption in the community it is STRONGLY RECOMMENDED to write a
+specification.
+
+For extensions with raw names, the `zarr-developers/zarr-extensions` repository
+SHOULD either contain the specification directly or link to the official location.
+For extensions with URI-based names, it is RECOMMENDED to publish the specification
+under the URI of the extension. Additionally, URI-based extensions MAY also register
+themselves under the `zarr-extensions` repository for better discovery.
 
 Implementation Notes
 ====================
