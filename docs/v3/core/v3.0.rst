@@ -810,28 +810,47 @@ above, but using a (currently made up) extension data type::
 Group metadata
 --------------
 
+Mandatory
+^^^^^^^^^
+
 A Zarr group metadata object must contain the following mandatory key:
 
 ``zarr_format``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     An integer defining the version of the storage specification to which the
     array store adheres, must be ``3`` here.
 
 ``node_type``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     A string defining the type of hierarchy node element, must be ``group``
     here.
 
+Optional
+^^^^^^^^
+
 Optional keys:
 
 ``attributes``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
+
+Extensions
+^^^^^^^^^^
+
+All other names found in the metadata object MUST be interpreted
+following the `extensions_section`_.
+An implementation MUST fail to open Zarr hierarchies, groups
+or arrays if any metadata fields are present which (a) the
+implementation does not recognize and (b) are not explicitly
+set to ``"must_understand": false``.
+
+Example
+^^^^^^^
 
 For example, the JSON document below defines a group::
 
