@@ -55,8 +55,12 @@ html_logo = '_static/logo.png'
 
 html_theme_options = {
   "github_url": "https://github.com/zarr-developers/zarr-specs",
-  "twitter_url": "https://twitter.com/zarr_dev/",
   "icon_links": [
+    {
+      "name": "Bluesky",
+      "url": "https://bsky.app/profile/zarr.dev",
+      "icon": "fa-brands fa-bluesky",
+    },
     {
       "name": "Zulip",
       "url": "https://ossci.zulipchat.com/",
@@ -65,7 +69,6 @@ html_theme_options = {
   ],
   "show_prev_next": False,
   "secondary_sidebar_items": ["page-toc"],
-  "footer_items": [],  # hidden in custom css
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
