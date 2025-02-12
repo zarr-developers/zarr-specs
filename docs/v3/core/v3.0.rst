@@ -494,9 +494,10 @@ mandatory names:
     identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
-    The ``data_type`` value is an extension point and may be defined by a data
+    The ``data_type`` value is an :ref:`extension point<extensions_section>`
+    and may be defined by a data
     type extension. If the data type is defined by an extension, then the value
-    may be either a plain string or an object containing the members ``name``
+    may be either a plain string (incl. URI) or an object containing the members ``name``
     and optionally ``configuration``.  A plain string is equivalent to
     specifying an object with just a ``name`` member.  The ``name`` is required
     and its value must refer to a v3 data type specification. ``configuration``
@@ -516,7 +517,8 @@ mandatory names:
     means a regular grid where the chunks have length 2 along the first
     dimension and length 5 along the second dimension.
 
-    The ``chunk_grid`` value is an extension point and may be defined by an
+    The ``chunk_grid`` value is an :ref:`extension point<extensions_section>`
+    and may be defined by an
     extension. If the chunk grid type is defined by an extension, then ``name``
     must be a string referring to a v3 chunk grid specification. The
     ``configuration`` is optional and defined by the extension.
@@ -655,7 +657,7 @@ mandatory names:
 """"""""""
 
     Specifies a list of codecs to be used for encoding and decoding chunks. The
-    value MUST be an array of extension definitions as defined under TODO.
+    value MUST be an array of :ref:`extension definitions<extensions_section>`.
     Because ``codecs`` MUST contain an ``array
     -> bytes`` codec, the list cannot be empty (See :ref:`codecs <codecs>`).
 
@@ -929,7 +931,8 @@ should be interpreted.
 
 This core specification defines a limited set of data types to
 represent boolean values, integers, and floating point
-numbers. Extensions may define additional data types. All of the data
+numbers. :ref:`Extensions<extensions_section>` may define additional
+data types. All of the data
 types defined here have a fixed size, in the sense that all values
 require the same number of bytes. However, extensions may define
 variable sized data types.
@@ -1020,7 +1023,8 @@ chunk, and there are no gaps or overlaps between chunks.
 
 In general there are different possible types of grids. The core
 specification defines the regular grid type, where all chunks are
-hyperrectangles of the same shape. Extensions may define other grid
+hyperrectangles of the same shape.
+:ref:`Extensions<extensions_section>` may define other grid
 types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
 
