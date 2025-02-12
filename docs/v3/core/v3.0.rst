@@ -458,23 +458,28 @@ Array metadata
 --------------
 
 Each Zarr array in a hierarchy must have an array metadata document, named
-``zarr.json``. This document must contain a single object with the following
+``zarr.json``.
+
+Mandatory
+^^^^^^^^^
+
+This document must contain a single object with the following
 mandatory names:
 
 ``zarr_format``
-^^^^^^^^^^^^^^^
+""""""""""""""""
 
     An integer defining the version of the storage specification to which the
     array store adheres, must be ``3`` here.
 
 ``node_type``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     A string defining the type of hierarchy node element, must be ``array``
     here.
 
 ``shape``
-^^^^^^^^^
+"""""""""
 
     An array of integers providing the length of each dimension of the
     Zarr array. For example, a value ``[10, 20]`` indicates a
@@ -482,7 +487,7 @@ mandatory names:
     10 and the second dimension has length 20.
 
 ``data_type``
-^^^^^^^^^^^^^
+"""""""""""""
 
     The data type of the Zarr array. If the data type is defined in
     this specification, then the value must be the data type
@@ -498,7 +503,7 @@ mandatory names:
     is optional and its value is defined by the extension.
 
 ``chunk_grid``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The chunk grid of the Zarr array. If the chunk grid is a regular chunk grid
     as defined in this specification, then the value must be an object with the
@@ -517,7 +522,7 @@ mandatory names:
     ``configuration`` is optional and defined by the extension.
 
 ``chunk_key_encoding``
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""
 
     The mapping from chunk grid cell coordinates to keys in the underlying
     store.
@@ -583,7 +588,7 @@ mandatory names:
          to be used when writing new arrays.
 
 ``fill_value``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     Provides an element value to use for uninitialised portions of the
     Zarr array.
@@ -647,17 +652,20 @@ mandatory names:
        chosen MUST be recorded in the metadata.
 
 ``codecs``
-^^^^^^^^^^
+""""""""""
 
     Specifies a list of codecs to be used for encoding and decoding chunks. The
     value MUST be an array of extension definitions as defined under TODO.
     Because ``codecs`` MUST contain an ``array
     -> bytes`` codec, the list cannot be empty (See :ref:`codecs <codecs>`).
 
+Optional
+^^^^^^^^
+
 The following members are optional:
 
 ``attributes``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
@@ -673,7 +681,7 @@ The following members are optional:
     https://github.com/zarr-developers/zeps/pull/28.
 
 ``storage_transformers``
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
     Specifies a stack of `storage transformers`_. Each value in the list must be
     an object containing the names ``name`` and optionally ``configuration``.
@@ -684,7 +692,7 @@ The following members are optional:
     absent no storage transformer is used, same for an empty list.
 
 ``dimension_names``
-^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""
 
     Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
     an array of strings or null objects with the same length as ``shape``.  An
@@ -700,11 +708,18 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
-The array metadata object must not contain any other names.
-Those are reserved for future versions of this specification.
-An implementation must fail to open Zarr hierarchies, groups
-or arrays with unknown metadata fields, with the exception of
-objects with a ``"must_understand": false`` key-value pair.
+Extensions
+^^^^^^^^^^
+
+All other names found in the metadata object MUST be interpreted
+following the `extensions_section`_.
+An implementation MUST fail to open Zarr hierarchies, groups
+or arrays if any metadata fields are present which (a) the
+implementation does not recognize and (b) are not explicitly
+set to ``"must_understand": false``.
+
+Example
+^^^^^^^
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
