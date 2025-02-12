@@ -349,6 +349,24 @@ terminology for a use case of reading from an array:
 .. image:: terminology-read.excalidraw.png
   :width: 600
 
+*Extension points*
+
+    Locations within a `metadata_document_` where extension-related
+    metadata can be found. Current extension points are listed in the core spec,
+    e.g. `codecs`, `data_type`. See :ref:`extension points <extensions_section>` below.
+
+*Extensions*
+
+    Components defined in a `metadata_document`_ to
+    configure how metadata are interpreted by implementations. These
+    components include codecs, data types, chunk key encodings, chunk grids and
+    storage transformers. See :ref:`extension points <extensions_section>` below.
+
+*Core*
+
+    Core concepts refers to the Zarr v3 core specification as defined in this document
+    not necessarily if something is a MUST for implementations.
+
 .. _stored-representation:
 
 Stored representation
