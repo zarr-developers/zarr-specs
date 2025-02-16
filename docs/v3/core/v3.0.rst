@@ -263,7 +263,7 @@ The following figure illustrates the first part of the terminology:
     contain. For example, the 32-bit signed integer data type defines binary
     representations for all integers in the range −2,147,483,648 to
     2,147,483,647. This specification only defines a limited set of data types,
-    but extensions may define other data types.
+    but :ref:`extensions<extensions_section>` may define other data types.
 
 .. _chunk:
 .. _chunks:
@@ -287,7 +287,7 @@ The following figure illustrates the first part of the terminology:
     The chunks_ of an array_ are organised into a grid. This
     specification only considers the case where all chunks_ have the
     same chunk shape and the chunks form a regular grid. However,
-    extensions may define other grid types such as
+    :ref:`extensions<extensions_section>` may define other grid types such as
     rectilinear grids.
 
 .. _codec:
@@ -295,7 +295,7 @@ The following figure illustrates the first part of the terminology:
 
 *Codec*
 
-    The list of *codecs* specified for an array_ determine the encoded byte
+    The list of *codecs* specified for an array_ determines the encoded byte
     representation of each chunk in the store_.
 
 .. _metadata document:
@@ -348,6 +348,24 @@ terminology for a use case of reading from an array:
    and can be loaded there, as the source is embedded in the png.
 .. image:: terminology-read.excalidraw.png
   :width: 600
+
+*Extension points*
+
+    Locations within a `metadata document_` where extension-related
+    metadata can be found. Current extension points are listed in the core spec,
+    e.g. `codecs`, `data_type`. See :ref:`extension points <extensions_section>` below.
+
+*Extensions*
+
+    Components defined in a `metadata document`_ to
+    configure how metadata are interpreted by implementations. These
+    components include codecs, data types, chunk key encodings, chunk grids and
+    storage transformers. See :ref:`extension points <extensions_section>` below.
+
+*Core*
+
+    Core concepts refers to the Zarr v3 core specification as defined in this document
+    not necessarily if something is a MUST for implementations.
 
 .. _stored-representation:
 
@@ -440,23 +458,28 @@ Array metadata
 --------------
 
 Each Zarr array in a hierarchy must have an array metadata document, named
-``zarr.json``. This document must contain a single object with the following
+``zarr.json``.
+
+Mandatory
+^^^^^^^^^
+
+This document must contain a single object with the following
 mandatory names:
 
 ``zarr_format``
-^^^^^^^^^^^^^^^
+""""""""""""""""
 
     An integer defining the version of the storage specification to which the
     array store adheres, must be ``3`` here.
 
 ``node_type``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     A string defining the type of hierarchy node element, must be ``array``
     here.
 
 ``shape``
-^^^^^^^^^
+"""""""""
 
     An array of integers providing the length of each dimension of the
     Zarr array. For example, a value ``[10, 20]`` indicates a
@@ -464,23 +487,24 @@ mandatory names:
     10 and the second dimension has length 20.
 
 ``data_type``
-^^^^^^^^^^^^^
+"""""""""""""
 
     The data type of the Zarr array. If the data type is defined in
     this specification, then the value must be the data type
     identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
-    The ``data_type`` value is an extension point and may be defined by a data
+    The ``data_type`` value is an :ref:`extension point<extensions_section>`
+    and may be defined by a data
     type extension. If the data type is defined by an extension, then the value
-    may be either a plain string or an object containing the members ``name``
+    may be either a plain string (incl. URI) or an object containing the members ``name``
     and optionally ``configuration``.  A plain string is equivalent to
     specifying an object with just a ``name`` member.  The ``name`` is required
     and its value must refer to a v3 data type specification. ``configuration``
     is optional and its value is defined by the extension.
 
 ``chunk_grid``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The chunk grid of the Zarr array. If the chunk grid is a regular chunk grid
     as defined in this specification, then the value must be an object with the
@@ -493,13 +517,14 @@ mandatory names:
     means a regular grid where the chunks have length 2 along the first
     dimension and length 5 along the second dimension.
 
-    The ``chunk_grid`` value is an extension point and may be defined by an
+    The ``chunk_grid`` value is an :ref:`extension point<extensions_section>`
+    and may be defined by an
     extension. If the chunk grid type is defined by an extension, then ``name``
     must be a string referring to a v3 chunk grid specification. The
     ``configuration`` is optional and defined by the extension.
 
 ``chunk_key_encoding``
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""
 
     The mapping from chunk grid cell coordinates to keys in the underlying
     store.
@@ -565,7 +590,7 @@ mandatory names:
          to be used when writing new arrays.
 
 ``fill_value``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     Provides an element value to use for uninitialised portions of the
     Zarr array.
@@ -629,20 +654,20 @@ mandatory names:
        chosen MUST be recorded in the metadata.
 
 ``codecs``
-^^^^^^^^^^
+""""""""""
 
     Specifies a list of codecs to be used for encoding and decoding chunks. The
-    value must be an array of objects, each object containing a member with
-    ``name`` whose value is a string referring to a v3 codec specification. The
-    codec object may also contain a ``configuration`` object which consists of
-    the parameter names and values as defined by the corresponding codec
-    specification.  Since an ``array -> bytes`` codec must be specified, the
-    list cannot be empty.
+    value MUST be an array of :ref:`extension definitions<extensions_section>`.
+    Because ``codecs`` MUST contain an ``array
+    -> bytes`` codec, the list cannot be empty (See :ref:`codecs <codecs>`).
+
+Optional
+^^^^^^^^
 
 The following members are optional:
 
 ``attributes``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
@@ -658,7 +683,7 @@ The following members are optional:
     https://github.com/zarr-developers/zeps/pull/28.
 
 ``storage_transformers``
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
     Specifies a stack of `storage transformers`_. Each value in the list must be
     an object containing the names ``name`` and optionally ``configuration``.
@@ -669,7 +694,7 @@ The following members are optional:
     absent no storage transformer is used, same for an empty list.
 
 ``dimension_names``
-^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""
 
     Specifies dimension names, e.g. ``["x", "y", "z"]``.  If specified, must be
     an array of strings or null objects with the same length as ``shape``.  An
@@ -685,11 +710,18 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
-The array metadata object must not contain any other names.
-Those are reserved for future versions of this specification.
-An implementation must fail to open Zarr hierarchies, groups
-or arrays with unknown metadata fields, with the exception of
-objects with a ``"must_understand": false`` key-value pair.
+Extensions
+^^^^^^^^^^
+
+All other names found in the metadata object MUST be interpreted
+following the `extensions_section`_.
+An implementation MUST fail to open Zarr hierarchies, groups
+or arrays if any metadata fields are present which (a) the
+implementation does not recognize and (b) are not explicitly
+set to ``"must_understand": false``.
+
+Example
+^^^^^^^
 
 For example, the array metadata JSON document below defines a
 two-dimensional array of 64-bit little-endian floating point numbers,
@@ -780,28 +812,47 @@ above, but using a (currently made up) extension data type::
 Group metadata
 --------------
 
+Mandatory
+^^^^^^^^^
+
 A Zarr group metadata object must contain the following mandatory key:
 
 ``zarr_format``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     An integer defining the version of the storage specification to which the
     array store adheres, must be ``3`` here.
 
 ``node_type``
-^^^^^^^^^^^^^^^
+"""""""""""""""
 
     A string defining the type of hierarchy node element, must be ``group``
     here.
 
+Optional
+^^^^^^^^
+
 Optional keys:
 
 ``attributes``
-^^^^^^^^^^^^^^
+""""""""""""""
 
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
+
+Extensions
+^^^^^^^^^^
+
+All other names found in the metadata object MUST be interpreted
+following the `extensions_section`_.
+An implementation MUST fail to open Zarr hierarchies, groups
+or arrays if any metadata fields are present which (a) the
+implementation does not recognize and (b) are not explicitly
+set to ``"must_understand": false``.
+
+Example
+^^^^^^^
 
 For example, the JSON document below defines a group::
 
@@ -880,7 +931,8 @@ should be interpreted.
 
 This core specification defines a limited set of data types to
 represent boolean values, integers, and floating point
-numbers. Extensions may define additional data types. All of the data
+numbers. :ref:`Extensions<extensions_section>` may define additional
+data types. All of the data
 types defined here have a fixed size, in the sense that all values
 require the same number of bytes. However, extensions may define
 variable sized data types.
@@ -971,7 +1023,8 @@ chunk, and there are no gaps or overlaps between chunks.
 
 In general there are different possible types of grids. The core
 specification defines the regular grid type, where all chunks are
-hyperrectangles of the same shape. Extensions may define other grid
+hyperrectangles of the same shape.
+:ref:`Extensions<extensions_section>` may define other grid
 types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
 
@@ -1204,19 +1257,37 @@ the following procedure:
 
 4. The chunk array ``A`` is equal to ``EC[0]``.
 
-Specifying codecs
------------------
+.. _codec-specification:
 
-To allow for flexibility to define and implement new codecs, this
-specification does not define any codecs, nor restrict the set of
-codecs that may be used. Each codec must be defined via a separate
-specification. In order to refer to codecs in array metadata
-documents, each codec must have a unique identifier, which is a URI
-that dereferences to a human-readable specification of the codec. A
-codec specification must declare the codec identifier, and describe
+Core codecs
+-----------
+
+This spec defines a set of well-known codecs ("core codecs") which all Zarr implementations SHOULD implement in
+order to ensure a minimal level of interoperability between Zarr implementations.
+The list of core codecs is part of the Zarr v3 specification.
+Changes to the list of core codecs MUST be made via the same protocol used for
+changing the Zarr v3 specification. Changes to the list of core codecs SHOULD be made
+in close collaboration with extant Zarr v3 implementations. A new core codec SHOULD be added to the
+list when a sufficient number of Zarr implementations support or intend to support that codec.
+An existing core codec SHOULD be removed from the list when a sufficient number of implementation
+developers and Zarr users deem the codec worth removing, e.g. because of a technical flaw in the
+algorithm underlying the codec.
+
+Extension codecs
+----------------
+
+To allow for flexibility to define and implement new codecs, the
+list of codecs defined for an array MAY contain codecs which are
+defined in separate specifications. In order to refer to codecs in array metadata
+documents, each codec must have a unique identifier, which is either
+a known "raw name" or as a URI as defined under :ref:`extensions_section`.
+For ease of discovery, it is
+recommended that codec specifications are contributed to the
+registry of extensions (TODO).
+
+A codec specification must declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
 and the format of the encoded data.
-
 A codec may have configuration parameters which modify the behaviour
 of the codec in some way. For example, a compression codec may have a
 compression level parameter, which is an integer that affects the
@@ -1224,20 +1295,8 @@ resulting compression ratio of the data. Configuration parameters must
 be declared in the codec specification, including a definition of how
 configuration parameters are represented as JSON.
 
-The Zarr core development team maintains a repository of codec
-specifications, which are hosted alongside this specification in the
-`zarr-specs GitHub repository`_, and which are
-published on the `zarr-specs documentation Web site
-<https://zarr-specs.readthedocs.io/>`_. For ease of discovery, it is
-recommended that codec specifications are contributed to the
-zarr-specs GitHub repository. However, codec specifications may be
-maintained by any group or organisation and published in any location
-on the Web. For further details of the process for contributing a
-codec specification to the zarr-specs GitHub repository, see
-`ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ which describes
-the process for Zarr specification changes.
-
-Further details of how codecs are configured for an array are given in the `Array metadata`_ section.
+Further details of how codecs are configured for an array are given in the
+`Array metadata`_ section.
 
 Stores
 ======
@@ -1598,9 +1657,14 @@ Storage transformers may be stacked to combine different functionalities:
 
 .. _extensions_section:
 
-Extension points
-================
+Extensions
+==========
 
+This section describes how additional functionality can defined
+for Zarr datasets by extended the `metadata documents`_.
+
+Extension points
+----------------
 
 Different types of extensions can exist and they can be grouped as follows:
 
@@ -1616,20 +1680,103 @@ array       storage transformer     `storage_transformers`_
 
 If such extension points are used by groups or arrays, they are required.
 
-See https://github.com/zarr-developers/zarr-specs/issues/49 for a list of
-potential extensions.
+New extension points may be proposed to the Zarr community through the ZEP
+process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more information.
 
-Specifications for new extensions are recommended to be published in the
-https://github.com/zarr-developers/zarr-specs repository via the
-`ZEP process <https://zarr.dev/zeps/active/ZEP0000.html>`_. If a specification
-is published decentralized (e.g. for initial experimentation or due to a very
-specialized scope), it must use a URL in the `name` key of its metadata, which
-identifies the publishing organization or individual, and should point to the
-specification of the extension.
+Extension definition
+--------------------
 
-Future versions of this specification may also add new core features by adding new top-level
-metadata keys. Such features are required by default. However, if the value of an unknown feature
-is an object containing the key-value pair ``"must_understand": false``, it can be ignored.
+Extensions are defined in `metadata documents`_ either as objects or as
+short-hand names. If using an objection definition, the following pattern
+MUST be followed::
+
+    {
+        "name": "<name>",
+        "configuration": { ... } # optional
+    }
+
+If such an object is present, the field `must_understand` is implicitly set to
+`True` and an object can explicitly set `must_understand=False` if
+implementations can ignore its presence, following the current guidelines in
+the v3 specification.
+
+Instead of extension objects, short-hand names may continue to be used if no
+configuration metadata is required. They would be equivalent to extension
+objects with just a `name` key.
+
+Extension naming
+----------------
+
+The identifier used in the `name` field of the extension definition can follow one of two forms:
+
+1. **Raw names** MUST be assigned within a central repository and follow the
+   compatibility and versioning [v3 stability
+   policy](https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html#stability-policy).
+   The name assignment is managed through the [`zarr-developers` Github
+   organization](https://github.com/zarr-developers), where each extension is
+   listed and either contains a spec document or links to a spec document.
+   Names are never unassigned or reassigned. The ZSC or by delegation a
+   maintainer team reserves the right to refuse name assignment at its own
+   discretion.
+
+   - **Example:** `zstd`
+   - **Acceptd regex:** `^[a-z0-9-_.]+$`
+
+2. **URI-based names** can be used by anyone without further coordination
+   though the assumption is that users reasonably "own" the URI. The URL SHOULD
+   resolve to a human-readable explanation of the extension, but
+   implementations SHOULD NOT attempt to resolve the URL during processing.
+   There are no guarantees in terms of versioning or compatibility. However,
+   preserving backwards-compatibility is strongly encouraged. See the
+   [versioning section](#Versioning-and-spec-evolution) below.
+
+   - **Example:** `https://example.com/zarr3/consolidated-metadata`
+   - **Accepted regex:** `^https?:\/\/[^/?#]+[^?#]*$`
+
+Extension example
+-----------------
+
+The following example represents an Array showing many of the proposed changes
+described above::
+
+    {
+        "zarr_format": 3,
+        "data_type": "https://example.com/zarr/string", // URI-based name, short-hand name
+        "chunk_key_encoding": {
+            "name": "default", // core
+            "configuration": { "separator": "." }
+        },
+        "codecs": [
+            {
+                "name": "https://numcodecs.dev/vlen-utf8" // URI-based name
+            },
+            {
+                "name": "zstd", // raw name
+                "configuration": { ... }
+            }
+        ],
+        "chunk_grid": {
+            "name": "regular", // core
+            "configuration": { "chunk_shape": [ 32 ] }
+        },
+        "shape": [ 128 ],
+        "dimension_names": [ "x" ],
+        "attributes": { ... },
+        "storage_transformers": []
+    }
+
+Extension specifications
+------------------------
+
+There is no strict requirement for extensions to have a formal specification.
+However, for adoption in the community it is STRONGLY RECOMMENDED to write a
+specification.
+
+For extensions with raw names, the `zarr-developers/zarr-extensions` repository
+SHOULD either contain the specification directly or link to the official location.
+For extensions with URI-based names, it is RECOMMENDED to publish the specification
+under the URI of the extension. Additionally, URI-based extensions MAY also register
+themselves under the `zarr-extensions` repository for better discovery.
 
 Implementation Notes
 ====================
@@ -1694,6 +1841,14 @@ All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
 
+3.1
+---
+
+- Clarification of extensions. `PR #TODO
+  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_. With this change,
+  it is now possible to register new names for extension objects as well as use
+  URI.
+
 Changes after Provisional Acceptance
 ------------------------------------
 - Support for implicit groups was removed. `PR #292
@@ -1710,7 +1865,7 @@ Changes after Provisional Acceptance
   <https://github.com/zarr-developers/zarr-specs/pull/236>`_
 
 Draft Changes
---------------------------
+-------------
 
 - Removed `extensions` field and clarified extension point behaviour, changing the config format of
   data-types, chunk-grid, storage-transformers and codecs. `PR #204
@@ -1747,15 +1902,5 @@ Draft Changes
   `PR #134 <https://github.com/zarr-developers/zarr-specs/pull/134>`_
 - The changelog is incomplete before 2022, please refer to the commits on
   GitHub.
-
-@@tag@@
--------
-
-Links: `view spec
-<https://zarr-specs.readthedocs.io/en/@@tag@@/core/v3.0.html>`_;
-`view source
-<https://github.com/zarr-developers/zarr-specs/blob/@@tag@@/docs/core/v3.0.rst>`_
-
-@@TODO summary of changes since previous tag.
 
 .. _zarr-specs GitHub repository: https://github.com/zarr-developers/zarr-specs
