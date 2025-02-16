@@ -1,8 +1,8 @@
 .. _crc32c-codec-v1:
 
-============================
+====================================
  CRC32C checksum codec (version 1.0)
-============================
+====================================
 
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/crc32c/v1.0.html
