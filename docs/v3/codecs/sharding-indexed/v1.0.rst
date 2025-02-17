@@ -35,7 +35,7 @@ that can be individually compressed and accessed. This allows to colocate
 multiple chunks within one storage object, bundling them in shards.
 
 Status of this document
-======================
+=======================
 
 ZEP0002 was accepted on November 1st, 2023 via https://github.com/zarr-developers/zarr-specs/issues/254.
 
