@@ -131,10 +131,10 @@ with implementation B.
 Therefore, data is only marked with the respective major version, unknown
 features are auto-discovered via the metadata document.
 
-Notably, this excludes extension points such as codecs, data types, chunk grids
+Notably, this excludes extensions such as codecs, data types, chunk grids
 and storage transformers from the compatibility of the core specification, as
-well as store support. However, versioned extension points and stores are also
-expected to follow this stability policy.
+well as store support. However, extensions and stores are also RECOMMENDED to 
+follow this stability policy.
 
 Document conventions
 ====================
@@ -1710,17 +1710,17 @@ Extension naming
 The identifier used in the `name` field of the extension definition can follow one of two forms:
 
 1. **Raw names** MUST be assigned within a central repository and follow the
-   compatibility and versioning [v3 stability
-   policy](https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html#stability-policy).
-   The name assignment is managed through the [`zarr-developers` Github
-   organization](https://github.com/zarr-developers), where each extension is
+   compatibility and versioning v3 `stability policy`_.
+   The name assignment is managed through the `zarr-extensions 
+   <https://github.com/zarr-developers/zarr-extensions>`_ Github
+   repository, where each extension is
    listed and either contains a spec document or links to a spec document.
-   Names are never unassigned or reassigned. The ZSC or by delegation a
+   Names are never unassigned or reassigned. The Zarr Steering Council or by delegation a
    maintainer team reserves the right to refuse name assignment at its own
    discretion.
 
-   - **Example:** `zstd`
-   - **Acceptd regex:** `^[a-z0-9-_.]+$`
+   - **Example:** ``zstd``
+   - **Acceptd regex:** ``^[a-z0-9-_.]+$``
 
 2. **URI-based names** can be used by anyone without further coordination
    though the assumption is that users reasonably "own" the URI. The URL SHOULD
@@ -1730,8 +1730,8 @@ The identifier used in the `name` field of the extension definition can follow o
    preserving backwards-compatibility is strongly encouraged. See the
    [versioning section](#Versioning-and-spec-evolution) below.
 
-   - **Example:** `https://example.com/zarr3/consolidated-metadata`
-   - **Accepted regex:** `^https?:\/\/[^/?#]+[^?#]*$`
+   - **Example:** ``https://example.com/zarr3/consolidated-metadata``
+   - **Accepted regex:** ``^https?:\/\/[^/?#]+[^?#]*$``
 
 Extension example
 -----------------
@@ -1772,11 +1772,11 @@ There is no strict requirement for extensions to have a formal specification.
 However, for adoption in the community it is STRONGLY RECOMMENDED to write a
 specification.
 
-For extensions with raw names, the `zarr-developers/zarr-extensions` repository
+For extensions with raw names, the `zarr-extensions <https://github.com/zarr-developers/zarr-extensions>`_ repository
 SHOULD either contain the specification directly or link to the official location.
 For extensions with URI-based names, it is RECOMMENDED to publish the specification
 under the URI of the extension. Additionally, URI-based extensions MAY also register
-themselves under the `zarr-extensions` repository for better discovery.
+themselves under the `zarr-extensions <https://github.com/zarr-developers/zarr-extensions>`_ repository for better discovery.
 
 Implementation Notes
 ====================
