@@ -2,6 +2,8 @@
 Specifications
 ==============
 
+.. _zarr-specs:
+
 .. toctree::
    :maxdepth: 1
    :caption: v3
