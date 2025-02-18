@@ -1,12 +1,12 @@
 .. This file is in restructured text format: https://docutils.sourceforge.io/rst.html
-.. _zarr-core-specification-v3.0:
+.. _zarr-core-specification-v3:
 
 ======================================
  Zarr core specification (version 3.0)
 ======================================
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/core/index.html
 
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
@@ -18,10 +18,10 @@ Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.0>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.1>`_
 
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/v3.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/index.rst>`_
 
 Copyright 2019-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License

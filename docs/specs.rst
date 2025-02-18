@@ -8,7 +8,7 @@ Specifications
    :maxdepth: 1
    :caption: v3
 
-   Core <v3/core/v3.0>
+   Core <v3/core/index>
    v3/codecs
    v3/chunk-grid
    v3/chunk-key-encoding
