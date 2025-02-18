@@ -1,8 +1,8 @@
+.. _data-types-list:
+
 ==========
 Data Types
 ==========
-
-.. _data-types:
 
 The following data types are defined by the maintainers of
 the Zarr specification. Being listed below does not imply that a data type is
@@ -46,3 +46,9 @@ Core data types
      - real and complex components are each IEEE 754 double-precision floating point
    * - ``r*`` (Optional)
      - raw bits, variable size given by ``*``, limited to be a multiple of 8
+
+Extensions
+----------
+
+Registered data type extensions can be found under
+`zarr-extensions::data-types <https://github.com/zarr-developers/zarr-extensions/tree/main/data-types>`_.

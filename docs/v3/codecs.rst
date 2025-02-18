@@ -1,3 +1,5 @@
+.. _codecs-list:
+
 ======
 Codecs
 ======
@@ -13,3 +15,9 @@ required to be implemented by all implementations.
    :caption: Contents:
 
    codecs/*/*
+
+Extensions
+----------
+
+Registered codec extensions can be found under
+`zarr-extensions::codecs <https://github.com/zarr-developers/zarr-extensions/tree/main/codecs>`_.

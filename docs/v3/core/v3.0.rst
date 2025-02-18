@@ -12,6 +12,7 @@ Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
+    * Josh Moore(`@joshmoore <https://github.com/joshmoore>`_), German BioImaging
 
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
@@ -467,17 +468,23 @@ Mandatory
 This document must contain a single object with the following
 mandatory names:
 
+.. _array-metadata-zarr-format:
+
 ``zarr_format``
 """"""""""""""""
 
     An integer defining the version of the storage specification to which the
     array store adheres, must be ``3`` here.
 
+.. _array-metadata-node-type:
+
 ``node_type``
 """""""""""""""
 
     A string defining the type of hierarchy node element, must be ``array``
     here.
+
+.. _array-metadata-shape:
 
 ``shape``
 """""""""
@@ -486,6 +493,8 @@ mandatory names:
     Zarr array. For example, a value ``[10, 20]`` indicates a
     two-dimensional Zarr array, where the first dimension has length
     10 and the second dimension has length 20.
+
+.. _array-metadata-data-type:
 
 ``data_type``
 """""""""""""
@@ -503,6 +512,8 @@ mandatory names:
     specifying an object with just a ``name`` member.  The ``name`` is required
     and its value must refer to a v3 data type specification. ``configuration``
     is optional and its value is defined by the extension.
+
+.. _array-metadata-chunk-grid:
 
 ``chunk_grid``
 """"""""""""""
@@ -524,6 +535,8 @@ mandatory names:
     must be a string referring to a v3 chunk grid specification. The
     ``configuration`` is optional and defined by the extension.
 
+.. _array-metadata-chunk-key-encoding:
+
 ``chunk_key_encoding``
 """"""""""""""""""""""
 
@@ -535,60 +548,7 @@ mandatory names:
     type-dependent parameters; the ``configuration`` value must be an object if
     it is specified.
 
-    The following encodings are defined:
-
-    - ``default``
-
-      The ``configuration`` object may contain one optional member,
-      ``separator``, which must be either ``"/"`` or ``"."``.  If not specified,
-      ``separator`` defaults to ``"/"``.
-
-      The key for a chunk with grid index (``k``, ``j``, ``i``, ...) is
-      formed by taking the initial prefix ``c``, and appending for each dimension:
-
-      - the ``separator`` character, followed by,
-
-      - the ASCII decimal string representation of the chunk index within that dimension.
-
-      For example, in a 3 dimensional array, with a separator of ``/`` the identifier
-      for the chunk at grid index (1, 23, 45) is the string ``"c/1/23/45"``.  With a
-      separator of ``.``, the identifier is the string ``"c.1.23.45"``. The initial prefix 
-      ``c`` ensures that metadata documents and chunks have separate prefixes.
-
-      .. note:: A main difference with spec v2 is that the default chunk separator
-         changed from ``.`` to ``/``, as in N5.  This decreases the maximum number of
-         items in hierarchical stores like directory stores.
-
-      .. note:: Arrays may have 0 dimensions (when for example representing scalars),
-         in which case the coordinate of a chunk is the empty tuple, and the chunk key
-         will consist of the string ``c``.
-
-    - ``v2``
-
-      The ``configuration`` object may contain one optional member,
-      ``separator``, which must be either ``"/"`` or ``"."``.  If not specified,
-      ``separator`` defaults to ``"."``.
-
-      The identifier for chunk with at least one dimension is formed by
-      concatenating for each dimension:
-
-      - the ASCII decimal string representation of the chunk index within that
-        dimension, followed by
-
-      - the ``separator`` character, except that it is omitted for the last
-        dimension.
-
-      For example, in a 3 dimensional array, with a separator of ``.`` the identifier
-      for the chunk at grid index (1, 23, 45) is the string ``"1.23.45"``.  With a
-      separator of ``/``, the identifier is the string ``"1/23/45"``.
-
-      For chunk grids with 0 dimensions, the single chunk has the key ``"0"``.
-
-      .. note::
-
-         This encoding is intended only to allow existing v2 arrays to be
-         converted to v3 without having to rename chunks.  It is not recommended
-         to be used when writing new arrays.
+.. _array-metadata-fill-value:
 
 ``fill_value``
 """"""""""""""
@@ -654,6 +614,8 @@ mandatory names:
        the data type will be chosen.  However, the default fill value that is
        chosen MUST be recorded in the metadata.
 
+.. _array-metadata-codecs:
+
 ``codecs``
 """"""""""
 
@@ -666,6 +628,8 @@ Optional
 ^^^^^^^^
 
 The following members are optional:
+
+.. _array-metadata-attributes:
 
 ``attributes``
 """"""""""""""
@@ -683,6 +647,8 @@ The following members are optional:
     A proposal to specify metadata conventions (ZEP 4) is being discussed in
     https://github.com/zarr-developers/zeps/pull/28.
 
+.. _array-metadata-storage-transformers:
+
 ``storage_transformers``
 """"""""""""""""""""""""
 
@@ -693,6 +659,8 @@ The following members are optional:
     consists of the parameter names and values as defined by the corresponding
     storage transformer specification. When the ``storage_transformers`` name is
     absent no storage transformer is used, same for an empty list.
+
+.. _array-metadata-dimension-names:
 
 ``dimension_names``
 """""""""""""""""""
@@ -710,6 +678,8 @@ The following members are optional:
     This specification also does not place any restrictions on the use of the
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
+
+.. _array-metadata-extensions:
 
 Extensions
 ^^^^^^^^^^
@@ -932,7 +902,7 @@ should be interpreted.
 
 This core specification defines a limited set of data types to
 represent boolean values, integers, and floating point
-numbers. These can be found under :ref:`Data Types<data-types>`.
+numbers. These can be found under :ref:`Data Types<data-types-list>`.
 
 :ref:`Extensions<extensions_section>` may define additional
 data types. All of the data
@@ -984,9 +954,8 @@ which is a space defined by the dimensionality and shape of the
 array. This means that every element of the array is a member of one
 chunk, and there are no gaps or overlaps between chunks.
 
-In general there are different possible types of grids. The core
-specification defines the regular grid type, where all chunks are
-hyperrectangles of the same shape.
+In general there are different possible types of grids. Those defined
+under the core specification can be found under :ref:`chunk-grid-list`.
 :ref:`Extensions<extensions_section>` may define other grid
 types, such as rectilinear grids where chunks are still
 hyperrectangles but do not all share the same shape.
@@ -995,75 +964,6 @@ A grid type must also define rules for constructing an identifier for
 each chunk that is unique within the grid, which is a string of ASCII
 characters that can be used to construct keys to save and retrieve
 chunk data in a store, see also the `Storage`_ section.
-
-Regular grids
--------------
-
-A regular grid is a type of grid where an array is divided into chunks
-such that each chunk is a hyperrectangle of the same shape. The
-dimensionality of the grid is the same as the dimensionality of the
-array. Each chunk in the grid can be addressed by a tuple of positive
-integers (`k`, `j`, `i`, ...) corresponding to the indices of the
-chunk along each dimension.
-
-The origin element of a chunk has coordinates in the array space (`k` *
-`dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
-the chunk sizes along each dimension.
-Thus the origin element of the chunk at grid index (0, 0, 0,
-...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
-grid is aligned with the origin of the array. If the length of any
-array dimension is not perfectly divisible by the chunk length along
-the same dimension, then the grid will overhang the edge of the array
-space.
-
-The shape of the chunk grid will be (ceil(`z` / `dz`), ceil(`y` /
-`dy`), ceil(`x` / `dx`), ...)  where (`z`, `y`, `x`, ...) is the array
-shape, "/" is the division operator and "ceil" is the ceiling
-function. For example, if a 3 dimensional array has shape (10, 200,
-3000), and has chunk shape (5, 20, 400), then the shape of the chunk
-grid will be (2, 10, 8), meaning that there will be 2 chunks along the
-first dimension, 10 along the second dimension, and 8 along the third
-dimension.
-
-.. list-table:: Regular Grid Example
-    :header-rows: 1
-
-    * - Array Shape
-      - Chunk Shape
-      - Chunk Grid Shape
-      - Notes
-    * - (10, 200, 3000)
-      - (5, 20, 400)
-      - (2, 10, 8)
-      - The grid does overhang the edge of the array on the 3rd dimension.
-
-An element of an array with coordinates (`c`, `b`, `a`, ...) will
-occur within the chunk at grid index (`c` // `dz`, `b` // `dy`, `a` //
-`dx`, ...), where "//" is the floor division operator. The element
-will have coordinates (`c` % `dz`, `b` % `dy`, `a` % `dx`, ...) within
-that chunk, where "%" is the modulo operator. For example, if a
-3 dimensional array has shape (10, 200, 3000), and has chunk shape
-(5, 20, 400), then the element of the array with coordinates (7, 150, 900)
-is contained within the chunk at grid index (1, 7, 2) and has coordinates
-(2, 10, 100) within that chunk.
-
-The store key corresponding to a given grid cell is determined based on the
-`chunk_key_encoding`_ member of the `Array metadata`_.
-
-Note that this specification does not consider the case where the
-chunk grid and the array space are not aligned at the origin vertices
-of the array and the chunk at grid index (0, 0, 0, ...). However,
-extensions may define variations on the regular grid type
-such that the grid indices may include negative integers, and the
-origin element of the array may occur at an arbitrary position within
-any chunk, which is required to allow arrays to be extended by an
-arbitrary length in a "negative" direction along any dimension.
-
-.. note:: Chunks at the border of an array always have the full chunk size, even when
-   the array only covers parts of it. For example, having an array with ``"shape": [30, 30]`` and
-   ``"chunk_shape": [16, 16]``, the chunk ``0,1`` would also contain unused values for the indices
-   ``0-16, 30-31``. When writing such chunks it is recommended to use the current fill value
-   for elements outside the bounds of the array.
 
 Chunk encoding
 ==============
@@ -1247,7 +1147,7 @@ a known "raw name" or as a URI as defined under :ref:`extensions_section`.
 For ease of discovery, it is
 recommended that codec specifications are contributed to the
 registry of extensions
-(`zarr-extensions <https:/github.com/zarr-developers/zarr-extensions/>`_).
+(`zarr-extensions`_).
 
 A codec specification must declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
@@ -1632,15 +1532,15 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ================================================
-level       extension               metadata
-=========== ======================= ================================================
-array       data type               `data_type`_
-array       chunk grid              `chunk_grid`_
-array       chunk key encoding      `chunk_key_encoding`_
-array       codecs                  `codecs`_
-array       storage transformer     `storage_transformers`_
-=========== ======================= ================================================
+=========== ======================= ========================= ================================
+level       extension               metadata                  core definitions
+=========== ======================= ========================= ================================
+array       data type               `data_type`_              :ref:`data-types-list`
+array       chunk grid              `chunk_grid`_             :ref:`chunk-grid-list`
+array       chunk key encoding      `chunk_key_encoding`_     :ref:`chunk-key-encoding-list`
+array       codecs                  `codecs`_                 :ref:`codecs-list`
+array       storage transformer     `storage_transformers`_   :ref:`storage-transformers-list`
+=========== ======================= ========================= ================================
 
 If such extension points are used by groups or arrays, they are required.
 
@@ -1675,9 +1575,8 @@ The identifier used in the `name` field of the extension definition can follow o
 
 1. **Raw names** MUST be assigned within a central repository and follow the
    compatibility and versioning v3 `stability policy`_.
-   The name assignment is managed through the `zarr-extensions 
-   <https://github.com/zarr-developers/zarr-extensions>`_ Github
-   repository, where each extension is
+   The name assignment is managed through the `zarr-extensions`_
+   Github repository, where each extension is
    listed and either contains a spec document or links to a spec document.
    Names are never unassigned or reassigned. The Zarr Steering Council or by delegation a
    maintainer team reserves the right to refuse name assignment at its own
@@ -1736,11 +1635,11 @@ There is no strict requirement for extensions to have a formal specification.
 However, for adoption in the community it is STRONGLY RECOMMENDED to write a
 specification.
 
-For extensions with raw names, the `zarr-extensions <https://github.com/zarr-developers/zarr-extensions>`_ repository
+For extensions with raw names, the `zarr-extensions`_ repository
 SHOULD either contain the specification directly or link to the official location.
 For extensions with URI-based names, it is RECOMMENDED to publish the specification
 under the URI of the extension. Additionally, URI-based extensions MAY also register
-themselves under the `zarr-extensions <https://github.com/zarr-developers/zarr-extensions>`_ repository for better discovery.
+themselves under the `zarr-extensions`_ repository for better discovery.
 
 Implementation Notes
 ====================
@@ -1868,3 +1767,4 @@ Draft Changes
   GitHub.
 
 .. _zarr-specs GitHub repository: https://github.com/zarr-developers/zarr-specs
+.. _zarr-extensions: https://github.com/zarr-developers/zarr-extensions

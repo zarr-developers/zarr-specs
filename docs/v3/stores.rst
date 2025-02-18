@@ -1,3 +1,5 @@
+.. _stores-list:
+
 ======
 Stores
 ======
@@ -12,3 +14,7 @@ Being listed below does not imply that a store is required to be implemented by 
    :caption: Contents:
 
    stores/*/*
+
+.. note::
+   Stores are *not* extension points since they define the mechanism
+   for loading metadata documents such that extensions can be loaded.
