@@ -1283,7 +1283,8 @@ documents, each codec must have a unique identifier, which is either
 a known "raw name" or as a URI as defined under :ref:`extensions_section`.
 For ease of discovery, it is
 recommended that codec specifications are contributed to the
-registry of extensions (TODO).
+registry of extensions
+(`zarr-extensions <https:/github.com/zarr-developers/zarr-extensions/>`_).
 
 A codec specification must declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
@@ -1844,8 +1845,8 @@ by time.
 3.1
 ---
 
-- Clarification of extensions. `PR #TODO
-  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_. With this change,
+- Clarification of extensions. `PR #330
+  <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
   it is now possible to register new names for extension objects as well as use
   URI.
 
