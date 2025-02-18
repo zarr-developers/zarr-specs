@@ -696,8 +696,7 @@ two-dimensional array of 64-bit little-endian floating point numbers,
 with 10000 rows and 1000 columns, divided into a regular chunk grid where
 each chunk has 1000 rows and 100 columns, and thus there will be 100
 chunks in total arranged into a 10 by 10 grid. Within each chunk the
-binary values are laid out in C contiguous order. Each chunk is
-compressed using gzip compression prior to storage::
+binary values are laid out in C contiguous order::
 
     {
         "zarr_format": 3,
