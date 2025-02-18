@@ -364,8 +364,9 @@ terminology for a use case of reading from an array:
 
 *Core*
 
-    Core concepts refers to the Zarr v3 core specification as defined in this document
-    not necessarily if something is a MUST for implementations.
+    Core indicates a feature or concepts defined within the Zarr v3
+    specification as defined in this repository. Note, however, that certain
+    core features are explicitly marked as optional for implementations.
 
 .. _stored-representation:
 
