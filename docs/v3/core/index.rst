@@ -1532,15 +1532,15 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ========================= ================================
-level       extension               metadata                  core definitions
-=========== ======================= ========================= ================================
-array       data type               `data_type`_              :ref:`data-types-list`
-array       chunk grid              `chunk_grid`_             :ref:`chunk-grid-list`
-array       chunk key encoding      `chunk_key_encoding`_     :ref:`chunk-key-encoding-list`
-array       codecs                  `codecs`_                 :ref:`codecs-list`
-array       storage transformer     `storage_transformers`_   :ref:`storage-transformers-list`
-=========== ======================= ========================= ================================
+=========== ======================= ====================================== ================================
+level       extension               metadata                               core definitions
+=========== ======================= ====================================== ================================
+array       data type               `array-metadata-data-type`_              :ref:`data-types-list`
+array       chunk grid              `array-metadata-chunk-grid`_             :ref:`chunk-grid-list`
+array       chunk key encoding      `array-metadata-chunk-key-encoding`_     :ref:`chunk-key-encoding-list`
+array       codecs                  `array-metadata-codecs`_                 :ref:`codecs-list`
+array       storage transformer     `array-metadata-storage-transformers`_   :ref:`storage-transformers-list`
+=========== ======================= ====================================== ================================
 
 If such extension points are used by groups or arrays, they are required.
 
