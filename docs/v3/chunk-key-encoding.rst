@@ -4,7 +4,7 @@
 Chunk Key Encodings
 ===================
 
-The following chunk key encodings are defined by the maintainers of
+The following core chunk key encodings are defined by the maintainers of
 the Zarr specification. Being listed below does not imply that a chunk key encoding is
 required to be implemented by implementations.
 

@@ -4,7 +4,7 @@
 Chunk Grid
 ==========
 
-The following chunk grids are defined by the maintainers of
+The following core chunk grids are defined by the maintainers of
 the Zarr specification. Being listed below does not imply that a data type is
 required to be implemented by implementations.
 

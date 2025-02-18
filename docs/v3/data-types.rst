@@ -4,7 +4,7 @@
 Data Types
 ==========
 
-The following data types are defined by the maintainers of
+The following core data types are defined by the maintainers of
 the Zarr specification. Being listed below does not imply that a data type is
 required to be implemented by implementations.
 
