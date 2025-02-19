@@ -288,8 +288,7 @@ The following figure illustrates the first part of the terminology:
     The chunks_ of an array_ are organised into a grid. This
     specification only considers the case where all chunks_ have the
     same chunk shape and the chunks form a regular grid. However,
-    :ref:`extensions<extensions_section>` may define other grid types such as
-    rectilinear grids.
+    additional chunk grids can be defined as :ref:`extensions<extensions_section>.` 
 
 .. _codec:
 .. _codecs:
