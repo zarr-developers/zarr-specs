@@ -4,8 +4,8 @@
 Codecs
 ======
 
-The following documents specify core codecs which are defined by the maintainers
-of the Zarr specification. Being listed below does not imply that a codec is
+The following documents specify core codecs which are defined by the specification.
+Being listed below does not imply that a codec is
 required to be implemented by all implementations.
 
 .. toctree::

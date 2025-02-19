@@ -4,7 +4,7 @@
 Stores
 ======
 
-The following documents specify core stores which are defined by the maintainers of the Zarr specification.
+The following documents specify core stores which are defined the specification.
 Being listed below does not imply that a store is required to be implemented by all implementations.
 
 .. toctree::
