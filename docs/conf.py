@@ -87,4 +87,5 @@ suppress_warnings = [
 
 redirects = {
     "index": "specs.html",
+    "v3/core/v3.0.html": "./index.html",
 }

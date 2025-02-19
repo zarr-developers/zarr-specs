@@ -8,9 +8,11 @@ Specifications
    :maxdepth: 1
    :caption: v3
 
-   Core <v3/core/v3.0>
-   v3/data-types
+   Core <v3/core/index>
    v3/codecs
+   v3/chunk-grid
+   v3/chunk-key-encoding
+   v3/data-types
    v3/stores
    v3/array-storage-transformers
 
