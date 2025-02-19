@@ -264,7 +264,7 @@ The following figure illustrates the first part of the terminology:
     contain. For example, the 32-bit signed integer data type defines binary
     representations for all integers in the range −2,147,483,648 to
     2,147,483,647. This specification only defines a limited set of data types,
-    but :ref:`extensions<extensions_section>` may define other data types.
+    but additional data types can be defined as :ref:`extensions<extensions_section>`.
 
 .. _chunk:
 .. _chunks:
