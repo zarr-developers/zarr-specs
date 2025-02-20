@@ -349,18 +349,17 @@ terminology for a use case of reading from an array:
 .. image:: terminology-read.excalidraw.png
   :width: 600
 
-*Extension points*
+*Extension point*
 
-    Locations within a `metadata document_` where extension-related
-    metadata can be found. Current extension points are listed in the core spec,
-    e.g. `codecs`, `data_type`. See :ref:`extension points <extensions_section>` below.
+    A field in a `metadata document_` that can be extended to allow values
+    not defined in this specification.
+    See :ref:`extension points <extensions_section>` below.
 
-*Extensions*
+*Extension*
 
-    Components defined in a `metadata document`_ to
-    configure how metadata are interpreted by implementations. These
-    components include codecs, data types, chunk key encodings, chunk grids and
-    storage transformers. See :ref:`extension points <extensions_section>` below.
+    An implementation of an extension point which can be referenced
+    by :ref:`name <extension-naming>`.
+    See the linked lists of extensions under :ref:`extension points <extensions_section>` below.
 
 *Core*
 
@@ -677,11 +676,11 @@ The following members are optional:
 
 .. _array-metadata-extensions:
 
-Extensions
-^^^^^^^^^^
+Unknown
+^^^^^^^
 
 All other keys found in the metadata object MUST be interpreted
-following the `extensions_section`_.
+following the :ref:`Extensions section <extensions_section>`.
 
 Example
 ^^^^^^^
@@ -804,11 +803,11 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
-Extensions
-^^^^^^^^^^
+Unknown
+^^^^^^^
 
 All other keys found in the metadata object MUST be interpreted
-following the `extensions_section`_.
+following the :ref:`Extensions section <extensions_section>`.
 
 Example
 ^^^^^^^
@@ -1539,7 +1538,7 @@ process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more infor
 Extension definition
 --------------------
 
-Extensions are defined in `metadata documents`_ either as objects or as
+In `metadata documents`_, extensions can be encoded either as objects or as
 short-hand names. If using an objection definition, the member ``name``
 MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
 Optionally, the member ``configuration`` MAY be present but if so MUST be
