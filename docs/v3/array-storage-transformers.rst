@@ -6,9 +6,8 @@ Array Storage Transformers
 
 .. COMMENT TO BE REMOVED WHEN ONE IS ADDED
 
-   The following documents specify transformers which are defined by the maintainers of
-   the Zarr specification. Being listed below does not imply that a transformer is
-   required to be implemented by implementations.
+   The following documents specify core storage transformers which SHOULD
+   be implemented by all implementations.
 
    toctree::
    :glob:
@@ -18,9 +17,7 @@ Array Storage Transformers
 
    array-storage-transformers/*/*
 
-Currently, no core storage transformers are defined by specification.
-Being listed below does not imply that a transformer is
-required to be implemented by implementations.
+Currently, no core storage transformers are defined by this specification.
 
 Extensions
 ----------

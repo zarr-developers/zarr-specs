@@ -4,8 +4,8 @@
 Stores
 ======
 
-The following documents specify core stores which are defined the specification.
-Being listed below does not imply that a store is required to be implemented by all implementations.
+The following documents specify stores which SHOULD
+be implemented by all implementations.
 
 .. toctree::
    :glob:

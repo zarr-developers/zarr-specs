@@ -4,9 +4,8 @@
 Data Types
 ==========
 
-The following core data types are defined by the specification.
-Being listed below does not imply that a data type is
-required to be implemented by implementations.
+The following section specifies data types which SHOULD
+be implemented by all implementations.
 
 Core data types
 ---------------

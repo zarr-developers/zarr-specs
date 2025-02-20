@@ -4,9 +4,8 @@
 Chunk Grid
 ==========
 
-The following core chunk grids are defined by the specification.
-Being listed below does not imply that a chunk grid is
-required to be implemented by implementations.
+The following documents specify chunk grids which SHOULD
+be implemented by all implementations.
 
 Regular grids
 -------------

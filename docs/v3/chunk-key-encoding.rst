@@ -4,9 +4,8 @@
 Chunk Key Encodings
 ===================
 
-The following core chunk key encodings are defined by the specification.
-Being listed below does not imply that a chunk key encoding is
-required to be implemented by implementations.
+The following documents specify chunk key encodings which SHOULD
+be implemented by all implementations.
 
 Core chunk key encodings
 ------------------------
