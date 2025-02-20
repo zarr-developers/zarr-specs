@@ -501,7 +501,7 @@ mandatory names:
     The data type of the Zarr array.
 
     ``data_type`` is an :ref:`extension point<extensions_section>`
-    and MUST conform to the :ref:`extension definition`.
+    and MUST conform to the :ref:`extension-definition`.
 
     If the data type is defined in
     this specification, then the value must be the data type
@@ -516,7 +516,7 @@ mandatory names:
     The chunk grid of the Zarr array.
 
     ``chunk_grid`` is an :ref:`extension point<extensions_section>`
-    and MUST conform to the :ref:`extension definition`.
+    and MUST conform to the :ref:`extension-definition`.
 
     If the chunk grid is a regular chunk grid
     as defined in this specification, then the value must be an object with the
@@ -539,7 +539,7 @@ mandatory names:
     store.
 
     ``chunk_key_encoding`` is an :ref:`extension point<extensions_section>`
-    and MUST conform to the :ref:`extension definition`.
+    and MUST conform to the :ref:`extension-definition`.
 
 .. _array-metadata-fill-value:
 
@@ -615,7 +615,7 @@ mandatory names:
     Specifies a list of codecs to be used for encoding and decoding chunks.
 
     Each codec is an :ref:`extension point<extensions_section>`
-    and MUST conform to the :ref:`extension definition`.
+    and MUST conform to the :ref:`extension-definition`.
 
     Because ``codecs`` MUST contain an ``array
     -> bytes`` codec, the list cannot be empty (See :ref:`codecs <codecs>`).
@@ -651,7 +651,7 @@ The following members are optional:
     Specifies a list of `storage transformers`_.
 
     Each storage transformer is an :ref:`extension point<extensions_section>`
-    and MUST conform to the :ref:`extension definition`.
+    and MUST conform to the :ref:`extension-definition`.
 
     When the ``storage_transformers`` name is
     absent no storage transformer is used, same for an empty list.
@@ -1534,6 +1534,8 @@ array       storage transformer     `array-metadata-storage-transformers`_ :ref:
 New extension points may be proposed to the Zarr community through the ZEP
 process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more information.
 
+.. _extension-definition:
+
 Extension definition
 --------------------
 
@@ -1565,6 +1567,8 @@ set to ``"must_understand": false``.
 
 `must_understand=False` is not supported for the following extension points:
 data type, chunk grid, and chunk key encoding.
+
+.. _extension-naming:
 
 Extension naming
 ----------------
