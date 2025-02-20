@@ -15,7 +15,7 @@ Corresponding ZEP:
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/index.rst>`_
 
 Copyright 2022-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work

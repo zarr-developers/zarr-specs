@@ -88,4 +88,11 @@ suppress_warnings = [
 redirects = {
     "index": "specs.html",
     "v3/core/v3.0.html": "./index.html",
+    "v3/codecs/blosc/v1.0.rst": "./index.html",
+    "v3/codecs/bytes/v1.0.rst": "./index.html",
+    "v3/codecs/crc32c/v1.0.rst": "./index.html",
+    "v3/codecs/gzip/v1.0.rst": "./index.html",
+    "v3/codecs/sharding-indexed/v1.0.rst": "./index.html",
+    "v3/codecs/transpose/v1.0.rst": "./index.html",
+    "v3/stores/filesystem/v1.0.rst": "./index.html",
 }

@@ -11,7 +11,7 @@ Corresponding ZEP:
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/gzip/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/gzip/index.rst>`_
 
 Copyright 2020-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License
