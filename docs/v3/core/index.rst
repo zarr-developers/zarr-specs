@@ -1539,7 +1539,7 @@ Extension definition
 
 Extensions are defined in `metadata documents`_ either as objects or as
 short-hand names. If using an objection definition, the member ``name``
-MUST be a plain string which conforms to :refs:`extension name <extension-naming>`.
+MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
 Optionally, the member ``configuration`` MAY be present but if so MUST be
 an object.
 
