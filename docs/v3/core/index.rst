@@ -1129,7 +1129,7 @@ list of codecs defined for an array MAY contain codecs which are
 defined in separate specifications. In order to refer to codecs in array metadata
 documents, each codec must have a unique identifier, which is either
 a known "`raw name <extension-naming-raw-names>`_" or
-a "`URI-based name <extension-naming-url-based-names>`_" as defined under :ref:`extensions_section`.
+a "`URL-based name <extension-naming-url-based-names>`_" as defined under :ref:`extensions_section`.
 For ease of discovery, it is
 recommended that codec specifications are contributed to the
 registry of extensions
@@ -1570,7 +1570,7 @@ data type, chunk grid, and chunk key encoding.
 Extension naming
 ----------------
 
-The `name` field of an extension can take two forms: **raw names** and **URI-based names**.
+The `name` field of an extension can take two forms: **raw names** and **URL-based names**.
 
 .. _extension-naming-raw-names:
 
