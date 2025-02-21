@@ -1518,15 +1518,15 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ====================================== ================================
-node_type   extension point         metadata definition                    list of core extensions
-=========== ======================= ====================================== ================================
-array       data type               `array-metadata-data-type`_            :ref:`data-types-list`
-array       chunk grid              `array-metadata-chunk-grid`_           :ref:`chunk-grid-list`
-array       chunk key encoding      `array-metadata-chunk-key-encoding`_   :ref:`chunk-key-encoding-list`
-array       codecs                  `array-metadata-codecs`_               :ref:`codecs-list`
-array       storage transformer     `array-metadata-storage-transformers`_ :ref:`storage-transformers-list`
-=========== ======================= ====================================== ================================
+=========== ======================= ================================================================== ================================
+node_type   extension point         metadata definition                                                list of core extensions
+=========== ======================= ================================================================== ================================
+array       data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-types-list`
+array       chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
+array       chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
+array       codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codecs-list`
+array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformers-list`
+=========== ======================= ================================================================== ================================
 
 New extension points may be proposed to the Zarr community through the ZEP
 process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more information.
