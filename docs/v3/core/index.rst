@@ -11,6 +11,7 @@ Specification URI:
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
+    * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
     * Josh Moore(`@joshmoore <https://github.com/joshmoore>`_), German BioImaging
 
