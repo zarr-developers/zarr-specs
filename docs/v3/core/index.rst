@@ -132,10 +132,8 @@ with implementation B.
 Therefore, data is only marked with the respective major version, unknown
 features are auto-discovered via the metadata document.
 
-Notably, this excludes extensions such as codecs, data types, chunk grids
-and storage transformers from the compatibility of the core specification, as
-well as store support. However, extensions and stores are also RECOMMENDED to 
-follow this stability policy.
+:ref:`Extensions<extensions_section>` defined in subpages of this specification
+follow the same stability policy but do so with their own version number.
 
 Document conventions
 ====================
