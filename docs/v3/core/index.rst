@@ -1732,8 +1732,11 @@ by time.
 
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
-  it is now possible to register new names for extension objects as well as use
-  URL.
+  it is now possible to register new names or even use URLs for extensions.
+  Additionally, extensions may be marked with `must_understand=False` in case
+  a non-implementing library can safely ignore them.
+  Please see the new :ref:`Extensions section <extensions_section>`
+  for details.
 
 Changes after Provisional Acceptance
 ------------------------------------
