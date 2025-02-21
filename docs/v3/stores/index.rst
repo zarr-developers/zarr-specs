@@ -13,7 +13,7 @@ be implemented by all implementations.
    :titlesonly:
    :caption: Contents:
 
-   stores/*/*
+   */*
 
 .. note::
    Stores are *not* extension points since they define the mechanism

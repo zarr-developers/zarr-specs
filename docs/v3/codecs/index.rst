@@ -13,7 +13,7 @@ be implemented by all implementations.
    :titlesonly:
    :caption: Contents:
 
-   codecs/*/*
+   */*
 
 Extensions
 ----------

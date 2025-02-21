@@ -95,4 +95,10 @@ redirects = {
     "v3/codecs/sharding-indexed/v1.0.rst": "./index.html",
     "v3/codecs/transpose/v1.0.rst": "./index.html",
     "v3/stores/filesystem/v1.0.rst": "./index.html",
+    "v3/chunk-grid.rst": "chunk-grids/index.rst",
+    "v3/chunk-key-encoding.rst": "chunk-key-encodings/index.html",
+    "v3/codecs.rst": "codecs/index.html",
+    "v3/data-types.rst": "data-types/index.html",
+    "v3/array-storage-transformers.rst": "storage-transformers/index.html",
+    "v3/stores.rst": "stores/index.html",
 }

@@ -9,12 +9,12 @@ Specifications
    :caption: v3
 
    Core <v3/core/index>
-   v3/codecs
-   v3/chunk-grid
-   v3/chunk-key-encoding
-   v3/data-types
-   v3/stores
-   v3/array-storage-transformers
+   v3/codecs/index
+   v3/chunk-grids/index
+   v3/chunk-key-encodings/index
+   v3/data-types/index
+   v3/stores/index
+   v3/storage-transformers/index
 
 .. toctree::
    :maxdepth: 1

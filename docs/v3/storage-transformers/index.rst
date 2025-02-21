@@ -15,7 +15,7 @@ Array Storage Transformers
    :titlesonly:
    :caption: Contents:
 
-   array-storage-transformers/*/*
+   */*
 
 Currently, no core storage transformers are defined by this specification.
 
