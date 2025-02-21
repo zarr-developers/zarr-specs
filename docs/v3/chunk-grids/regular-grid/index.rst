@@ -8,7 +8,7 @@
   **Editor's draft 26 July 2019**
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/chunk-grids/regular-grid/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/chunk-grids/regular-grid/
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 Issue tracking:

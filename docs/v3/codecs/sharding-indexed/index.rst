@@ -5,7 +5,7 @@ Sharding codec (version 1.0)
 ==========================================
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/
 Editors:
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds

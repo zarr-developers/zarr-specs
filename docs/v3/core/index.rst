@@ -2,11 +2,11 @@
 .. _zarr-core-specification-v3:
 
 ======================================
- Zarr core specification (version 3.0)
+ Zarr core specification (version 3.1)
 ======================================
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/core/index.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/core/
 
 Editors:
     * Alistair Miles (`@alimanfoo <https://github.com/alimanfoo>`_), Wellcome Sanger Institute

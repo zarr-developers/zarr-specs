@@ -5,7 +5,7 @@
 ====================================
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/crc32c/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/crc32c/
 Editors:
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds

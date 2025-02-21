@@ -5,7 +5,7 @@
   **Editor's draft 26 July 2019**
 
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/gzip/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/gzip/
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 Issue tracking:
