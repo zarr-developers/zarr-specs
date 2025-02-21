@@ -1,8 +1,8 @@
 .. _chunk-grid-list:
 
-==========
-Chunk Grid
-==========
+===========
+Chunk Grids
+===========
 
 The following documents specify chunk grids which SHOULD
 be implemented by all implementations.
