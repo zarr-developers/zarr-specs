@@ -13,9 +13,7 @@ interpreted as described in `RFC 2119
 Status
 ------
 
-This specification is deprecated. See `v3
-<https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html>`_ for the
-latest version.
+This specification is deprecated. See :ref:`zarr-specs` for the latest version.
 
 Storage
 -------
