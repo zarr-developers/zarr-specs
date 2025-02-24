@@ -13,7 +13,7 @@ Editors:
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
-    * Josh Moore(`@joshmoore <https://github.com/joshmoore>`_), German BioImaging
+    * Josh Moore (`@joshmoore <https://github.com/joshmoore>`_), German BioImaging
 
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
@@ -350,7 +350,7 @@ terminology for a use case of reading from an array:
 
 *Extension point*
 
-    A field in a `metadata document_` that can be extended to allow values
+    A field in a `metadata document`_ that can be extended to allow values
     not defined in this specification.
     See :ref:`extension points <extensions_section>` below.
 
@@ -1136,10 +1136,10 @@ recommended that codec specifications are contributed to the
 registry of extensions
 (`zarr-extensions`_).
 
-A codec specification must declare the codec identifier, and describe
+A codec specification MUST declare the codec identifier, and describe
 (or cite documents that describe) the encoding and decoding algorithms
 and the format of the encoded data.
-A codec may have configuration parameters which modify the behaviour
+A codec MAY have configuration parameters which modify the behaviour
 of the codec in some way. For example, a compression codec may have a
 compression level parameter, which is an integer that affects the
 resulting compression ratio of the data. Configuration parameters must
@@ -1590,7 +1590,7 @@ maintainer team reserves the right to refuse name assignment at its own
 discretion.
 
 - **Example:** ``zstd``
-- **Acceptd regex:** ``^[a-z0-9-_.]+$``
+- **Accepted regex:** ``^[a-z0-9-_.]+$``
 
 .. _extension-naming-url-based-names:
 

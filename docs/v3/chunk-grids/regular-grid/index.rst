@@ -2,7 +2,7 @@
 .. _regulargrid-chunkgrid-v1:
 
 ======================================
- Regular grid chunk grid (version 1.0)
+ Regular chunk grid (version 1.0)
 ======================================
 
   **Editor's draft 26 July 2019**
