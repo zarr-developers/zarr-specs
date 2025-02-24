@@ -547,55 +547,10 @@ mandatory names:
     Provides an element value to use for uninitialised portions of the
     Zarr array.
 
-    The permitted values depend on the data type:
+    The permitted values depend on the data type. Fill values for core
+    data types are listed in :ref:`fill-value-list`.
 
-    ``bool``
-      The value must be a JSON boolean (``false`` or ``true``).
-
-    Integers (``{uint,int}{8,16,32,64}``)
-      The value must be a JSON number with no fraction or exponent part that is
-      within the representable range of the data type.
-
-    IEEE 754 floating point numbers (``float{16,32,64}``)
-      The value may be either:
-
-      - A JSON number, that will be rounded to the nearest representable value.
-
-      - A JSON string of the form:
-
-        - ``"Infinity"``, denoting positive infinity;
-        - ``"-Infinity"``, denoting negative infinity;
-        - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
-          0 (positive), the most significant bit (MSB) of the mantissa is 1, and
-          all other bits of the mantissa are zero;
-        - ``"0xYYYYYYYY"``, specifying the byte representation of the floating
-          point number as an unsigned integer.  For example, for ``float32``,
-          ``"NaN"`` is equivalent to ``"0x7fc00000"``.  This representation is
-          the only way to specify a NaN value other than the specific NaN value
-          denoted by ``"NaN"``.
-
-        .. warning::
-
-           While this NaN syntax is consistent with the syntax accepted by the
-           C99 ``strtod`` function, C99 leaves the meaning of the NaN payload
-           string implementation defined, which may not match the Zarr
-           definition.
-
-    Complex numbers (``complex{64,128}``)
-      The value must be a two-element array, specifying the real and imaginary
-      components respectively, where each component is specified as defined
-      above for floating point number.
-
-      For example, ``[1, 2]`` indicates ``1 + 2i`` and ``["-Infinity", "NaN"]``
-      indicates a complex number with real component of -inf and imaginary
-      component of NaN.
-
-    Raw data types (``r<N>``)
-      An array of integers, with length equal to ``<N>``, where each integer is
-      in the range ``[0, 255]``.
-
-    Extensions to the spec that define new data types must also define the JSON
-    fill value representation.
+    Extension data types MUST also define the JSON fill value representation.
 
     .. note::
 
@@ -1529,6 +1484,8 @@ array       codecs                  :ref:`codecs <array-metadata-codecs>`       
 array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformers-list`
 =========== ======================= ================================================================== ================================
 
+Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
+
 New extension points may be proposed to the Zarr community through the ZEP
 process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more information.
 
@@ -1664,6 +1621,10 @@ SHOULD either contain the specification or link to it.
 For extensions with URL-based names, it is RECOMMENDED that the URL resolve to
 a specification of the extension. Additionally, URL-based extensions MAY also register
 themselves under the `zarr-extensions`_ repository for better discovery.
+
+Because the ``fill_value`` metadata key is dependent on the data type, 
+extension data types SHOULD specify permitted values for the ``fill_value`` in
+their specification.
 
 Implementation Notes
 ====================

@@ -14,7 +14,7 @@ Core data types
    :header-rows: 1
 
    * - Identifier
-     - Numerical type
+     - Numerical Type
    * - ``bool``
      - Boolean
    * - ``int8``
@@ -45,6 +45,58 @@ Core data types
      - real and complex components are each IEEE 754 double-precision floating point
    * - ``r*`` (Optional)
      - raw bits, variable size given by ``*``, limited to be a multiple of 8
+
+.. _fill-value-list:
+
+Permitted fill values
+^^^^^^^^^^^^^^^^^^^^^
+
+The permitted values depend on the data type:
+
+    ``bool``
+      The value must be a JSON boolean (``false`` or ``true``).
+
+    Integers (``{uint,int}{8,16,32,64}``)
+      The value must be a JSON number with no fraction or exponent part that is
+      within the representable range of the data type.
+
+    IEEE 754 floating point numbers (``float{16,32,64}``)
+      The value may be either:
+
+      - A JSON number, that will be rounded to the nearest representable value.
+
+      - A JSON string of the form:
+
+        - ``"Infinity"``, denoting positive infinity;
+        - ``"-Infinity"``, denoting negative infinity;
+        - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
+          0 (positive), the most significant bit (MSB) of the mantissa is 1, and
+          all other bits of the mantissa are zero;
+        - ``"0xYYYYYYYY"``, specifying the byte representation of the floating
+          point number as an unsigned integer.  For example, for ``float32``,
+          ``"NaN"`` is equivalent to ``"0x7fc00000"``.  This representation is
+          the only way to specify a NaN value other than the specific NaN value
+          denoted by ``"NaN"``.
+
+        .. warning::
+
+           While this NaN syntax is consistent with the syntax accepted by the
+           C99 ``strtod`` function, C99 leaves the meaning of the NaN payload
+           string implementation defined, which may not match the Zarr
+           definition.
+
+    Complex numbers (``complex{64,128}``)
+      The value must be a two-element array, specifying the real and imaginary
+      components respectively, where each component is specified as defined
+      above for floating point number.
+
+      For example, ``[1, 2]`` indicates ``1 + 2i`` and ``["-Infinity", "NaN"]``
+      indicates a complex number with real component of -inf and imaginary
+      component of NaN.
+
+    Raw data types (``r<N>``)
+      An array of integers, with length equal to ``<N>``, where each integer is
+      in the range ``[0, 255]``.
 
 Extensions
 ----------
