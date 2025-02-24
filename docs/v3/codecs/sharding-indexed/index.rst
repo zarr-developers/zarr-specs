@@ -1,9 +1,11 @@
-.. _sharding-indexed-codec-v1:
+.. _sharding-indexed-codec:
 
-==========================================
-Sharding codec (version 1.0)
-==========================================
+==============
+Sharding codec
+==============
 
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/
 Editors:

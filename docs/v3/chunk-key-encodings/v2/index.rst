@@ -1,11 +1,11 @@
-.. _v2-chunkkeyencoding-v1:
+.. _v2-chunkkeyencoding:
 
-=========================================
- v2 chunk key encoding (version 1.0)
-=========================================
+=====================
+v2 chunk key encoding
+=====================
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/chunk-key-encodings/v2/
 Corresponding ZEP:

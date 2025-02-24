@@ -1,11 +1,11 @@
 .. _bytes-codec-v1:
 
-============================
- Bytes codec (version 1.0)
-============================
+===========
+Bytes codec
+===========
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/bytes/
 Corresponding ZEP:

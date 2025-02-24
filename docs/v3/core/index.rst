@@ -1,10 +1,12 @@
 .. This file is in restructured text format: https://docutils.sourceforge.io/rst.html
 .. _zarr-core-specification-v3:
 
-======================================
- Zarr core specification (version 3.1)
-======================================
+=======================
+Zarr core specification
+=======================
 
+Version:
+    3.1
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/core/
 

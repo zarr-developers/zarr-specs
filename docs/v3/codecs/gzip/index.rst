@@ -1,9 +1,9 @@
-==========================
- Gzip codec (version 1.0)
-==========================
+==========
+Gzip codec
+==========
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/gzip/
 Corresponding ZEP:

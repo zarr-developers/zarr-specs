@@ -1,9 +1,11 @@
 .. _file-system-store-v1:
 
-=================================
- File system store (version 1.0)
-=================================
+=================
+File system store
+=================
 
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/stores/filesystem/
 Corresponding ZEP:

@@ -1,11 +1,11 @@
-.. _default-chunkkeyencoding-v1:
+.. _default-chunkkeyencoding:
 
-=========================================
- Default chunk key encoding (version 1.0)
-=========================================
+==========================
+Default chunk key encoding
+==========================
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/chunk-key-encodings/default/
 Corresponding ZEP:

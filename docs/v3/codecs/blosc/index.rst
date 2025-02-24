@@ -1,9 +1,9 @@
-===========================
- Blosc codec (version 1.0)
-===========================
+===========
+Blosc codec
+===========
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/blosc/
 Corresponding ZEP:
