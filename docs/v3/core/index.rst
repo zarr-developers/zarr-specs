@@ -1559,7 +1559,8 @@ Raw names are centrally registered names which can be used without prefix.
 
 Raw names MUST be assigned within a central repository.
 Raw names are unique and immutable.
-Raw names MUST be composed of lower case letters a-z, numerals 0-9, underscores, dashes, and dots.
+Raw names MUST start with one lower case letter a-z and then be followed
+by only lower case letters a-z, numerals 0-9, underscores, dashes, and dots.
 Raw name assignment is managed through the `zarr-extensions`_
 Github repository, where extensions and their specification are listed.
 The Zarr Steering Council or by delegation a
@@ -1567,7 +1568,7 @@ maintainer team reserves the right to refuse name assignment at its own
 discretion.
 
 - **Example:** ``zstd``
-- **Accepted regex:** ``^[a-z0-9-_.]+$``
+- **Accepted regex:** ``^[a-z][a-z0-9-_.]+$``
 
 .. _extension-naming-url-based-names:
 
