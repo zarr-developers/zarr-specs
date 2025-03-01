@@ -1575,9 +1575,10 @@ discretion.
 URL-based names
 ^^^^^^^^^^^^^^^
 
-URL-based names delegate name registration to the domain name system (DNS).
+URL-based names delegate the assignment of unique identifiers to
+the well-established addressing mechanism of the web.
 
-URL-based named MAY be used by any extension without further coordination.
+URL-based names are decentralized and MAY be used by any extension without further coordination.
 Entities defining a URL-based name SHOULD have appropriate
 authority over the URL. A persistent redirecting URL like PURL MAY be used.
 URLs have been chosen due to their potential for being self-documenting.
