@@ -1653,12 +1653,45 @@ Because the ``fill_value`` metadata key is dependent on the data type,
 extension data types SHOULD specify permitted values for the ``fill_value`` in
 their specification.
 
+
+.. _extension-guidance:
+
+Guidance for extension authors
+------------------------------
+
+*This section is non-normative and provides assistance for the authors of
+extensions, especially those who are just getting started.*
+
+* If you are just getting started, use the URL of your work-in-progress as an
+  identifier for your extension. The GitHub link, including the branch if you
+  would like, makes a fine choice. This says to the community that this is a
+  draft, and if they are interested in the details, they can follow the URL to
+  find out more.
+
+* When developing an extension for which you intend to register a short name,
+  you may wish to test it using the short name even before you have registered
+  it. However, you MUST register the name before using the extension for
+  non-test purposes/for purposes where interoperability with other
+  implementations/users is a concern.
+
+* If you are implementing a well-known extension like a data type or codec that
+  is already referred to by name in the community, you may want to check the `zarr-extensions`_
+  repository to see if someone has already implemented the extension.
+
+* For raw names that are coming from well-known projects, use the same prefix followed
+  by a dot for requesting your raw name, e.g. "numcodecs.". Other examples of prefixes can
+  be found in the `zarr-extensions`_ repository.
+
+* If you migrate your URL-based extension to a new location, try to redirect the
+  previous URL to the new location or document the migration. Similarly, if you
+  register a raw name extension after having used an URL-based extension in production,
+  cross-link the two pages.
+
 Implementation Notes
 ====================
 
 This section is non-normative and presents notes from implementers about cases
 that need to be carefully considered but do not strictly fall into the spec.
-
 
 Resizing
 --------
