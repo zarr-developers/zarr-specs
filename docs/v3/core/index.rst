@@ -783,6 +783,7 @@ The group metadata object must not contain any other names. Those are reserved
 for future versions of this specification. An implementation must fail to open
 zarr hierarchies or groups with unknown metadata fields, with the exception of
 objects with a ``"must_understand": false`` key-value pair.
+See :ref:`extension-definition-must-understand` for more information.
 
 
 Node names
@@ -1496,8 +1497,15 @@ process. See `ZEP 0 <https://zarr.dev/zeps/active/ZEP0000.html>`_ for more infor
 Extension definition
 --------------------
 
+.. _extension-definition-object:
+
+Objects
+^^^^^^^
+
 In `metadata documents`_, extensions can be encoded either as objects or as
-short-hand names. If using an objection definition, the member ``name``
+short-hand names.
+
+If using an objection definition, the member ``name``
 MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
 Optionally, the member ``configuration`` MAY be present but if so MUST be
 an object.
@@ -1509,9 +1517,19 @@ For example::
         "configuration": { ... } # optional
     }
 
+.. _extension-definition-short-hand-name:
+
+Short-hand names
+^^^^^^^^^^^^^^^^
+
 Instead of extension objects, short-hand names MAY be used if no
 configuration metadata is required. They are equivalent to extension
 objects with just a `name` key.
+
+.. _extension-definition-must-understand:
+
+`must_understand`
+^^^^^^^^^^^^^^^^^
 
 If such an object is present, the field `must_understand` is implicitly set to
 `True` and an object MAY explicitly set `must_understand=False` if
