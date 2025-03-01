@@ -1612,14 +1612,14 @@ The following example of array metadata demonstrates these extension naming sche
 
     {
         "zarr_format": 3,
-        "data_type": "https://example.com/zarr/string", // URL-based name, short-hand name
+        "data_type": "string", // raw name, short-hand name
         "chunk_key_encoding": {
             "name": "default", // core
             "configuration": { "separator": "." }
         },
         "codecs": [
             {
-                "name": "https://numcodecs.dev/vlen-utf8" // URL-based name
+                "name": "vlen-utf8" // raw name
             },
             {
                 "name": "zstd", // raw name
@@ -1632,8 +1632,7 @@ The following example of array metadata demonstrates these extension naming sche
         },
         "shape": [ 128 ],
         "dimension_names": [ "x" ],
-        "attributes": { ... },
-        "storage_transformers": []
+        "attributes": { ... }
     }
 
 Extension specifications
