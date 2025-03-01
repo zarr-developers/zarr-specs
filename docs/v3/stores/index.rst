@@ -1,4 +1,4 @@
-.. _stores-list:
+.. _store-list:
 
 ======
 Stores

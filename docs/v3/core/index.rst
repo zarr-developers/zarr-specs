@@ -846,7 +846,7 @@ should be interpreted.
 
 This specification defines a limited set of data types to
 represent boolean values, integers, and floating point
-numbers. These can be found under :ref:`Data Types<data-types-list>`.
+numbers. These can be found under :ref:`Data Types<data-type-list>`.
 
 All of the data types defined here have a fixed size, in the sense that all values
 require the same number of bytes.
@@ -1480,11 +1480,11 @@ Different types of extensions can exist and they can be grouped as follows:
 =========== ======================= ================================================================== ================================
 node_type   extension point         metadata definition                                                list of core extensions
 =========== ======================= ================================================================== ================================
-array       data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-types-list`
+array       data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-type-list`
 array       chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
 array       chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
-array       codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codecs-list`
-array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformers-list`
+array       codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
+array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
 =========== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.

@@ -1,4 +1,4 @@
-.. _codecs-list:
+.. _codec-list:
 
 ======
 Codecs

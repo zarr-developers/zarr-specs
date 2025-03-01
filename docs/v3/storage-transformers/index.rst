@@ -1,4 +1,4 @@
-.. _storage-transformers-list:
+.. _storage-transformer-list:
 
 ==========================
 Array Storage Transformers

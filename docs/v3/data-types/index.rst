@@ -1,4 +1,4 @@
-.. _data-types-list:
+.. _data-type-list:
 
 ==========
 Data Types
