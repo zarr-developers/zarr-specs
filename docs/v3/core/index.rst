@@ -1472,6 +1472,8 @@ Extensions
 This section describes how additional functionality can be defined
 for Zarr datasets by the `metadata documents`_.
 
+.. _extension-points:
+
 Extension points
 ----------------
 
@@ -1542,6 +1544,9 @@ set to ``"must_understand": false``.
 
 `must_understand=False` is not supported for the following extension points:
 data type, chunk grid, and chunk key encoding.
+
+Use of `must_understand=False` to add top-level keys is discouraged in favor
+of the explicit use of :ref:`extension-points`.
 
 .. _extension-naming:
 
