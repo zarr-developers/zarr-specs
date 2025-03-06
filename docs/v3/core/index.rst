@@ -1087,8 +1087,9 @@ To allow for flexibility to define and implement new codecs, the
 list of codecs defined for an array MAY contain codecs which are
 defined in separate specifications. In order to refer to codecs in array metadata
 documents, each codec must have a unique identifier, which is either
-a known "`raw name <extension-naming-raw-names>`_" or
-a "`URL-based name <extension-naming-url-based-names>`_" as defined under :ref:`extensions_section`.
+a known "`raw name <extension-naming-raw-names>`_" (for registered extensions) or
+a "`namespaced extension <extension-naming-namespaced-names>`_" (for private / 
+experimental extensions)as defined under :ref:`extensions_section`.
 For ease of discovery, it is
 recommended that codec specifications are contributed to the
 registry of extensions
@@ -1515,7 +1516,7 @@ an object.
 For example::
 
     {
-        "name": "<name>",        # "raw name" or URL-based name
+        "name": "<name>",        # "raw name" or namespaced name
         "configuration": { ... } # optional
     }
 
@@ -1553,19 +1554,22 @@ of the explicit use of :ref:`extension-points`.
 Extension naming
 ----------------
 
-The `name` field of an extension can take two forms: **raw names** and **URL-based names**.
+The `name` field of an extension can take two forms: **raw names** and **namespaced names**.
 
 .. _extension-naming-raw-names:
 
 Raw names
 ^^^^^^^^^
 
-Raw names are centrally registered names which can be used without prefix.
+Raw names consist of a single string that is unique within the Zarr ecosystem, with no prefix.
+Raw names are intended for well-known extensions aimed at broad adoption and maximum interoperability.
 
 Raw names MUST be assigned within a central repository.
 Raw names are unique and immutable.
 Raw names MUST start with one lower case letter a-z and then be followed
-by only lower case letters a-z, numerals 0-9, underscores, dashes, and dots.
+by only lower case letters a-z, numerals 0-9, underscores, and dashes.
+Raw names MUST NOT use a dot character `.`, to avoid confusion with namespaced extensions.
+
 Raw name assignment is managed through the `zarr-extensions`_
 Github repository, where extensions and their specification are listed.
 The Zarr Steering Council or by delegation a
@@ -1573,27 +1577,20 @@ maintainer team reserves the right to refuse name assignment at its own
 discretion.
 
 - **Example:** ``zstd``
-- **Accepted regex:** ``^[a-z][a-z0-9-_.]+$``
+- **Accepted regex:** ``^[a-z][a-z0-9-_]+$``
 
-.. _extension-naming-url-based-names:
+.. _extension-naming-namespaced-names:
 
-URL-based names
-^^^^^^^^^^^^^^^
+Namespaced names
+^^^^^^^^^^^^^^^^
 
-URL-based names delegate the assignment of unique identifiers to
-the well-established addressing mechanism of the web.
+Namespaced names are intended for private extensions and for experimental and development purposes.
+Namespaced names start with a prefix of one or more parts, each separated by the `.` character.
 
-URL-based names are decentralized and MAY be used by any extension without further coordination.
-Entities defining a URL-based name SHOULD have appropriate
-authority over the URL. A persistent redirecting URL like PURL MAY be used.
-URLs have been chosen due to their potential for being self-documenting.
-While a URL SHOULD resolve to a human-readable
-explanation of the extension, preferably including a JSON schema definition
-of the extension metadata, implementations are not expected to resolve
-URLs during processing.
+Namespaced names are not centrally managed and MAY be used by any extension without coordination.
 
-- **Example:** ``https://example.com/zarr3/consolidated-metadata``
-- **Accepted regex:** ``^https?:\/\/[^/?#]+[^?#]*$``
+- **Example:** ``myorg.my-private-extension``
+- **Accepted regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+$``
 
 Extension versioning
 --------------------
@@ -1601,7 +1598,7 @@ Extension versioning
 Extensions with **raw names** SHOULD follow the
 compatibility and versioning v3 `stability policy`_.
 
-For extensions with **URL-based names**, there are no guarantees in terms of
+For extensions with **namespaced names**, there are no guarantees in terms of
 versioning or compatibility. However, preserving backwards-compatibility is
 strongly encouraged.
 
@@ -1644,10 +1641,6 @@ facilitates multiple implementations of an extension.
 For extensions with raw names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
 
-For extensions with URL-based names, it is RECOMMENDED that the URL resolve to
-a specification of the extension. Additionally, URL-based extensions MAY also register
-themselves under the `zarr-extensions`_ repository for better discovery.
-
 Because the ``fill_value`` metadata key is dependent on the data type, 
 extension data types SHOULD specify permitted values for the ``fill_value`` in
 their specification.
@@ -1661,30 +1654,15 @@ Guidance for extension authors
 *This section is non-normative and provides assistance for the authors of
 extensions, especially those who are just getting started.*
 
-* If you are just getting started, use the URL of your work-in-progress as an
-  identifier for your extension. The GitHub link, including the branch if you
-  would like, makes a fine choice. This says to the community that this is a
-  draft, and if they are interested in the details, they can follow the URL to
-  find out more.
+* If you are just getting started, use a namespaced extension for your extension name.
+  As you extension matures, you may consider registering it using a Raw name.
 
-* When developing an extension for which you intend to register a short name,
-  you may wish to test it using the short name even before you have registered
-  it. However, you MUST register the name before using the extension for
-  non-test purposes/for purposes where interoperability with other
-  implementations/users is a concern.
+* If you intend to distribute data widely using your extension, you SHOULD register your
+  extension using Raw name, rather than a namespaced name, in the extension repository.
 
 * If you are implementing a well-known extension like a data type or codec that
   is already referred to by name in the community, you may want to check the `zarr-extensions`_
   repository to see if someone has already implemented the extension.
-
-* For raw names that are coming from well-known projects, use the same prefix followed
-  by a dot for requesting your raw name, e.g. "numcodecs.". Other examples of prefixes can
-  be found in the `zarr-extensions`_ repository.
-
-* If you migrate your URL-based extension to a new location, try to redirect the
-  previous URL to the new location or document the migration. Similarly, if you
-  register a raw name extension after having used an URL-based extension in production,
-  cross-link the two pages.
 
 Implementation Notes
 ====================
@@ -1753,7 +1731,7 @@ by time.
 
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
-  it is now possible to register new names or even use URLs for extensions.
+  it is now possible to add user-defined extensions.
   Additionally, extensions may be marked with `must_understand=False` in case
   a non-implementing library can safely ignore them.
   Please see the new :ref:`Extensions section <extensions_section>`
