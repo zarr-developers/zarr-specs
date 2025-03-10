@@ -504,8 +504,8 @@ mandatory names:
     ``data_type`` is an :ref:`extension point<extensions_section>`
     and MUST conform to the :ref:`extension-definition`.
 
-    If the data type is defined in
-    this specification, then the value must be the data type
+    If the data type is defined in :ref:`this specification <data-type-list>`,
+    then the value must be the data type
     identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
