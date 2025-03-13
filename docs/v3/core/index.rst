@@ -1592,6 +1592,14 @@ Namespaced names are not centrally managed and MAY be used by any extension with
 - **Example:** ``myorg.my-private-extension``
 - **Accepted regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+$``
 
+URIs as names
+-------------
+
+In an earlier draft of this spec, the name of an extension codec was required to be a URI that
+dereferences to a human-readable codec specification.
+That is now discouraged for new extensions; either raw names or namespaced names should be used instead.
+However, for backwards compatibility with existing extensions, URI names are permitted.
+
 Extension versioning
 --------------------
 
