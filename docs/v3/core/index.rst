@@ -1666,7 +1666,7 @@ extensions, especially those who are just getting started.*
   As you extension matures, you may consider registering it using a Raw name.
 
 * If you intend to distribute data widely using your extension, you SHOULD register your
-  extension using Raw name, rather than a namespaced name, in the extension repository.
+  extension using a Raw name, rather than a namespaced name, in the extension repository.
 
 * If you are implementing a well-known extension like a data type or codec that
   is already referred to by name in the community, you may want to check the `zarr-extensions`_
