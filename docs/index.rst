@@ -2,7 +2,7 @@
 Specs
 =====
 
-A good starting point is the :ref:`zarr-core-specification-v3.0`.
+A good starting point is the :ref:`zarr-core-specification-v3`.
 
 .. toctree::
 
