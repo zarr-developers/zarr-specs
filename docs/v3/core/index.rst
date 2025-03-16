@@ -17,8 +17,9 @@ Editors:
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
     * Josh Moore (`@joshmoore <https://github.com/joshmoore>`_), German BioImaging
 
-Corresponding ZEP:
-    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
+Corresponding ZEPs:
+    * `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
+    * `ZEP0009 — Zarr extension naming <https://zarr.dev/zeps/draft/ZEP0009.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.1>`_
@@ -42,7 +43,7 @@ This specification defines the Zarr format for N-dimensional typed arrays.
 Status of this document
 =======================
 
-ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
+ * ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
 
 
 Introduction
@@ -125,8 +126,8 @@ implementing a specification ``X.Y`` can be considered compatible with all
 datasets which only use features contained in version ``X.Y``.
 
 For example, spec ``X.1`` adds core feature "foo" compared to ``X.0``. Assuming
-implementation A implements ``X.1`` and implementation B implements ``X.0``.
-Data using feature "foo" can only be read with implementation A. B fails to open
+implementation A implements ``X.1`` and implementation B implements ``X.0``,
+data using feature "foo" can only be read with implementation A. B fails to open
 it, as the key "foo" is unknown.
 
 Data not using "foo" can be used with both implementations, even if it's written
@@ -689,7 +690,7 @@ above, but using a (currently made up) extension data type::
         "node_type": "array",
         "shape": [10000, 1000],
         "data_type": {
-            "name": "datetime",
+            "name": "urn:example:datetime",
             "configuration": {
                 "unit": "ns"
             }
