@@ -509,6 +509,10 @@ mandatory names:
     identifier provided as a string. For example, ``"float64"`` for
     little-endian 64-bit floating point number.
 
+    Because the ``fill_value`` metadata key is dependent on the data type, 
+    extension data types SHOULD specify permitted values for the ``fill_value`` in
+    their specification.
+
 .. _array-metadata-chunk-grid:
 
 ``chunk_grid``
@@ -1649,11 +1653,6 @@ facilitates multiple implementations of an extension.
 
 For extensions with raw names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
-
-Because the ``fill_value`` metadata key is dependent on the data type, 
-extension data types SHOULD specify permitted values for the ``fill_value`` in
-their specification.
-
 
 .. _extension-guidance:
 
