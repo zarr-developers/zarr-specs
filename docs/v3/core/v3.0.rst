@@ -804,6 +804,63 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
+``consolidated_metadata``
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    An object consolidating all the Array and Group metadata of members below
+    the root node in a hierarchy.
+
+    =============== =========================  ===================================================================================================
+    Field           Type                       Description
+    =============== =========================  ===================================================================================================
+    metadata        ``Map<string, Metadata>``  A mapping from node path to Group or Array ``Metadata`` object.
+    kind            const ``'inline'``         The string literal ``'inline'``. Reserved for future use.
+    must_understand const ``False``            The boolean literal ``False``. Indicates that the field is not required to load the Zarr hierarchy.
+    =============== =========================  ===================================================================================================
+
+    Consolidated metadata can help reduce the time needed to load the metadata
+    for an entire hierarchy, especially when the metadata is being served over a
+    network. Without consolidated metadata, opening an entire hierarchy over the
+    network requires an HTTP request per node. Consolidated metadata enables
+    loading the metadata for every node in a hierarchy with a single HTTP
+    request.
+
+    Note that *all* children Arrays and Groups should be included in
+    consolidated metadata, not just the nodes immediately below the root Group.
+    Children nested inside other groups should be included too as a flat list of
+    nodes. The keys of ``metadata`` should be the path of the node relative to
+    the node at which the metadata is being consolidated (i.e. the ``Group``
+    where this ``consolidated_metadata`` object is stored). For example, given a
+    hierarchy with groups like the following, where capital letters indicate
+    groups: and lowercase letters indicate arrays::
+
+       A/
+         B/
+           C/
+            x
+            y
+
+    If we consolidate the metadata at the Group ``A``, the consolidated metadata
+    would have the keys ``"A", "A/B", "A/B/C", "A/B/C/x", ...``.
+
+    If we consolidate the metadata at the Group ``B``, the consolidated metadata
+    would have the keys ``"C", "C/x", "C/y"``.
+
+    If we consolidate the metadata at the Group ``C``, the consolidated metadata
+    would have the keys ``"x", "y"``.
+
+    Consolidated Metadata is optional. If present, then readers should use the
+    consolidated metadata. When not present, readers should use the
+    non-consolidated metadata located in the Store to load the data.
+
+    The ``kind`` field indicates that consolidated metadata is stored inline in
+    the root ``zarr.json`` object. At this time, ``'inline'`` is the only
+    supported value for ``kind``. Future versions of the specification may allow
+    for consolidated metadata in other locations.
+
+Example Group Metadata
+----------------------
+
 For example, the JSON document below defines a group::
 
     {
