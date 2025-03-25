@@ -1244,9 +1244,7 @@ Stores
 ======
 
 A Zarr store is a system that can be used to store and retrieve data
-from a Zarr hierarchy. For a store to be compatible with this
-specification, it must support a set of operations defined in the `Abstract store
-interface`_ subsection. The store interface can be implemented using a
+from a Zarr hierarchy. The store interface can be implemented using a
 variety of underlying storage technologies, described in the
 subsection on `Store implementations`_.
 
@@ -1258,6 +1256,8 @@ when opening a Zarr hierarchy to automatically determine the appropriate store.
 
 Abstract store interface
 ------------------------
+
+(This subsection is not normative. It is intended only as a recommendation for API design, but does not need to be strictly followed like the specification for the on-disk storage does.)
 
 The store interface is intended to be simple to implement using a
 variety of different underlying storage technologies. It is defined in
