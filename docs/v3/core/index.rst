@@ -1473,8 +1473,14 @@ Storage transformers may be stacked to combine different functionalities:
 Extensions
 ==========
 
-This section describes how additional functionality can be defined
-for Zarr datasets by the `metadata documents`_.
+Additional functionality and features can be enabled in Zarr datasets through
+extensions defined in `metadata documents`_. Each extension corresponds to a
+specific extension point, such as data types or codecs. Extensions may include
+optional configuration, which can be provided via structured objects. Proper
+naming is essential for cross-implementation interoperability, ensuring
+extensions are recognized and used consistently. This section outlines
+available extension points, the structural constraints on extensions, and
+naming conventions.
 
 .. _extension-points:
 
@@ -1557,8 +1563,11 @@ of the explicit use of :ref:`extension-points`.
 Extension naming
 ----------------
 
-The `name` field of an extension can take two forms: **registered names** (as simple strings)
-and **unregistered names** (as URIs).
+The `name` field of an extension is an identifier taking one of two forms:
+**registered names** (as simple strings) and **unregistered names** (as URIs).
+
+Implementations SHOULD be able to resolve multiple names to the same
+implementation to support unregistered names which are subsequently registered.
 
 .. _extension-naming-registered-names:
 
@@ -1567,20 +1576,22 @@ Registered names
 
 Registered names consist of a single string that is unique within the Zarr ecosystem, with no prefix.
 Registered names are intended for well-known extensions aimed at broad adoption and maximum interoperability.
-
-Registered names MUST be assigned within a central repository.
 Registered names are unique and immutable.
 Registered names MUST start with one lower case letter a-z and then be followed
 by only lower case letters a-z, numerals 0-9, underscores, dots and dashes.
 
-Registered name assignment is managed through the `zarr-extensions`_
-Github repository, where extensions and their specification are listed.
+Registered names MUST be assigned within a central repository, `zarr-extensions`_
+a Github repository, where extensions and their specification are listed.
 The Zarr Steering Council or by delegation a
 maintainer team reserves the right to refuse name assignment at its own
 discretion.
 
-- **Example:** ``zstd``
 - **Accepted regex:** ``^[a-z][a-z0-9-_.]+$``
+- **Valid examples:**
+  - ``zstd``
+  - ``numcodecs.adler32``
+- **Invalid examples:**
+  - ``foo/bar``
 
 .. _extension-naming-unregistered-names:
 
@@ -1596,26 +1607,33 @@ are prefixed with a scheme beginning with a letter and followed by
 any number of letters, numbers, plus symbols, dashes or dots and then followed by a colon.
 
 - **Identifying regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+:``
-  ``[A-Za-z][A-Za-z0-9+\-.]*``
+
+
+    TODO: The goal of using URI identifiers is to provide a large and flexible namespace which
+    balances the needs of developers building new extensions with a extensible mechanism
+    which the Zarr community can make use of in the years to come. We understand there may
+    be several reasons that someone would not want to register a name.
+
 
 URIs (`Uniform Resource Identifiers <https://en.wikipedia.org/wiki/Uniform_Resource_Identifier>`_)
-are a well-known mechanism to identify resources on the internet.
-(`Uniform Resource Locators <https://en.wikipedia.org/wiki/URL>`_) are one class of URIs which
-provide a mechanism for resolving resources.
+are a well-known mechanism to identify resources on the internet and extension authors are
+encouraged to explore further documentation on which identifiers might best express their intent.
 
+Aware that not all extension developers will want to immediately register a name,
+the goal of using URI identifiers is to provide a large and flexible namespace which
+balances the needs of developers building new extensions with a extensible mechanism
+which the Zarr community can make use of in the years to come.
+
+URLs (`Uniform Resource Locators <https://en.wikipedia.org/wiki/URL>`_) are one class of URIs which
+provide a mechanism for resolving resources.
 In previous versions of the v3 spec, the name of an extension was required to
 be a URI that dereferences to a human-readable codec specification, i.e. a URL.
 That is now discouraged for new extensions, though, for backwards compatibility
 with existing extensions, URLs names are still permitted.
 
-Instead, extension names SHOULD either be registered names or simpler URNs.
+Instead, extension names SHOULD either be registered names as specified above or URNs.
 URNs (`Uniform Resource Names <https://en.wikipedia.org/wiki/Uniform_Resource_Name>`_)
-are persistent identifiers assigned within defined namespaces.
-
-TODO: The goal of using URI identifiers is to provide a large and flexible namespace which
-balances the needs of developers building new extensions with a extensible mechanism
-which the Zarr community can make use of in the years to come. We understand there may
-be several reasons that someone would not want to register a name.
+are simpler persistent identifiers assigned within defined namespaces.
 
 .. _extension-guidance:
 
@@ -1625,33 +1643,34 @@ Guidance for extension authors
 *This section is non-normative and provides assistance for the authors of
 extensions, especially those who are just getting started.*
 
-Below will find
-guidance how best to get started.
+TODO Below will find guidance how best to get started.
 
 * **Local development**: Authors looking to define a name for local development
-  purposes should prefix their extensions with ``urn:x-`` for "experimental".
+purposes should prefix their extensions with ``urn:x-``. This prefix defines an
+"experimental" name. As such an extension matures, authors might consider registering
+a new name for it. Implementations should check both for the unregistered as well
+as the registered named.
 
-* **Proprietary extensions**: Authors looking
+* **Proprietary extensions**: Authors looking to create proprietary extensions
+which are only interpretable within their own institutions are encouraged to
+take ownership of their "own" namespace, ``urn:x-company`` or ``urn:x-domain.name``.
 
-* **UUID**: ``urn:uuid:...``
+* **Complete opaquness**: Authors looking for a prefix which is communicates
+*nothing* to implementations MAY use the prefix ``urn:uuid:...`` following
+by following by a valid
+UUID (`Universally Unique Identifier <https://en.wikipedia.org/wiki/Universally_unique_identifier>`_).
 
-Nevertheless, the Zarr maintainers endeavor to make the registration of names as
+* If you are implementing a well-known extension like a data type or codec that
+is already referred to by name in the community, you may want to check the `zarr-extensions`_
+repository to see if someone has already implemented the extension.
+
+* Authors intending to create significant amounts of data or widely distributed data
+should consider registering all extensions in the extension registry to  TODO
+
+The Zarr maintainers endeavor to make the registration of names as
 straight-forward as possible. We encourage all authors to make use of the extensions
 repository to prevent duplicate efforts across the community where possible.
 
-
-
-
-
-* If you are just getting started, use a namespaced extension for your extension name.
-  As you extension matures, you may consider registering it using a registered name.
-
-* If you intend to distribute data widely using your extension, you SHOULD register your
-  extension using a registered name, rather than a namespaced name, in the extension repository.
-
-* If you are implementing a well-known extension like a data type or codec that
-  is already referred to by name in the community, you may want to check the `zarr-extensions`_
-  repository to see if someone has already implemented the extension.
 
 .. note::
     The simple form of the registered names can be thought of as a short-hand
@@ -1664,7 +1683,7 @@ Extension versioning
 Extensions with **registered names** SHOULD follow the
 compatibility and versioning v3 `stability policy`_.
 
-For extensions with **namespaced names**, there are no guarantees in terms of
+For extensions with **unregistered names**, there are no guarantees in terms of
 versioning or compatibility. However, preserving backwards-compatibility is
 strongly encouraged.
 
