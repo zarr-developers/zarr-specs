@@ -45,6 +45,8 @@ Status of this document
 
  * ZEP0001 was accepted on May 15th, 2023 via https://github.com/zarr-developers/zarr-specs/issues/227.
 
+This specification is the latest version.
+
 
 Introduction
 ============
@@ -651,8 +653,7 @@ two-dimensional array of 64-bit little-endian floating point numbers,
 with 10000 rows and 1000 columns, divided into a regular chunk grid where
 each chunk has 1000 rows and 100 columns, and thus there will be 100
 chunks in total arranged into a 10 by 10 grid. Within each chunk the
-binary values are laid out in C contiguous order. Each chunk is
-compressed using gzip compression prior to storage::
+binary values are laid out in C contiguous order::
 
     {
         "zarr_format": 3,
@@ -993,18 +994,18 @@ of an additional operation:
   encoded representation is a byte string, then ``decoded_regions``
   specifies a list of byte ranges.
 
-- ``c.compute_encoded_size(input_size)``, a procedure that determines the 
+- ``c.compute_encoded_size(input_size)``, a procedure that determines the
   size of the encoded representation given a size of the decoded representation.
   This procedure cannot be implemented for codecs that produce variable-sized
-  encoded representations, such as compression algorithms. Depending on the 
+  encoded representations, such as compression algorithms. Depending on the
   type of the codec, the signature could differ:
 
-  - ``c.compute_encoded_size(array_size, data_type) -> (array_size, data_type)`` 
-    for ``array -> array`` codecs, where ``array_size`` is the number of items 
+  - ``c.compute_encoded_size(array_size, data_type) -> (array_size, data_type)``
+    for ``array -> array`` codecs, where ``array_size`` is the number of items
     in the array, i.e., the product of the components of the array's shape;
-  - ``c.compute_encoded_size(array_size, data_type) -> byte_size`` 
+  - ``c.compute_encoded_size(array_size, data_type) -> byte_size``
     for ``array -> bytes`` codecs;
-  - ``c.compute_encoded_size(byte_size) -> byte_size`` 
+  - ``c.compute_encoded_size(byte_size) -> byte_size``
     for ``bytes -> bytes`` codecs.
 
 .. note::

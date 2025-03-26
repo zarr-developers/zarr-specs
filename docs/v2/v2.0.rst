@@ -12,8 +12,8 @@ used for storing Zarr arrays. The key words "MUST", "MUST NOT", "REQUIRED",
 Status
 ------
 
-This specification is the latest version. See :ref:`zarr-specs` for previous
-versions.
+This specification has been superseded. See :ref:`zarr-specs` for the latest
+version.
 
 .. _spec_v2_storage:
 
