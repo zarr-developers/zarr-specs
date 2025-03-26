@@ -1517,7 +1517,7 @@ Objects
 In `metadata documents`_, extensions can be encoded either as objects or as
 short-hand names.
 
-If using an objection definition, the member ``name``
+If using an object definition, the member ``name``
 MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
 Optionally, the member ``configuration`` MAY be present but if so MUST be
 an object.
