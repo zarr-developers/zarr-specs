@@ -1092,7 +1092,7 @@ To allow for flexibility to define and implement new codecs, the
 list of codecs defined for an array MAY contain codecs which are
 defined in separate specifications. In order to refer to codecs in array metadata
 documents, each codec must have a conformant identifier as specified under
-"`extension naming<extension-naming>`_" below.
+"`extension naming <extension-naming>`_" below.
 For ease of discovery, it is
 recommended that codec specifications are contributed to the
 registry of extensions
@@ -1602,18 +1602,11 @@ Unregistered names are intended for private extensions and for experimental and 
 
 Unregistered names are not centrally managed and MAY be used by any extension without coordination.
 
-Unregistered names consist of URIs, which 
-are prefixed with a scheme beginning with a letter and followed by
-any number of letters, numbers, plus symbols, dashes or dots and then followed by a colon.
+Unregistered names consist of URIs, which are prefixed with a scheme beginning
+with a letter and followed by any number of letters, numbers, plus symbols,
+dashes or dots and then followed by a colon.
 
 - **Identifying regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+:``
-
-
-    TODO: The goal of using URI identifiers is to provide a large and flexible namespace which
-    balances the needs of developers building new extensions with a extensible mechanism
-    which the Zarr community can make use of in the years to come. We understand there may
-    be several reasons that someone would not want to register a name.
-
 
 URIs (`Uniform Resource Identifiers <https://en.wikipedia.org/wiki/Uniform_Resource_Identifier>`_)
 are a well-known mechanism to identify resources on the internet and extension authors are
@@ -1643,34 +1636,39 @@ Guidance for extension authors
 *This section is non-normative and provides assistance for the authors of
 extensions, especially those who are just getting started.*
 
-TODO Below will find guidance how best to get started.
+Recognizing that there are diverse considerations in choosing an extension
+name, guidance is provided below based on generic scenarios. Extension authors
+who are still unsure of how best to choose a name are welcome to open an issue
+on the zarr-specs repository.
 
 * **Local development**: Authors looking to define a name for local development
-purposes should prefix their extensions with ``urn:x-``. This prefix defines an
-"experimental" name. As such an extension matures, authors might consider registering
-a new name for it. Implementations should check both for the unregistered as well
-as the registered named.
+  purposes should prefix their extensions with ``urn:x-``. This prefix defines
+  an "experimental" name. As such an extension matures, authors might consider
+  registering a new name for it. Implementations should check both for the
+  unregistered as well as the registered named.
 
 * **Proprietary extensions**: Authors looking to create proprietary extensions
-which are only interpretable within their own institutions are encouraged to
-take ownership of their "own" namespace, ``urn:x-company`` or ``urn:x-domain.name``.
+  which are only interpretable within their own institutions are encouraged to
+  take ownership of their "own" namespace, ``urn:x-company`` or
+  ``urn:x-domain.name``.
 
-* **Complete opaquness**: Authors looking for a prefix which is communicates
-*nothing* to implementations MAY use the prefix ``urn:uuid:...`` following
-by following by a valid
-UUID (`Universally Unique Identifier <https://en.wikipedia.org/wiki/Universally_unique_identifier>`_).
-
-* If you are implementing a well-known extension like a data type or codec that
-is already referred to by name in the community, you may want to check the `zarr-extensions`_
-repository to see if someone has already implemented the extension.
-
-* Authors intending to create significant amounts of data or widely distributed data
-should consider registering all extensions in the extension registry to  TODO
+* **Complete opaqueness**: Authors looking for a prefix which is communicates
+  *nothing* to implementations MAY use the prefix ``urn:uuid:...`` following by
+  following by a valid UUID (`Universally Unique Identifier
+  <https://en.wikipedia.org/wiki/Universally_unique_identifier>`_).
 
 The Zarr maintainers endeavor to make the registration of names as
 straight-forward as possible. We encourage all authors to make use of the extensions
 repository to prevent duplicate efforts across the community where possible.
 
+* **Well-known extensions**: If you are implementing a well-known extension
+  like a data type or codec that is already referred to by name in the
+  community, you may want to check the `zarr-extensions`_ repository to see if
+  someone has already implemented the extension.
+
+* **Production extensions**: Authors intending to create significant amounts of
+  data or widely distributed data should consider registering all extensions in
+  the extension registry to increase the long-term maintainability of the data.
 
 .. note::
     The simple form of the registered names can be thought of as a short-hand
