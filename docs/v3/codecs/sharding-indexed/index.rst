@@ -1,11 +1,13 @@
-.. _sharding-indexed-codec-v1:
+.. _sharding-indexed-codec:
 
-==========================================
-Sharding codec (version 1.0)
-==========================================
+==============
+Sharding codec
+==============
 
+Version:
+    1.0
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/
 Editors:
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds
@@ -15,7 +17,7 @@ Corresponding ZEP:
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/index.rst>`_
 
 Copyright 2022-Present `Zarr core development team
 <https://github.com/orgs/zarr-developers/teams/core-devs>`_. This work
