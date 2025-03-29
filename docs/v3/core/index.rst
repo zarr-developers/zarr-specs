@@ -1628,9 +1628,16 @@ be a URI that dereferences to a human-readable codec specification, i.e. a URL.
 That is now discouraged for new extensions, though, for backwards compatibility
 with existing extensions, URLs names are still permitted.
 
-Instead, extension names SHOULD either be registered names as specified above or URNs.
-URNs (`Uniform Resource Names <https://en.wikipedia.org/wiki/Uniform_Resource_Name>`_)
-are simpler persistent identifiers assigned within defined namespaces.
+Instead, new unregistered extension names SHOULD use the [Tag URI scheme](https://datatracker.ietf.org/doc/html/rfc4151).
+The Tag URI scheme has four principal requirements:
+> - Identifiers are likely to be unique across space and time, and come from a practically inexhaustible supply.
+> - Identifiers are relatively convenient for humans to mint (create), read, type, remember etc.
+> - No central registration is necessary, at least for holders of domain names or email addresses; and there is negligible cost to mint each new identifier.
+> - The identifiers are independent of any particular resolution scheme.
+
+These requirements are aligned well with the needs of Zarr extension developers.
+
+An example of a Tag URI for a Zarr extension is `tag:josh@openmicroscopy.org,2025-03:experimental-new-dtype`.
 
 .. _extension-guidance:
 
