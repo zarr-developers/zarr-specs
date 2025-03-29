@@ -1659,9 +1659,8 @@ on the zarr-specs repository.
   unregistered as well as the registered named.
 
 * **Proprietary extensions**: Authors looking to create proprietary extensions
-  which are only interpretable within their own institutions are encouraged to
-  take ownership of their "own" namespace, ``urn:x-company`` or
-  ``urn:x-domain.name``.
+  for internal, non-public use are encouraged to use a Tag URI. For example
+  ``tag:mycompany.com,2025-03-27:top-secret``.
 
 * **Complete opaqueness**: Authors looking for a prefix which is communicates
   *nothing* to implementations MAY use the prefix ``urn:uuid:...`` following by
