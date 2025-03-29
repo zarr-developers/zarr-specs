@@ -1581,7 +1581,8 @@ Registered names are unique and immutable.
 Registered names MUST start with one lower case letter a-z and then be followed
 by only lower case letters a-z, numerals 0-9, underscores, dots and dashes.
 
-Registered names MUST be assigned within a central repository, `zarr-extensions`_
+Prior to release in any implementation,
+registered names MUST be assigned within a central repository, `zarr-extensions`_
 a Github repository, where extensions and their specification are listed.
 The Zarr Steering Council or by delegation a
 maintainer team reserves the right to refuse name assignment at its own
@@ -1593,6 +1594,7 @@ discretion.
   - ``numcodecs.adler32``
 - **Invalid examples:**
   - ``foo/bar``
+  - ``foo:bar``
 
 .. _extension-naming-unregistered-names:
 
@@ -1603,14 +1605,15 @@ Unregistered names are intended for private extensions and for experimental and 
 
 Unregistered names are not centrally managed and MAY be used by any extension without coordination.
 
-Unregistered names consist of URIs, which are prefixed with a scheme beginning
+Unregistered names MUST be URIs, which are prefixed with a scheme beginning
 with a letter and followed by any number of letters, numbers, plus symbols,
 dashes or dots and then followed by a colon.
+The use of URI names ensures that unregistered extensions will never conflict with or override registered extensions.
 
 - **Identifying regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+:``
 
 URIs (`Uniform Resource Identifiers <https://en.wikipedia.org/wiki/Uniform_Resource_Identifier>`_)
-are a well-known mechanism to identify resources on the internet and extension authors are
+are a well-known mechanism to identify abstract or phyiscal resources and extension authors are
 encouraged to explore further documentation on which identifiers might best express their intent.
 
 Aware that not all extension developers will want to immediately register a name,
