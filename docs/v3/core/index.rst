@@ -765,6 +765,8 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
+.. _group-metadata-extensions:
+
 Unknown
 ^^^^^^^
 
@@ -784,13 +786,6 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
-
-The group metadata object must not contain any other names. Those are reserved
-for future versions of this specification. An implementation must fail to open
-zarr hierarchies or groups with unknown metadata fields, with the exception of
-objects with a ``"must_understand": false`` key-value pair.
-See :ref:`extension-definition-must-understand` for more information.
-
 
 Node names
 ==========
