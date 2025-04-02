@@ -1588,10 +1588,10 @@ by only lower case letters a-z, numerals 0-9, underscores, dots and dashes.
     - ``foo:bar``
 
 .. note::
-   In previous versions of the v3 spec, the name of an extension was required
-   to be a URI. That is now discouraged for new extensions, though, for
-   backwards compatibility with existing extensions, URIs names are still
-   permitted.
+  In previous versions of the v3 spec, the name of an extension was required
+  to be a URI. That is now discouraged for new extensions, though, for
+  backwards compatibility with existing extensions, URIs names are still
+  permitted.
 
   A proposal to additionally support multiple registration mechanisms is under
   discussion in https://github.com/zarr-developers/zarr-specs/pull/330 .
