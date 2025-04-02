@@ -1564,80 +1564,34 @@ of the explicit use of :ref:`extension-points`.
 Extension naming
 ----------------
 
-The `name` field of an extension is an identifier taking one of two forms:
-**registered names** (as simple strings) and **unregistered names** (as URIs).
-
-Implementations SHOULD be able to resolve multiple names to the same
-implementation to support unregistered names which are subsequently registered.
+The `name` field of an extension is an identifier that has been registered
+prior to release in any implementation within the `zarr-extensions`_ Github
+repository, where extensions and their specification are listed. The Zarr
+Steering Council or by delegation a maintainer team reserves the right to
+refuse name assignment at its own discretion.
 
 .. _extension-naming-registered-names:
 
-Registered names
-^^^^^^^^^^^^^^^^
-
-Registered names consist of a single string that is unique within the Zarr ecosystem, with no prefix.
+Registered names consist of a single string that is unique within the Zarr ecosystem.
 Registered names are intended for well-known extensions aimed at broad adoption and maximum interoperability.
 Registered names are unique and immutable.
+
 Registered names MUST start with one lower case letter a-z and then be followed
 by only lower case letters a-z, numerals 0-9, underscores, dots and dashes.
 
-Prior to release in any implementation,
-registered names MUST be assigned within a central repository, `zarr-extensions`_
-a Github repository, where extensions and their specification are listed.
-The Zarr Steering Council or by delegation a
-maintainer team reserves the right to refuse name assignment at its own
-discretion.
-
 - **Accepted regex:** ``^[a-z][a-z0-9-_.]+$``
 - **Valid examples:**
-  - ``zstd``
-  - ``numcodecs.adler32``
+    - ``zstd``
+    - ``numcodecs.adler32``
 - **Invalid examples:**
-  - ``foo/bar``
-  - ``foo:bar``
+    - ``foo/bar``
+    - ``foo:bar``
 
-.. _extension-naming-unregistered-names:
-
-Unregistered names
-^^^^^^^^^^^^^^^^^^
-
-Unregistered names are intended for private extensions and for experimental and development purposes.
-
-Unregistered names are not centrally managed and MAY be used by any extension without coordination.
-
-Unregistered names MUST be URIs, which are prefixed with a scheme beginning
-with a letter and followed by any number of letters, numbers, plus symbols,
-dashes or dots and then followed by a colon.
-The use of URI names ensures that unregistered extensions will never conflict with or override registered extensions.
-
-- **Identifying regex:** ``^([a-z][a-z0-9-_]+\.)+[a-z][a-z0-9-_]+:``
-
-URIs (`Uniform Resource Identifiers <https://en.wikipedia.org/wiki/Uniform_Resource_Identifier>`_)
-are a well-known mechanism to identify abstract or phyiscal resources and extension authors are
-encouraged to explore further documentation on which identifiers might best express their intent.
-
-Aware that not all extension developers will want to immediately register a name,
-the goal of using URI identifiers is to provide a large and flexible namespace which
-balances the needs of developers building new extensions with a extensible mechanism
-which the Zarr community can make use of in the years to come.
-
-URLs (`Uniform Resource Locators <https://en.wikipedia.org/wiki/URL>`_) are one class of URIs which
-provide a mechanism for resolving resources.
-In previous versions of the v3 spec, the name of an extension was required to
-be a URI that dereferences to a human-readable codec specification, i.e. a URL.
-That is now discouraged for new extensions, though, for backwards compatibility
-with existing extensions, URLs names are still permitted.
-
-Instead, new unregistered extension names SHOULD use the [Tag URI scheme](https://datatracker.ietf.org/doc/html/rfc4151).
-The Tag URI scheme has four principal requirements:
-> - Identifiers are likely to be unique across space and time, and come from a practically inexhaustible supply.
-> - Identifiers are relatively convenient for humans to mint (create), read, type, remember etc.
-> - No central registration is necessary, at least for holders of domain names or email addresses; and there is negligible cost to mint each new identifier.
-> - The identifiers are independent of any particular resolution scheme.
-
-These requirements are aligned well with the needs of Zarr extension developers.
-
-An example of a Tag URI for a Zarr extension is `tag:josh@openmicroscopy.org,2025-03:experimental-new-dtype`.
+.. note::
+   In previous versions of the v3 spec, the name of an extension was required
+   to be a URI. That is now discouraged for new extensions, though, for
+   backwards compatibility with existing extensions, URIs names are still
+   permitted.
 
 .. _extension-guidance:
 
@@ -1646,26 +1600,6 @@ Guidance for extension authors
 
 *This section is non-normative and provides assistance for the authors of
 extensions, especially those who are just getting started.*
-
-Recognizing that there are diverse considerations in choosing an extension
-name, guidance is provided below based on generic scenarios. Extension authors
-who are still unsure of how best to choose a name are welcome to open an issue
-on the zarr-specs repository.
-
-* **Local development**: Authors looking to define a name for local development
-  purposes should prefix their extensions with ``urn:x-``. This prefix defines
-  an "experimental" name. As such an extension matures, authors might consider
-  registering a new name for it. Implementations should check both for the
-  unregistered as well as the registered named.
-
-* **Proprietary extensions**: Authors looking to create proprietary extensions
-  for internal, non-public use are encouraged to use a Tag URI. For example
-  ``tag:mycompany.com,2025-03-27:top-secret``.
-
-* **Complete opaqueness**: Authors looking for a prefix which is communicates
-  *nothing* to implementations MAY use the prefix ``urn:uuid:...`` following by
-  following by a valid UUID (`Universally Unique Identifier
-  <https://en.wikipedia.org/wiki/Universally_unique_identifier>`_).
 
 The Zarr maintainers endeavor to make the registration of names as
 straight-forward as possible. We encourage all authors to make use of the extensions
@@ -1680,20 +1614,10 @@ repository to prevent duplicate efforts across the community where possible.
   data or widely distributed data should consider registering all extensions in
   the extension registry to increase the long-term maintainability of the data.
 
-.. note::
-    The simple form of the registered names can be thought of as a short-hand
-    for a URN prefixed with ``urn:zarr:``. Formal registration with
-    `IANA <https://www.iana.org/>`_ will not change the validity of the simple form.
-
 Extension versioning
 --------------------
 
-Extensions with **registered names** SHOULD follow the
-compatibility and versioning v3 `stability policy`_.
-
-For extensions with **unregistered names**, there are no guarantees in terms of
-versioning or compatibility. However, preserving backwards-compatibility is
-strongly encouraged.
+Registered extensions SHOULD follow the compatibility and versioning `stability policy`_.
 
 Extension example
 -----------------
