@@ -1593,6 +1593,9 @@ by only lower case letters a-z, numerals 0-9, underscores, dots and dashes.
    backwards compatibility with existing extensions, URIs names are still
    permitted.
 
+  A proposal to additionally support multiple registration mechanisms is under
+  discussion in https://github.com/zarr-developers/zarr-specs/pull/330 .
+
 .. _extension-guidance:
 
 Guidance for extension authors
@@ -1605,9 +1608,14 @@ The Zarr maintainers endeavor to make the registration of names as
 straight-forward as possible. We encourage all authors to make use of the extensions
 repository to prevent duplicate efforts across the community where possible.
 
-* **Well-known extensions**: If you are implementing a well-known extension
+* **During development**: Authors should use whatever name makes sense
+  for their extension, provided it is not already reserved in the registry.
+  Once there is a working implementation of the extension (e.g. a PR to an
+  existing Zarr implementation), the extension should be submitted to the registry.
+
+* **Well-known extensions**: Authors implementing a well-known extension
   like a data type or codec that is already referred to by name in the
-  community, you may want to check the `zarr-extensions`_ repository to see if
+  community may want to check the `zarr-extensions`_ repository to see if
   someone has already implemented the extension.
 
 * **Production extensions**: Authors intending to create significant amounts of
