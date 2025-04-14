@@ -687,8 +687,6 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
-The array metadata object must not contain any other names.
-Those are reserved for future versions of this specification.
 An implementation must fail to open Zarr hierarchies, groups
 or arrays with unknown metadata fields, with the exception of
 objects with a ``"must_understand": false`` key-value pair.
@@ -815,11 +813,9 @@ For example, the JSON document below defines a group::
         }
     }
 
-The group metadata object must not contain any other names. Those are reserved
-for future versions of this specification. An implementation must fail to open
-zarr hierarchies or groups with unknown metadata fields, with the exception of
-objects with a ``"must_understand": false`` key-value pair.
-
+An implementation must fail to open zarr hierarchies or groups with unknown
+metadata fields, with the exception of objects with a ``"must_understand":
+false`` key-value pair.
 
 Node names
 ==========
