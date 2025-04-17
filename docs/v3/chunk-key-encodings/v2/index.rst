@@ -43,7 +43,7 @@ separator of ``/``, the identifier is the string ``"1/23/45"``.
 
 For chunk grids with 0 dimensions, the single chunk has the key ``"0"``.
 
-.. note::
+.. warning::
 
     This encoding is intended only to allow existing v2 arrays to be
     converted to v3 without having to rename chunks.  It is not recommended
