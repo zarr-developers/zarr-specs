@@ -1,17 +1,19 @@
 .. _file-system-store-v1:
 
-=================================
- File system store (version 1.0)
-=================================
+=================
+File system store
+=================
 
+Version:
+    1.0
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/stores/filesystem/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/stores/filesystem/
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/stores-filesystem-v1.0>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/stores/filesystem/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/stores/filesystem/index.rst>`_
 
 Copyright 2019-Present Zarr core development team. This work is
 licensed under a `Creative Commons Attribution 3.0 Unported License
@@ -207,4 +209,4 @@ References
 Change log
 ==========
 
-@@TODO
+No changes yet.

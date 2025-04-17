@@ -1,19 +1,19 @@
 .. _transpose-codec-v1:
 
-==============================
- Transpose codec (version 1.0)
-==============================
+===============
+Transpose codec
+===============
 
-  **Editor's draft 26 July 2019**
-
+Version:
+    1.0
 Specification URI:
-    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/transpose/v1.0.html
+    https://zarr-specs.readthedocs.io/en/latest/v3/codecs/transpose/
 Corresponding ZEP:
     `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/codec>`_
 Suggest an edit for this spec:
-    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/transpose/v1.0.rst>`_
+    `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/codecs/transpose/index.rst>`_
 
 Copyright 2020-Present Zarr core development team. This work
 is licensed under a `Creative Commons Attribution 3.0 Unported License
