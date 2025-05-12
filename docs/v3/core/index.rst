@@ -638,6 +638,15 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
+.. _array-metadata-extensions-container:
+
+``extensions``
+"""""""""""""""""""
+
+    Specifies an extensions container as defined under
+    :ref:`extensions container<extensions_container>` which lists
+    top-level extensions which apply to the entire array.
+
 .. _array-metadata-extensions:
 
 Unknown
@@ -722,6 +731,27 @@ above, but using a (currently made up) extension data type::
         "fill_value": null,
     }
 
+The following example illustrates an array with a top-level extensions
+object::
+
+    {
+        "zarr_format": 3,
+        "node_type": "array",
+        ...TBD...
+        "extensions": {
+            "must_understand": True,
+            "content": [
+                {
+                    "name": "extensions.example",
+                    "configuration": {
+                        "version": 1.0,
+                        "foo": "bar"
+                    }
+                }
+            ]
+        }
+    }
+
 .. note::
 
    Comparison with Zarr spec v2:
@@ -766,6 +796,15 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
+.. _array-metadata-extensions-container:
+
+``extensions``
+"""""""""""""""""""
+
+    Specifies an extensions container as defined under
+    :ref:`extensions container<extensions_container>` which lists
+    top-level extensions which apply to the entire group.
+
 .. _group-metadata-extensions:
 
 Unknown
@@ -787,6 +826,8 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
+
+TBD extensions example
 
 Node names
 ==========
