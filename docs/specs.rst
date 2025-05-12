@@ -15,6 +15,7 @@ Specifications
    v3/data-types/index
    v3/stores/index
    v3/storage-transformers/index
+   v3/extensions/index
 
 .. toctree::
    :maxdepth: 1

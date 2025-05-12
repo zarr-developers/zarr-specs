@@ -796,7 +796,7 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
-.. _array-metadata-extensions-container:
+.. _group-metadata-extensions-container:
 
 ``extensions``
 """""""""""""""""""
@@ -1535,7 +1535,7 @@ array           chunk grid              :ref:`chunk-grid <array-metadata-chunk-g
 array           chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
 array           codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
 array           storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
-array or group  extensions container    :ref:`extensions-containers <extensions_containers>`               :ref:`extensions-list`
+array or group  extensions container    :ref:`extensions-containers <extensions_container>`                 :ref:`extensions-list`
 =============== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
@@ -1704,16 +1704,20 @@ facilitates multiple implementations of an extension.
 For extensions with registered names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
 
+.. _extensions_container:
+
 Extensions container
 --------------------
 
 Each group or array MAY have a top-level field named ``extensions`` whose
 value is an "extensions container" with the fields:
 
-| Field           | Required | Type                       | Default |
-|-----------------|----------|----------------------------|---------|
-| content         | True     | Array of extension objects | n/a     |
-| must_understand | False    | boolean                    | True    |
+=============== ========= =========================== ========
+Field            Required  Type                       Default
+=============== ========= =========================== ========
+content         ``True``   Array of extension objects n/a
+must_understand ``False`` ``boolean``                 ``True``
+=============== ========= =========================== ========
 
 Each contained `extension object<extension-definition>` should conform
 to the above sections including naming, versioning, schema definition.
