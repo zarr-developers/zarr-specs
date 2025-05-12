@@ -1527,15 +1527,16 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ================================================================== ================================
-node_type   extension point         metadata definition                                                list of core extensions
-=========== ======================= ================================================================== ================================
-array       data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-type-list`
-array       chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
-array       chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
-array       codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
-array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
-=========== ======================= ================================================================== ================================
+=============== ======================= ================================================================== ================================
+node_type       extension point         metadata definition                                                list of core extensions
+=============== ======================= ================================================================== ================================
+array           data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-type-list`
+array           chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
+array           chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
+array           codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
+array           storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
+array or group  extensions container    :ref:`extensions-containers <extensions_containers>`               :ref:`extensions-list`
+=============== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
 
@@ -1702,6 +1703,41 @@ facilitates multiple implementations of an extension.
 
 For extensions with registered names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
+
+Extensions container
+--------------------
+
+Each group or array MAY have a top-level field named ``extensions`` whose
+value is an "extensions container" with the fields:
+
+| Field           | Required | Type                       | Default |
+|-----------------|----------|----------------------------|---------|
+| content         | True     | Array of extension objects | n/a     |
+| must_understand | False    | boolean                    | True    |
+
+Each contained `extension object<extension-definition>` should conform
+to the above sections including naming, versioning, schema definition.
+
+``must_understand``
+^^^^^^^^^^^^^^^^^^^
+
+The ``must_understand`` field applies to the extensions container itself
+as with individual extension objects in order to allow implementations
+which are unaware of ZEP0010 to safely ignore the ``extensions`` block.
+
+
+
+If in doubt, implementations should not use ``must_understand=False``
+erring on the side of data safety.
+
+Relationship to attributes
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+defined schema
+
+
+
+
 
 Implementation Notes
 ====================
