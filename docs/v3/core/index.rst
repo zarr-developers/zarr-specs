@@ -6,7 +6,7 @@ Zarr core specification
 =======================
 
 Version:
-    3.1
+    3.2
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/core/
 
@@ -20,9 +20,10 @@ Editors:
 Corresponding ZEPs:
     * `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
     * `ZEP0009 — Zarr extension naming <https://zarr.dev/zeps/draft/ZEP0009.html>`_
+    * `ZEP0010 — Zarr extensions object <https://zarr.dev/zeps/draft/ZEP0010.html>`_
 
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.1>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.2>`_
 
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/index.rst>`_
