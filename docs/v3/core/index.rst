@@ -20,7 +20,7 @@ Editors:
 Corresponding ZEPs:
     * `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
     * `ZEP0009 — Zarr extension naming <https://zarr.dev/zeps/draft/ZEP0009.html>`_
-    * `ZEP0010 — Zarr extensions object <https://zarr.dev/zeps/draft/ZEP0010.html>`_
+    * `ZEP0010 — Zarr extensions container <https://zarr.dev/zeps/draft/ZEP0010.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.2>`_
