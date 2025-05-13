@@ -647,6 +647,26 @@ The following members are optional:
     :ref:`extensions container<extensions_container>` which lists
     top-level extensions which apply to the entire array.
 
+    The following example illustrates an array with a top-level extensions
+    object::
+
+        {
+            "zarr_format": 3,
+            "node_type": "array",
+            "extensions": [
+                {
+                    "name": "extensions.example1",
+                    "configuration": {
+                        "foo": "bar"
+                    }
+                },
+                "extensions.example2" // referenced by name
+            ]
+        }
+
+    See the :ref:`Extensions section <extensions_section>` for
+    more information about extensions.
+
 .. _array-metadata-extensions:
 
 Unknown
@@ -731,27 +751,6 @@ above, but using a (currently made up) extension data type::
         "fill_value": null,
     }
 
-The following example illustrates an array with a top-level extensions
-object::
-
-    {
-        "zarr_format": 3,
-        "node_type": "array",
-        ...TBD...
-        "extensions": {
-            "must_understand": True,
-            "content": [
-                {
-                    "name": "extensions.example",
-                    "configuration": {
-                        "version": 1.0,
-                        "foo": "bar"
-                    }
-                }
-            ]
-        }
-    }
-
 .. note::
 
    Comparison with Zarr spec v2:
@@ -805,6 +804,26 @@ Optional keys:
     :ref:`extensions container<extensions_container>` which lists
     top-level extensions which apply to the entire group.
 
+    The following example illustrates an array with a top-level extensions
+    object::
+
+        {
+            "zarr_format": 3,
+            "node_type": "group",
+            "extensions": [
+                {
+                    "name": "extensions.example1",
+                    "configuration": {
+                        "foo": "bar"
+                    }
+                },
+                "extensions.example2" // referenced by name
+            ]
+        }
+
+    See the :ref:`Extensions section <extensions_section>` for
+    more information about extensions.
+
 .. _group-metadata-extensions:
 
 Unknown
@@ -826,8 +845,6 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
-
-TBD extensions example
 
 Node names
 ==========
