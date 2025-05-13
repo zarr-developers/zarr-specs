@@ -1552,7 +1552,7 @@ array           chunk grid              :ref:`chunk-grid <array-metadata-chunk-g
 array           chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
 array           codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
 array           storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
-array or group  extensions container    :ref:`extensions-containers <extensions_container>`                 :ref:`extensions-list`
+array or group  extensions container    :ref:`extensions-containers <extensions_container>`                :ref:`extensions-list`
 =============== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
@@ -1567,11 +1567,11 @@ Extension definition
 
 .. _extension-definition-object:
 
-Objects
-^^^^^^^
-
 In `metadata documents`_, extensions can be encoded either as objects or as
 short-hand names.
+
+Objects
+^^^^^^^
 
 If using an object definition, the member ``name``
 MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
@@ -1726,39 +1726,30 @@ SHOULD either contain the specification or link to it.
 Extensions container
 --------------------
 
-Each group or array MAY have a top-level field named ``extensions`` whose
-value is an "extensions container" with the fields:
+Each group or array MAY have a top-level field named ``extensions`` whose value
+MUST be an array containing one or more :ref:`extension
+definitions<extension-definition>` as described above.
 
-=============== ========= =========================== ========
-Field            Required  Type                       Default
-=============== ========= =========================== ========
-content         ``True``   Array of extension objects n/a
-must_understand ``False`` ``boolean``                 ``True``
-=============== ========= =========================== ========
+Processing
+^^^^^^^^^^
 
-Each contained `extension object<extension-definition>` should conform
-to the above sections including naming, versioning, schema definition.
+Implementations not wanting to support the ``extensions`` field
+SHOULD minimally iterate through the array and fail if not all
+are ``must_understand=False``.
 
-``must_understand``
-^^^^^^^^^^^^^^^^^^^
+Each contained extension SHOULD be processed in order. Processing entails
+invoking the language-specific method for concrete implementations
+with sufficient processing context. In pseudo code::
 
-The ``must_understand`` field applies to the extensions container itself
-as with individual extension objects in order to allow implementations
-which are unaware of ZEP0010 to safely ignore the ``extensions`` block.
+    for extension in self.extensions_container:
+        extension(self)
 
+More information
+^^^^^^^^^^^^^^^^
 
-
-If in doubt, implementations should not use ``must_understand=False``
-erring on the side of data safety.
-
-Relationship to attributes
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-defined schema
-
-
-
-
+Background on this collection of top-level extensions can be found in ZEP0010
+along with potential use cases. Community registered top-level extensions can
+be found in the `zarr-extensions`_ repository.
 
 Implementation Notes
 ====================
@@ -1821,6 +1812,16 @@ Change log
 All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
+
+3.2
+---
+
+- Addition of extensions container. `PR #TODO
+  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_.
+  Implementations SHOULD add support for the top-level ``extensions``
+  field described under :ref:`Extensions container<extensions_container>`.
+  Minimal processing should detect ``must_understand=True`` extensions
+  and fail with an informative exception.
 
 3.1
 ---
