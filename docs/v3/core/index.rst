@@ -1600,18 +1600,18 @@ objects with just a `name` key.
 ^^^^^^^^^^^^^^^^^
 
 An extension object is interpreted to have an implicit field `must_understand` set to
-`True`, unless otherwise stated. An extension object MAY explicitly set `must_understand=False` if
-implementations can ignore its presence.
+`True`, unless otherwise stated. An extension object MAY explicitly set
+``must_understand=false`` if implementations can ignore its presence.
 
 An implementation MUST fail to open Zarr groups or arrays if any
 metadata fields are present which (a) the
 implementation does not recognize and (b) are not explicitly
 set to ``"must_understand": false``.
 
-`must_understand=False` is not supported for the following extension points:
+``must_understand=false`` is not supported for the following extension points:
 data type, chunk grid, and chunk key encoding.
 
-Use of `must_understand=False` to add top-level keys is discouraged in favor
+Use of ``must_understand=false`` to add top-level keys is discouraged in favor
 of the explicit use of :ref:`extension-points`.
 
 .. _extension-naming:
@@ -1735,7 +1735,7 @@ Processing
 
 Implementations not wanting to support the ``extensions`` field
 SHOULD minimally iterate through the array and fail if not all
-are ``must_understand=False``.
+are ``must_understand=false``.
 
 Each contained extension SHOULD be processed in order. Processing entails
 invoking the language-specific method for concrete implementations
@@ -1820,7 +1820,7 @@ by time.
   <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_.
   Implementations SHOULD add support for the top-level ``extensions``
   field described under :ref:`Extensions container<extensions_container>`.
-  Minimal processing should detect ``must_understand=True`` extensions
+  Minimal processing should detect ``must_understand=true`` extensions
   and fail with an informative exception.
 
 3.1
@@ -1829,7 +1829,7 @@ by time.
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
   it is now possible to add user-defined extensions.
-  Additionally, extensions may be marked with `must_understand=False` in case
+  Additionally, extensions may be marked with ``must_understand=false`` in case
   a non-implementing library can safely ignore them.
   Please see the new :ref:`Extensions section <extensions_section>`
   for details.
