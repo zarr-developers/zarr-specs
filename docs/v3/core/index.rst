@@ -1728,21 +1728,48 @@ Extensions container
 
 Each group or array MAY have a top-level field named ``extensions`` whose value
 MUST be an array containing one or more :ref:`extension
-definitions<extension-definition>` as described above.
+definitions<extension-definition>` as described above::
 
-Processing
-^^^^^^^^^^
+Container example
+^^^^^^^^^^^^^^^^^
 
-Implementations not wanting to support the ``extensions`` field
-SHOULD minimally iterate through the array and fail if not all
-are ``must_understand=false``.
+The following example shows how required metadata, ``offset``, can be
+attached to an array::
 
-Each contained extension SHOULD be processed in order. Processing entails
-invoking the language-specific method for concrete implementations
-with sufficient processing context. In pseudo code::
+    {
+        "zarr_format": 3,
+        "node_type": "array",
+        ...,
+        "extensions": [
+            {
+                "name": "example.offset",
+                "configuration": { "offset": [ 12, 24 ] }
+            }
+        ]
+    }
 
-    for extension in self.extensions_container:
-        extension(self)
+Implementations wishing to implement such an extension should refer to the
+documentation linked from the `zarr-extensions`_ registry for details.
+
+Container Processing
+^^^^^^^^^^^^^^^^^^^^
+
+Zarr implementations should inspect the extensions array and determine whether
+each listed extension is supported. If an extension includes "must_understand":
+true and the implementation does not support it, the dataset must not be loaded
+and an appropriate error should be raised. For extensions without
+must_understand, implementers may safely ignore unrecognized entries.
+
+To support a given extension, an implementation must either (1) check for known
+extension names and invoke appropriate logic according to the extension’s
+specification at the correct point in its processing pipeline (e.g., during
+metadata interpretation, data access, or layout resolution), or (2) delegate
+that logic via a callback or plugin mechanism that allows third-party code to
+handle the extension dynamically. This modular approach enables implementers to
+support a flexible and evolving set of extensions while maintaining core
+compatibility.
+
+Each contained extension should be processed in order to the extent possible.
 
 More information
 ^^^^^^^^^^^^^^^^
