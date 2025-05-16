@@ -20,7 +20,7 @@ Editors:
 Corresponding ZEPs:
     * `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
     * `ZEP0009 — Zarr extension naming <https://zarr.dev/zeps/draft/ZEP0009.html>`_
-    * `ZEP0010 — Zarr extensions container <https://zarr.dev/zeps/draft/ZEP0010.html>`_
+    * `ZEP0010 — Zarr generic extensions <https://zarr.dev/zeps/draft/ZEP0010.html>`_
 
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.2>`_
@@ -643,12 +643,11 @@ The following members are optional:
 ``extensions``
 """""""""""""""""""
 
-    Specifies an extensions container as defined under
-    :ref:`extensions container<extensions_container>` which lists
-    top-level extensions which apply to the entire array.
+    Specifies a generic extensions field as defined under
+    :ref:`generic extensions<generic_extensions>` which lists
+    extensions which apply to the entire array.
 
-    The following example illustrates an array with a top-level extensions
-    object::
+    The following example illustrates an array with a generic extension::
 
         {
             "zarr_format": 3,
@@ -800,12 +799,11 @@ Optional keys:
 ``extensions``
 """""""""""""""""""
 
-    Specifies an extensions container as defined under
-    :ref:`extensions container<extensions_container>` which lists
-    top-level extensions which apply to the entire group.
+    Specifies a generic extensions field as defined under
+    :ref:`generic extensions<generic_extensions>` which lists
+    extensions which apply to the entire group.
 
-    The following example illustrates an array with a top-level extensions
-    object::
+    The following example illustrates a group with a generic extension::
 
         {
             "zarr_format": 3,
@@ -1552,7 +1550,7 @@ array           chunk grid              :ref:`chunk-grid <array-metadata-chunk-g
 array           chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
 array           codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
 array           storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
-array or group  extensions container    :ref:`extensions-containers <extensions_container>`                :ref:`extensions-list`
+array or group  generic extensions      :ref:`generic-extensions <generic_extensions>`                     :ref:`generic-extensions-list`
 =============== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
@@ -1721,17 +1719,19 @@ facilitates multiple implementations of an extension.
 For extensions with registered names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
 
-.. _extensions_container:
+.. _generic_extensions:
 
-Extensions container
---------------------
+Generic extensions
+------------------
 
 Each group or array MAY have a top-level field named ``extensions`` whose value
 MUST be an array containing one or more :ref:`extension
-definitions<extension-definition>` as described above::
+definitions<extension-definition>` as described above.
 
-Container example
-^^^^^^^^^^^^^^^^^
+.. _generic_extensions_example:
+
+Generic extension example
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following example shows how required metadata, ``offset``, can be
 attached to an array::
@@ -1748,17 +1748,21 @@ attached to an array::
         ]
     }
 
-Implementations wishing to implement such an extension should refer to the
+Implementations wishing to implement such a generic extension should refer to the
 documentation linked from the `zarr-extensions`_ registry for details.
 
-Container Processing
-^^^^^^^^^^^^^^^^^^^^
+.. _generic_extensions_processing:
 
-Zarr implementations should inspect the extensions array and determine whether
-each listed extension is supported. If an extension includes "must_understand":
-true and the implementation does not support it, the dataset must not be loaded
-and an appropriate error should be raised. For extensions without
-must_understand, implementers may safely ignore unrecognized entries.
+Generic Extension Processing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Zarr implementations must inspect the ``extensions`` array and determine whether
+each listed extension is supported. If not, then that status of ``must_understand``
+must be followed:
+
+* If the key is missing, then the value defaults to ``true``.
+* If the value is ``true``, then the dataset must not be loaded and an appropriate error should be raised.
+* If the value is ``false``, then implementers may safely ignored unsupported extensions.
 
 To support a given extension, an implementation must either (1) check for known
 extension names and invoke appropriate logic according to the extension’s
