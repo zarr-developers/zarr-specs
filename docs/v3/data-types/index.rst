@@ -69,7 +69,7 @@ The permitted values depend on the data type:
 
         - ``"Infinity"``, denoting positive infinity;
         - ``"-Infinity"``, denoting negative infinity;
-        - ``"NaN"``, denoting thenot-a-number (NaN) value where the sign bit is
+        - ``"NaN"``, denoting the not-a-number (NaN) value where the sign bit is
           0 (positive), the most significant bit (MSB) of the mantissa is 1, and
           all other bits of the mantissa are zero;
         - ``"0xYYYYYYYY"``, specifying the byte representation of the floating
