@@ -22,37 +22,11 @@
         "attributes": {
             "$ref": "#/$defs/attributes",
             "description": "User-defined metadata"
-        },
-        "additionalProperties": {
-            "$ref": "#/$defs/extension_property"
         }
     },
-    "allOf": [
-        {
-            "if": {
-                "properties": {
-                    "node_type": {
-                        "const": "array"
-                    }
-                }
-            },
-            "then": {
-                "$ref": "#/$defs/array_metadata"
-            }
-        },
-        {
-            "if": {
-                "properties": {
-                    "node_type": {
-                        "const": "group"
-                    }
-                }
-            },
-            "then": {
-                "$ref": "#/$defs/group_metadata"
-            }
-        }
-    ],
+    "additionalProperties": {
+        "$ref": "#/$defs/extension_property"
+    },
     "$defs": {
         "attributes": {
             "type": "object",
