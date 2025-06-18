@@ -6,7 +6,7 @@ Zarr core specification
 =======================
 
 Version:
-    3.1
+    3.2
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/core/
 
@@ -20,9 +20,10 @@ Editors:
 Corresponding ZEPs:
     * `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/accepted/ZEP0001.html>`_
     * `ZEP0009 — Zarr extension naming <https://zarr.dev/zeps/draft/ZEP0009.html>`_
+    * `ZEP0010 — Zarr generic extensions <https://zarr.dev/zeps/draft/ZEP0010.html>`_
 
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.1>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/core-protocol-v3.2>`_
 
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/v3/core/index.rst>`_
@@ -637,6 +638,34 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
+.. _array-metadata-extensions-container:
+
+``extensions``
+"""""""""""""""""""
+
+    Specifies a generic extensions field as defined under
+    :ref:`generic extensions<generic_extensions>` which lists
+    extensions which apply to the entire array.
+
+    The following example illustrates an array with a generic extension::
+
+        {
+            "zarr_format": 3,
+            "node_type": "array",
+            "extensions": [
+                {
+                    "name": "extensions.example1",
+                    "configuration": {
+                        "foo": "bar"
+                    }
+                },
+                "extensions.example2" // referenced by name
+            ]
+        }
+
+    See the :ref:`Extensions section <extensions_section>` for
+    more information about extensions.
+
 .. _array-metadata-extensions:
 
 Unknown
@@ -764,6 +793,34 @@ Optional keys:
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
+
+.. _group-metadata-extensions-container:
+
+``extensions``
+"""""""""""""""""""
+
+    Specifies a generic extensions field as defined under
+    :ref:`generic extensions<generic_extensions>` which lists
+    extensions which apply to the entire group.
+
+    The following example illustrates a group with a generic extension::
+
+        {
+            "zarr_format": 3,
+            "node_type": "group",
+            "extensions": [
+                {
+                    "name": "extensions.example1",
+                    "configuration": {
+                        "foo": "bar"
+                    }
+                },
+                "extensions.example2" // referenced by name
+            ]
+        }
+
+    See the :ref:`Extensions section <extensions_section>` for
+    more information about extensions.
 
 .. _group-metadata-extensions:
 
@@ -1485,15 +1542,16 @@ Extension points
 
 Different types of extensions can exist and they can be grouped as follows:
 
-=========== ======================= ================================================================== ================================
-node_type   extension point         metadata definition                                                list of core extensions
-=========== ======================= ================================================================== ================================
-array       data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-type-list`
-array       chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
-array       chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
-array       codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
-array       storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
-=========== ======================= ================================================================== ================================
+=============== ======================= ================================================================== ================================
+node_type       extension point         metadata definition                                                list of core extensions
+=============== ======================= ================================================================== ================================
+array           data type               :ref:`data-type <array-metadata-data-type>`                        :ref:`data-type-list`
+array           chunk grid              :ref:`chunk-grid <array-metadata-chunk-grid>`                      :ref:`chunk-grid-list`
+array           chunk key encoding      :ref:`chunk-key-encoding <array-metadata-chunk-key-encoding>`      :ref:`chunk-key-encoding-list`
+array           codecs                  :ref:`codecs <array-metadata-codecs>`                              :ref:`codec-list`
+array           storage transformer     :ref:`storage-transformers <array-metadata-storage-transformers>`  :ref:`storage-transformer-list`
+array or group  generic extensions      :ref:`generic-extensions <generic_extensions>`                     :ref:`generic-extensions-list`
+=============== ======================= ================================================================== ================================
 
 Note, that ``fill_value`` is not its own extension point, but is dependent on the data type.
 
@@ -1507,11 +1565,11 @@ Extension definition
 
 .. _extension-definition-object:
 
-Objects
-^^^^^^^
-
 In `metadata documents`_, extensions can be encoded either as objects or as
 short-hand names.
+
+Objects
+^^^^^^^
 
 If using an object definition, the member ``name``
 MUST be a plain string which conforms to :ref:`extension name <extension-naming>`.
@@ -1540,18 +1598,18 @@ objects with just a `name` key.
 ^^^^^^^^^^^^^^^^^
 
 An extension object is interpreted to have an implicit field `must_understand` set to
-`True`, unless otherwise stated. An extension object MAY explicitly set `must_understand=False` if
-implementations can ignore its presence.
+`True`, unless otherwise stated. An extension object MAY explicitly set
+``must_understand=false`` if implementations can ignore its presence.
 
 An implementation MUST fail to open Zarr groups or arrays if any
 metadata fields are present which (a) the
 implementation does not recognize and (b) are not explicitly
 set to ``"must_understand": false``.
 
-`must_understand=False` is not supported for the following extension points:
+``must_understand=false`` is not supported for the following extension points:
 data type, chunk grid, and chunk key encoding.
 
-Use of `must_understand=False` to add top-level keys is discouraged in favor
+Use of ``must_understand=false`` to add top-level keys is discouraged in favor
 of the explicit use of :ref:`extension-points`.
 
 .. _extension-naming:
@@ -1661,6 +1719,69 @@ facilitates multiple implementations of an extension.
 For extensions with registered names, the `zarr-extensions`_ repository
 SHOULD either contain the specification or link to it.
 
+.. _generic_extensions:
+
+Generic extensions
+------------------
+
+Each group or array MAY have a top-level field named ``extensions`` whose value
+MUST be an array containing one or more :ref:`extension
+definitions<extension-definition>` as described above.
+
+.. _generic_extensions_example:
+
+Generic extension example
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following example shows how required metadata, ``offset``, can be
+attached to an array::
+
+    {
+        "zarr_format": 3,
+        "node_type": "array",
+        ...,
+        "extensions": [
+            {
+                "name": "example.offset",
+                "configuration": { "offset": [ 12, 24 ] }
+            }
+        ]
+    }
+
+Implementations wishing to implement such a generic extension should refer to the
+documentation linked from the `zarr-extensions`_ registry for details.
+
+.. _generic_extensions_processing:
+
+Generic Extension Processing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Zarr implementations must inspect the ``extensions`` array and determine whether
+each listed extension is supported. If not, then that status of ``must_understand``
+must be followed:
+
+* If the key is missing, then the value defaults to ``true``.
+* If the value is ``true``, then the dataset must not be loaded and an appropriate error should be raised.
+* If the value is ``false``, then implementers may safely ignored unsupported extensions.
+
+To support a given extension, an implementation must either (1) check for known
+extension names and invoke appropriate logic according to the extension’s
+specification at the correct point in its processing pipeline (e.g., during
+metadata interpretation, data access, or layout resolution), or (2) delegate
+that logic via a callback or plugin mechanism that allows third-party code to
+handle the extension dynamically. This modular approach enables implementers to
+support a flexible and evolving set of extensions while maintaining core
+compatibility.
+
+Each contained extension should be processed in order to the extent possible.
+
+More information
+^^^^^^^^^^^^^^^^
+
+Background on this collection of top-level extensions can be found in ZEP0010
+along with potential use cases. Community registered top-level extensions can
+be found in the `zarr-extensions`_ repository.
+
 Implementation Notes
 ====================
 
@@ -1723,13 +1844,23 @@ All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
 
+3.2
+---
+
+- Addition of extensions container. `PR #TODO
+  <https://github.com/zarr-developers/zarr-specs/pull/TODO/>`_.
+  Implementations SHOULD add support for the top-level ``extensions``
+  field described under :ref:`Extensions container<extensions_container>`.
+  Minimal processing should detect ``must_understand=true`` extensions
+  and fail with an informative exception.
+
 3.1
 ---
 
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
   it is now possible to add user-defined extensions.
-  Additionally, extensions may be marked with `must_understand=False` in case
+  Additionally, extensions may be marked with ``must_understand=false`` in case
   a non-implementing library can safely ignore them.
   Please see the new :ref:`Extensions section <extensions_section>`
   for details.
