@@ -736,6 +736,9 @@ above, but using a (currently made up) extension data type::
 Group metadata
 --------------
 
+Each Zarr group in a hierarchy must have a group metadata document, named
+``zarr.json``.
+
 Mandatory
 ^^^^^^^^^
 
