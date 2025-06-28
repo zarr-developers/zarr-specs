@@ -586,9 +586,9 @@ mandatory names:
     
        Zarr v3.1 extended the permitted form of each codec from an object to an
        :ref:`extension-definition`.
-       Implementations are encouraged to avoid the short-hand string form of an
-       :ref:`extension-definition` in ``codecs`` if they wish to maintain
-       backwards compatibility with Zarr v3.0.
+       Implementations should avoid the short-hand string form of an
+       :ref:`extension-definition` in ``codecs`` if backwards compatibility
+       with Zarr v3.0 is required.
 
 Optional
 ^^^^^^^^
