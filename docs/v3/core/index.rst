@@ -582,6 +582,15 @@ mandatory names:
     Because ``codecs`` MUST contain an ``array
     -> bytes`` codec, the list cannot be empty (See :ref:`codecs <codecs>`).
 
+    .. note::
+    
+       Zarr v3.1 extended the permitted form of each codec from an object with
+       a ``name`` and optional ``configuration`` to an
+       :ref:`extension-definition`.
+       If backwards compatibility with Zarr v3.0 is required, implementations
+       must not use the ``must_understand`` field or the short-hand name form
+       of an :ref:`extension-definition` in ``codecs``.
+
 Optional
 ^^^^^^^^
 
