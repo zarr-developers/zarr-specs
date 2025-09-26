@@ -94,11 +94,11 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
     {
       "codecs": [
         {
-          "name": "sharding_indexed"
+          "name": "sharding_indexed",
           "configuration": {
             "chunk_shape": [32, 32],
             "codecs": [
-              { 
+              {
                 "name": "bytes",
                 "configuration": {
                   "endian": "little",
@@ -112,13 +112,13 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
               }
             ],
             "index_codecs": [
-              { 
+              {
                 "name": "bytes",
                 "configuration": {
                   "endian": "little",
                 }
               },
-              { "name": "crc32c" } 
+              { "name": "crc32c" }
             ],
             "index_location": "end"
           }
