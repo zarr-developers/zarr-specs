@@ -646,13 +646,11 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
-.. _array-metadata-extensions:
+Additional fields
+^^^^^^^^^^^^^^^^^
 
-Unknown
-^^^^^^^
-
-All other keys found in the metadata object MUST be interpreted
-following the :ref:`Extensions section <extensions_section>`.
+See :ref:`Additional fields<additional_fields>`.
+ 
 
 Example
 ^^^^^^^
@@ -777,13 +775,10 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
-.. _group-metadata-extensions:
+Additional fields
+^^^^^^^^^^^^^^^^^
 
-Unknown
-^^^^^^^
-
-All other keys found in the metadata object MUST be interpreted
-following the :ref:`Extensions section <extensions_section>`.
+See :ref:`Additional fields<additional_fields>`.
 
 Example
 ^^^^^^^
@@ -798,6 +793,15 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
+
+.. _additional_fields:
+
+Additional fields
+=================
+
+If a reader encounters a Zarr array or group metadata document bearing a field not defined in this 
+document, the reader MUST fail to open the array or group unless the additional field is a 
+``JSON`` object containing a ``"must_understand": false`` key-value pair.
 
 Node names
 ==========
@@ -1564,7 +1568,7 @@ set to ``"must_understand": false``.
 data type, chunk grid, and chunk key encoding.
 
 Use of `must_understand=False` to add top-level keys is discouraged in favor
-of the explicit use of :ref:`extension-points`.
+of the explicit use of :ref:`extension-points`. See :ref:`additional-keys`.
 
 .. _extension-naming:
 
