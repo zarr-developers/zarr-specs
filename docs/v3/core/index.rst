@@ -811,6 +811,7 @@ apply to node names:
 * must not include the character ``"/"``
 * must not be a string composed only of period characters, e.g. ``"."`` or ``".."``
 * must not start with the reserved prefix ``"__"``
+* must not be ``"zarr.json"``
 
 To ensure consistent behaviour across different storage systems and programming
 languages, we recommend users to only use characters in the sets ``a-z``,
