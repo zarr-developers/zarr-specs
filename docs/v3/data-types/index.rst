@@ -63,7 +63,7 @@ The permitted values depend on the data type:
     IEEE 754 floating point numbers (``float{16,32,64}``)
       The value may be either:
 
-      - A JSON number, that will be rounded to the nearest representable value.
+      - A JSON number, that will be rounded to the nearest representable value using the "round half to even" rule.
 
       - A JSON string of the form:
 
