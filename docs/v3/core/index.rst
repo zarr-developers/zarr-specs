@@ -799,9 +799,24 @@ For example, the JSON document below defines a group::
 Additional fields
 =================
 
-If a reader encounters a Zarr array or group metadata document bearing a field not defined in this 
-document, the reader MUST fail to open the array or group unless the additional field is a 
-``JSON`` object containing a ``"must_understand": false`` key-value pair.
+The handling of fields not defined in this document is specified in the
+:ref:`extension definition <extension-definition-must-understand>`.
+
+For historical reasons, group metadata documents may contain an additional field named
+``consolidated_metadata`` that deviates from the :ref:`extension definition <extension-definition>`.
+If present, its value MUST be a JSON object with the following structure::
+
+    {
+        "must_understand": false,
+        "kind": "inline",
+        "metadata": {...}
+    }
+
+Note that this object lacks the ``name`` member required of extension objects and contains the
+additional ``kind`` and ``metadata`` members.
+
+The use of ``consolidated_metadata`` as described above is widespread, but writers should avoid it in favor
+of alternatives that preserve the standard field structure of the group metadata document.
 
 Node names
 ==========
