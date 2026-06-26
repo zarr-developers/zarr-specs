@@ -815,9 +815,6 @@ If present, its value MUST be a JSON object with the following structure::
 Note that this object lacks the ``name`` member required of extension objects and contains the
 additional ``kind`` and ``metadata`` members.
 
-The use of ``consolidated_metadata`` as described above is widespread, but writers should avoid it in favor
-of alternatives that preserve the standard field structure of the group metadata document.
-
 Node names
 ==========
 
