@@ -646,13 +646,11 @@ The following members are optional:
     same dimension name across multiple arrays within the same Zarr hierarchy,
     but extensions or specific applications may do so.
 
-.. _array-metadata-extensions:
+Additional fields
+^^^^^^^^^^^^^^^^^
 
-Unknown
-^^^^^^^
-
-All other keys found in the metadata object MUST be interpreted
-following the :ref:`Extensions section <extensions_section>`.
+See :ref:`Additional fields<additional_fields>`.
+ 
 
 Example
 ^^^^^^^
@@ -777,13 +775,10 @@ Optional keys:
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
 
-.. _group-metadata-extensions:
+Additional fields
+^^^^^^^^^^^^^^^^^
 
-Unknown
-^^^^^^^
-
-All other keys found in the metadata object MUST be interpreted
-following the :ref:`Extensions section <extensions_section>`.
+See :ref:`Additional fields<additional_fields>`.
 
 Example
 ^^^^^^^
@@ -798,6 +793,27 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
+
+.. _additional_fields:
+
+Additional fields
+=================
+
+The handling of fields not defined in this document is specified in the
+:ref:`extension definition <extension-definition-must-understand>`.
+
+For historical reasons, group metadata documents may contain an additional field named
+``consolidated_metadata`` that deviates from the :ref:`extension definition <extension-definition>`.
+If present, its value MUST be a JSON object with the following structure::
+
+    {
+        "must_understand": false,
+        "kind": "inline",
+        "metadata": {...}
+    }
+
+Note that this object lacks the ``name`` member required of extension objects and contains the
+additional ``kind`` and ``metadata`` members.
 
 Node names
 ==========
