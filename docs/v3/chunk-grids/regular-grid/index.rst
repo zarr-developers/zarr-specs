@@ -37,7 +37,7 @@ Description
 
 The origin element of a chunk has coordinates in the array space (`k` *
 `dz`, `j` * `dy`, `i` * `dx`, ...) where (`dz`, `dy`, `dx`, ...) are
-the chunk sizes along each dimension.
+the chunk sizes along each dimension. Chunk sizes must be greater than zero.
 Thus the origin element of the chunk at grid index (0, 0, 0,
 ...) is at coordinate (0, 0, 0, ...) in the array space, i.e., the
 grid is aligned with the origin of the array. If the length of any
