@@ -507,9 +507,10 @@ mandatory names:
     and MUST conform to the :ref:`extension-definition`.
 
     If the data type is defined in :ref:`this specification <data-type-list>`,
-    then the value must be the data type
-    identifier provided as a string. For example, ``"float64"`` for
-    little-endian 64-bit floating point number.
+    its ``name`` is the data type identifier listed there, for example
+    ``"float64"`` for a 64-bit floating point number, in any of the forms
+    the :ref:`extension-definition` permits (the short-hand name or an
+    extension object).
 
     Because the ``fill_value`` metadata key is dependent on the data type, 
     extension data types SHOULD specify permitted values for the ``fill_value`` in
