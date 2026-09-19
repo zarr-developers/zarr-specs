@@ -510,7 +510,7 @@ mandatory names:
     its ``name`` is the data type identifier listed there, for example
     ``"float64"`` for a 64-bit floating point number, in any of the forms
     the :ref:`extension-definition` permits (the short-hand name or an
-    extension object).
+    extension object). If specified, ``must_understand`` MUST be ``true``.
 
     Because the ``fill_value`` metadata key is dependent on the data type, 
     extension data types SHOULD specify permitted values for the ``fill_value`` in
