@@ -1,6 +1,6 @@
-==============
-Specifications
-==============
+==========================
+Zarr Format Specifications
+==========================
 
 .. _zarr-specs:
 
