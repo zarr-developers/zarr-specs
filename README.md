@@ -1,4 +1,4 @@
-# Zarr Specification
+# Zarr Format Specification
 
 **Zarr core protocol for storage and retrieval of N-dimensional typed arrays**
 
