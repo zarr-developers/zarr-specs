@@ -507,9 +507,9 @@ mandatory names:
     and MUST conform to the :ref:`extension-definition`.
 
     If the data type is defined in :ref:`this specification <data-type-list>`,
-    then the value must be the data type
-    identifier provided as a string. For example, ``"float64"`` for
-    little-endian 64-bit floating point number.
+    then the value must be the identifier given in that data type's section.
+    For most core data types this is a string, e.g. ``"float64"`` for a 64-bit
+    floating point number; the ``raw_bits`` data type uses an object identifier.
 
     Because the ``fill_value`` metadata key is dependent on the data type, 
     extension data types SHOULD specify permitted values for the ``fill_value`` in
@@ -889,23 +889,20 @@ of data between a variety of computing environments. The native byte
 order may differ between machines used to write and read the data.
 
 Each data type is associated with an identifier, which can be used in
-metadata documents to refer to the data type. For the data types
-defined in this specification, the identifier is a simple ASCII
-string. However, extensions may use any JSON value to identify a data
-type.
+metadata documents to refer to the data type. For most of the data types
+defined in this specification, the identifier is a simple ASCII string;
+the ``raw_bits`` data type uses an object identifier. Extensions may use any
+JSON value permitted by the :ref:`extension-definition` to identify a
+data type.
 
-In addition to these base types, an implementation should also handle the
-raw/opaque pass-through type designated by the lower-case letter ``r`` followed
-by the number of bits, multiple of 8. For example, ``r8``, ``r16``, and ``r24``
-should be understood as fall-back types of respectively 1, 2, and 3 byte length.
+In addition to these base types, this specification defines a raw/opaque
+pass-through data type, :ref:`raw_bits <dtype-raw>`, whose elements are
+fixed-length byte sequences. Its identifier is an object such as
+``{"name": "raw_bits", "configuration": {"length_bits": 24}}`` for 3-byte
+elements; the legacy string ``"r24"`` is accepted as a synonym when reading.
 
 Zarr v3 is limited to type sizes that are a multiple of 8 bits but may support
 other type sizes in later versions of this specification.
-
-.. note::
-
-    We are explicitly looking for more feedback and prototypes of code using the ``r*``,
-    raw bits, for various endianness and whether the spec could be made clearer.
 
 .. note::
 
@@ -1755,6 +1752,18 @@ by time.
 3.1
 ---
 
+- The :ref:`data types document <data-type-list>` was restructured so that
+  each core data type has its own section describing its meaning, values,
+  identifier, and element (fill value) encoding, together with an informative
+  JSON schema document.
+- ``float16`` and the raw bits data type are no longer marked as optionally
+  supported; implementations SHOULD support all core data types.
+- The raw bits data type is now identified by the object
+  ``{"name": "raw_bits", "configuration": {"length_bits": <int>}}``. The
+  previous string form ``"r<N>"`` is retained as a legacy synonym that
+  implementations MUST accept when reading. See :ref:`raw_bits <dtype-raw>`.
+- The fill value of the raw bits data type may now also be encoded as a
+  base64 string, in addition to an array of byte values.
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
   it is now possible to add user-defined extensions.

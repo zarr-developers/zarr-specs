@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bool",
+  "description": "Boolean data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the bool data type.",
+      "const": "bool"
+    },
+    "element": {
+      "description": "A boolean value.",
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "uint16",
+  "description": "Unsigned 16-bit integer data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the uint16 data type.",
+      "const": "uint16"
+    },
+    "element": {
+      "description": "An integer in [0, 65535].",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    }
+  }
+}
