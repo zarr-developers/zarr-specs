@@ -1755,6 +1755,12 @@ by time.
 3.1
 ---
 
+- The :ref:`data types document <data-type-list>` was restructured so that
+  each core data type has its own section describing its meaning, values,
+  identifier, and element (fill value) encoding, together with an informative
+  JSON schema document.
+- ``float16`` and ``r*`` are no longer marked as optionally supported;
+  implementations SHOULD support all core data types.
 - Clarification of extensions. `PR #330
   <https://github.com/zarr-developers/zarr-specs/pull/330/>`_. With this change,
   it is now possible to add user-defined extensions.

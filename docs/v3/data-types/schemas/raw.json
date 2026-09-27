@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "r*",
+  "description": "Fixed-length raw bytes data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the r* data type: the string \"r<N>\" where N is the size of each element in bits. N must be a positive multiple of 8; this constraint cannot be expressed in the pattern.",
+      "type": "string",
+      "pattern": "^r[1-9][0-9]*$"
+    },
+    "element": {
+      "description": "A byte sequence of length N / 8, as one integer per byte in order. The length constraint cannot be expressed here because it depends on the identifier.",
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      }
+    }
+  }
+}
