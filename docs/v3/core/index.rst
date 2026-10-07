@@ -176,7 +176,7 @@ The following figure illustrates the first part of the terminology:
 
     A Zarr hierarchy is a tree structure, where each node in the tree
     is either a group_ or an array_. Group nodes may have children but
-    array nodes may not. All nodes in a hierarchy have a name_ and a
+    array nodes must not. All nodes in a hierarchy have a name_ and a
     path_. The root of a Zarr hierarchy may be either a group_ or an array_.
     In the latter case, the hierarchy consists of just the single array.
 
@@ -189,7 +189,7 @@ The following figure illustrates the first part of the terminology:
     with zero or more dimensions_ whose lengths define the shape_ of
     the array. An array contains zero or more data elements_. All
     elements_ in an array conform to the same `data type`_. An array
-    may not have child nodes.
+    must not have child nodes.
 
 .. _group:
 .. _groups:
