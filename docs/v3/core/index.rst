@@ -339,10 +339,8 @@ The following figure illustrates the first part of the terminology:
     Upon retrieval, the original keys and bytes are restored within the
     transformer. Any number of storage transformers can be registered and
     stacked. In contrast to codecs, storage transformers can act on the
-    complete array, rather than individual chunks. See the
-    `storage transformers details`_ below.
-
-.. _`storage transformers details`: #storage-transformers-1
+    complete array, rather than individual chunks. See
+    :ref:`storage transformers details <storage-transformers-details>` below.
 
 The following figure illustrates the codec, store and storage transformer
 terminology for a use case of reading from an array:
@@ -1459,6 +1457,8 @@ Let "+" be the string concatenation operator.
         For listable stores, ``list_dir(parent(P))`` can be an alternative.
 
 
+.. _storage-transformers-details:
+
 Storage transformers
 ====================
 
@@ -1466,7 +1466,7 @@ A Zarr storage transformer modifies a request to read or write data before passi
 that request to the following transformer or store.
 The stored transformed data is restored to its original state whenever data is requested
 by the Array. Storage transformers can be configured per array via the
-`storage_transformers <storage_transformers_>`_ name in the `array metadata`_. Storage transformers which do
+:ref:`storage_transformers <array-metadata-storage-transformers>` name in the `array metadata`_. Storage transformers which do
 not change the storage layout (e.g. for caching) may be specified at runtime without
 adding them to the array metadata.
 
