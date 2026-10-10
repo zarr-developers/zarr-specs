@@ -604,6 +604,8 @@ The following members are optional:
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
+    Numbers that are not finite are encoded as described in
+    :ref:`attribute-values`.
 
 
   .. note::
@@ -774,6 +776,8 @@ Optional keys:
     The value must be an object. The object may contain any key/value
     pairs, where the key must be a string and the value can be an arbitrary
     JSON literal. Intended to allow storage of arbitrary user metadata.
+    Numbers that are not finite are encoded as described in
+    :ref:`attribute-values`.
 
 Additional fields
 ^^^^^^^^^^^^^^^^^
@@ -793,6 +797,91 @@ For example, the JSON document below defines a group::
             "eggs": 42
         }
     }
+
+.. _attribute-values:
+
+Attribute values
+----------------
+
+The ``attributes`` member of array and group metadata holds user metadata as
+JSON. [RFC8259]_ has no representation for a number that is not finite, so
+the tokens ``NaN``, ``Infinity`` and ``-Infinity`` MUST NOT be written in a
+metadata document. Such numbers are instead encoded as strings, using the
+forms already defined for :ref:`fill values <fill-value-list>`:
+
+- ``"NaN"``, denoting a not-a-number (NaN) value;
+- ``"Infinity"``, denoting positive infinity;
+- ``"-Infinity"``, denoting negative infinity.
+
+These are called the *reserved strings*. So that a string with the same
+characters as a reserved string can also be stored, such strings are escaped
+with the prefix ``_str_``. An *affected string* is a string that consists of
+zero or more repetitions of ``_str_`` followed by exactly one reserved string.
+The comparison is case sensitive, and no other characters, including
+whitespace, may be present. All other strings are *unaffected*.
+
+When encoding attributes, an implementation MUST apply the following rules to
+every value within ``attributes``, including the members of objects and the
+elements of arrays at any depth:
+
+- A number that is not finite is written as the corresponding reserved string.
+- An affected string is written with one additional ``_str_`` prefix.
+- Any other value is written unchanged.
+
+When decoding attributes, an implementation MUST apply the inverse rules to
+every such value:
+
+- A string that is exactly a reserved string is read as the corresponding
+  number.
+- An affected string that has one or more ``_str_`` prefixes is read as a
+  string, with one prefix removed.
+- Any other value is read unchanged.
+
+An affected string therefore always gains exactly one prefix when it is
+written and loses exactly one when it is read, however many it already has.
+
+These rules apply to values only. The names of the members of an object are
+never changed.
+
+For example:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Attribute value
+     - Encoded in ``zarr.json``
+   * - the number NaN
+     - ``"NaN"``
+   * - the number negative infinity
+     - ``"-Infinity"``
+   * - the string ``NaN``
+     - ``"_str_NaN"``
+   * - the string ``_str_NaN``
+     - ``"_str__str_NaN"``
+   * - the string ``_str__str_NaN``
+     - ``"_str__str__str_NaN"``
+   * - the string ``_str_hello``
+     - ``"_str_hello"``
+   * - the strings ``nan``, ``inf`` and ``N/A``
+     - ``"nan"``, ``"inf"`` and ``"N/A"``
+
+An attribute holds a JSON number, which has no data type, so the sign and
+payload of a NaN are not preserved. The ``"0xYYYYYYYY"`` form that is
+permitted for fill values is not a reserved string and is read as a string.
+
+.. note::
+
+   Some implementations have written non-finite numbers in attributes as the
+   bare tokens ``NaN``, ``Infinity`` and ``-Infinity``, which do not conform
+   to [RFC8259]_. An implementation SHOULD accept these tokens within
+   ``attributes`` when reading, and read them as the corresponding numbers,
+   so that existing data remains readable.
+
+.. note::
+
+   Metadata written before this section was added may contain a reserved
+   string that was intended as text. An implementation following this
+   section reads it as a number.
 
 .. _additional_fields:
 
@@ -1751,6 +1840,14 @@ Change log
 All notable and possibly implementation-affecting changes to this specification
 are documented in this section, grouped by the specification status and ordered
 by time.
+
+Unreleased
+----------
+
+- Numbers that are not finite are now encoded in ``attributes`` as the strings
+  ``"NaN"``, ``"Infinity"`` and ``"-Infinity"``, and strings that would be
+  confused with these are escaped. Please see the new
+  :ref:`Attribute values <attribute-values>` section for details.
 
 3.1
 ---
