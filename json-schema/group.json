@@ -1,0 +1,58 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://zarr-specs.readthedocs.io/v3/json-schema/group.json",
+    "title": "Zarr v3 Group Metadata Schema",
+    "description": "JSON Schema for Zarr v3 Group metadata documents.",
+    "type": "object",
+    "required": [
+        "zarr_format",
+        "node_type"
+    ],
+    "properties": {
+        "zarr_format": {
+            "type": "integer",
+            "const": 3,
+            "description": "Version of the Zarr storage specification"
+        },
+        "node_type": {
+            "type": "string",
+            "const": "group",
+            "description": "Type of hierarchy node element, which must be 'group'."
+        },
+        "attributes": {
+            "$ref": "#/$defs/attributes",
+            "description": "User-defined metadata"
+        }
+    },
+    "additionalProperties": {
+        "$ref": "#/$defs/extension_property"
+    },
+    "$defs": {
+        "attributes": {
+            "type": "object",
+            "description": "User-defined metadata as key-value pairs",
+            "patternProperties": {
+                ".*": {
+                    "description": "Arbitrary JSON value for user metadata"
+                }
+            }
+        },
+        "extension_property": {
+            "description": "Extension properties that implementations may not understand",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "must_understand": {
+                            "const": false
+                        }
+                    },
+                    "required": [
+                        "must_understand"
+                    ]
+                },
+                true
+            ]
+        }
+    }
+}
