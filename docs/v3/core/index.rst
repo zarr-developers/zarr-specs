@@ -535,8 +535,7 @@ names; of ``shape`` and ``bounds``, exactly one must be present:
     Exactly one of ``shape`` and ``bounds`` must be present. ``shape`` is
     equivalent to ``bounds`` with every entry of ``inclusive_min`` 0 and
     ``exclusive_max`` equal to ``shape``.
-    Writers SHOULD use ``shape``, and omit ``origin``, when that is the
-    case and the chunk grid's origin is 0 along every dimension, because
+    Writers SHOULD use ``shape`` when that is the case, because
     implementations of earlier versions of this specification do not read
     ``bounds``. The number of dimensions is the length of ``inclusive_min``;
     where this specification refers to the shape of an array or to the
@@ -575,12 +574,9 @@ names; of ``shape`` and ``bounds``, exactly one must be present:
     as defined in this specification, then the value must be an object with the
     names ``name`` and ``configuration``. The value of ``name`` must be the
     string ``"regular"``, and the value of ``configuration`` an object with the
-    member ``chunk_shape`` and, only when the array metadata gives
-    ``bounds``, the optional member ``origin``. ``chunk_shape`` must be an
-    array of integers providing the lengths of the chunk along each
-    dimension of the array. ``origin``, if present, must be an array of
-    integers giving the coordinate at which the chunk with grid index 0
-    begins along each dimension; see :ref:`regular-chunkgrid`.  For example,
+    member ``chunk_shape``. ``chunk_shape`` must be an array of
+    integers providing the lengths of the chunk along each dimension of the
+    array.  For example,
     ``{"name": "regular", "configuration": {"chunk_shape": [2, 5]}}``
     means a regular grid where the chunks have length 2 along the first
     dimension and length 5 along the second dimension, aligned at
@@ -1849,8 +1845,8 @@ by time.
 --------------
 
 - Added ``bounds`` as an alternative to ``shape``, so that the coordinates of
-  an array may start at any integer, and an optional ``origin`` to the regular
-  chunk grid. Chunk grid indices may be negative. `ZEP0012 — Explicit array bounds <https://zarr.dev/zeps/draft/ZEP0012.html>`_.
+  an array may start at any integer. Chunk grid indices of the regular chunk
+  grid may be negative. `ZEP0012 — Explicit array bounds <https://zarr.dev/zeps/draft/ZEP0012.html>`_.
 
 3.1
 ---
