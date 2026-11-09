@@ -535,9 +535,11 @@ names; of ``shape`` and ``bounds``, exactly one must be present:
     Exactly one of ``shape`` and ``bounds`` must be present. ``shape`` is
     equivalent to ``bounds`` with every entry of ``inclusive_min`` 0 and
     ``exclusive_max`` equal to ``shape``.
-    Writers SHOULD use ``shape`` when that is the case, because
-    implementations of earlier versions of this specification do not read
-    ``bounds``. The number of dimensions is the length of ``inclusive_min``;
+    Writers choosing a form SHOULD use ``shape`` when that is the case,
+    because implementations of earlier versions of this specification do
+    not read ``bounds``, and SHOULD keep whichever form a stored document
+    has when updating it, unless the new extent no longer starts at 0.
+    The number of dimensions is the length of ``inclusive_min``;
     where this specification refers to the shape of an array or to the
     length of a dimension, the length ``stop - start`` applies.
 
