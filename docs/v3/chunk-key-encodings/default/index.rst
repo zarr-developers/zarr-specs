@@ -5,11 +5,12 @@ Default chunk key encoding
 ==========================
 
 Version:
-    1.0
+    1.1
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/chunk-key-encodings/default/
 Corresponding ZEP:
-    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_;
+    `ZEP0012 — Explicit array bounds <https://zarr.dev/zeps/draft/ZEP0012.html>`_ (negative indices, version 1.1)
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/chunk-grid>`_
 Suggest an edit for this spec:
@@ -33,12 +34,21 @@ formed by taking the initial prefix ``c``, and appending for each dimension:
 
 - the ``separator`` character, followed by,
 
-- the ASCII decimal string representation of the chunk index within that dimension.
+- the ASCII decimal string representation of the chunk index within that
+  dimension, with a leading ``-`` when the index is negative. The string
+  ``-0`` MUST NOT be written, and a key containing it MUST be rejected when
+  parsed.
 
 For example, in a 3 dimensional array, with a separator of ``/`` the identifier
 for the chunk at grid index (1, 23, 45) is the string ``"c/1/23/45"``.  With a
-separator of ``.``, the identifier is the string ``"c.1.23.45"``. The initial prefix 
+separator of ``.``, the identifier is the string ``"c.1.23.45"``. The chunk at
+grid index (-1, 0, 45) has the identifier ``"c/-1/0/45"``. The initial prefix
 ``c`` ensures that metadata documents and chunks have separate prefixes.
+
+.. note:: The lexicographic order of keys is not the numeric order of grid
+    indices, and with negative indices the two also differ in direction:
+    ``c/-2`` sorts after ``c/-1``, and both sort before ``c/0``. An
+    implementation that lists keys by range has to allow for this.
 
 .. note:: A main difference with spec v2 is that the default chunk separator
     changed from ``.`` to ``/``, as in N5.  This decreases the maximum number of

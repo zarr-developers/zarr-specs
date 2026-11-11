@@ -5,11 +5,12 @@ v2 chunk key encoding
 =====================
 
 Version:
-    1.0
+    1.1
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/chunk-key-encodings/v2/
 Corresponding ZEP:
-    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_
+    `ZEP0001 — Zarr specification version 3 <https://zarr.dev/zeps/draft/ZEP0001.html>`_;
+    `ZEP0012 — Explicit array bounds <https://zarr.dev/zeps/draft/ZEP0012.html>`_ (negative indices, version 1.1)
 Issue tracking:
     `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/chunk-grid>`_
 Suggest an edit for this spec:
@@ -32,14 +33,22 @@ The identifier for chunk with at least one dimension is formed by
 concatenating for each dimension:
 
  - the ASCII decimal string representation of the chunk index within that
-   dimension, followed by
+   dimension, with a leading ``-`` when the index is negative (the string
+   ``-0`` MUST NOT be written, and a key containing it MUST be rejected when
+   parsed), followed by
 
  - the ``separator`` character, except that it is omitted for the last
    dimension.
 
 For example, in a 3 dimensional array, with a separator of ``.`` the identifier
 for the chunk at grid index (1, 23, 45) is the string ``"1.23.45"``.  With a
-separator of ``/``, the identifier is the string ``"1/23/45"``.
+separator of ``/``, the identifier is the string ``"1/23/45"``. The chunk at
+grid index (-1, 0, 45) has the identifier ``"-1.0.45"``.
+
+.. note:: The lexicographic order of keys is not the numeric order of grid
+    indices, and with negative indices the two also differ in direction:
+    ``-2`` sorts after ``-1``, and both sort before ``0``. An
+    implementation that lists keys by range has to allow for this.
 
 For chunk grids with 0 dimensions, the single chunk has the key ``"0"``.
 
