@@ -62,7 +62,7 @@ Configuration parameters
 
 order:
     Required.  Must be an array of integers specifying a permutation of ``0``, ``1``, ...,
-    `n-1``, where ``n`` is the number of dimensions in the decoded chunk
+    ``n-1``, where ``n`` is the number of dimensions in the decoded chunk
     representation provided as input to this codec.
 
 Format and algorithm
