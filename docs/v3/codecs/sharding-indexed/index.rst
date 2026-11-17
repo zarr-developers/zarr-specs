@@ -5,17 +5,18 @@ Sharding codec
 ==============
 
 Version:
-    1.0
+    1.1
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/
 Editors:
     * Jonathan Striebel (`@jstriebel <https://github.com/jstriebel>`_), Scalable Minds
     * Norman Rzepka (`@normanrz <https://github.com/normanrz>`_), Scalable Minds
     * Jeremy Maitin-Shepard (`@jbms <https://github.com/jbms>`_), Google
+    * Mark Kittisopikul (`@mkitti <https://github.com/mkitti>`_), Howard Hughes Medical Institute
 Corresponding ZEP:
     `ZEP0002 — Sharding codec <https://zarr.dev/zeps/accepted/ZEP0002.html>`_
 Issue tracking:
-    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.0>`_
+    `GitHub issues <https://github.com/zarr-developers/zarr-specs/labels/sharding-indexed-codec-v1.1>`_
 Suggest an edit for this spec:
     `GitHub editor <https://github.com/zarr-developers/zarr-specs/blob/main/docs/codecs/sharding-indexed/index.rst>`_
 
@@ -140,25 +141,54 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
 ``codecs``
 
     Specifies a list of codecs to be used for encoding and decoding inner chunks. 
-    The value must be an array of objects, as specified in the 
+    The value must be an array of objects, as specified in the
     :ref:`array-metadata`. The ``codecs`` member is required and needs to contain
     exactly one ``array -> bytes`` codec.
 
 ``index_codecs``
 
-    Specifies a list of codecs to be used for encoding and decoding shard index. 
-    The value must be an array of objects, as specified in the 
-    :ref:`array-metadata`. The ``index_codecs`` member is required and needs to 
-    contain exactly one ``array -> bytes`` codec. Codecs that produce 
-    variable-sized encoded representation, such as compression codecs, MUST NOT
-    be used for index codecs. It is RECOMMENDED to use a little-endian codec 
-    followed by a crc32c checksum as index codecs.
+    Specifies a list of codecs to be used for processing a shard index.
+    The shard index is an array with a ``shape`` of ``[N,2]`` and a ``data_type`` of
+    ``uint64`` where ``N`` is the number of chunks to be indexed in the shard.
+    The ``index_codecs`` value must be an array of objects, as specified in the
+    :ref:`array-metadata`.
+
+    Unless ``index_location`` is ``configuration`` and `predefined_index` is a
+    JSON array, the ``index_codecs`` member is required and needs to contain
+    exactly one ``array -> bytes`` codec. This ``array -> bytes`` codec MAY be
+    preceded by ``array -> array`` codecs that modify either the ``shape`` or
+    ``data_type`` of the array.
+
+    If ``index_location`` is ``configuration`` and `predefined_index` is a JSON array,
+    the ``index_codecs`` member MAY be empty or contain only ``array -> array``
+    codecs. An ``array -> bytes`` codec MUST NOT be present. The ``array -> array``
+    codecs define the transformation from the conceptual `[N, 2]` index to the
+    structure represented in the JSON array.
+
+    Codecs that produce variable-sized encoded representation, such as
+    compression codecs, MUST NOT be used for index codecs. It is RECOMMENDED
+    to use a little-endian codec followed by a crc32c checksum as index codecs
+    when an ``array -> bytes`` codec is used.
 
 ``index_location``
 
-    Specifies whether the shard index is located at the beginning or end of the 
-    file. The parameter value must be either the string ``start`` or ``end``. 
-    If the parameter is not present, the value defaults to ``end``.
+    Specifies whether the shard index is located at the beginning of the file,
+    the end of the file, or is defined directly in the codec's configuration. The
+    parameter value must be either the string ``start``, ``end``, or
+    ``configuration``. If the parameter is not present, the value defaults to
+    ``end``.
+
+``predefined_index``
+
+    REQUIRED if ``index_location`` is ``configuration``. This parameter
+    contains the shard index data itself. The value can either be:
+
+    *   A JSON array: A JSON array representing the `(offset, nbytes)` pairs
+        for each inner chunk. This array must have a shape of `[N, 2]` where `N`
+        is the number of inner chunks in the shard. Each element must be an integer.
+    *   A BASE64 encoded string: A string containing the BASE64 encoding of
+        the binary representation of the shard index. The binary representation
+        is as described in the "Binary shard format" section.
     
 Definitions
 ===========
@@ -180,8 +210,8 @@ Binary shard format
 This is an ``array -> bytes`` codec.
 
 In the ``sharding_indexed`` binary format, inner chunks are written successively in a 
-shard, where unused space between them is allowed, followed by an index 
-referencing them.
+shard, where unused space between them is allowed. An index referencing them may
+precede, follow, or be defined directly in the codec configuration.
 
 The index is an array with 64-bit unsigned integers with a shape that matches the
 chunks per shard tuple with an appended dimension of size 2.
@@ -199,11 +229,24 @@ Empty inner chunks are interpreted as being filled with the fill value. The inde
 always has the full shape of all possible inner chunks per shard, even if they extend
 beyond the array shape.
 
-The index is either placed at the end of the file or at the beginning of the file,
-as configured by the ``index_location`` parameter. The index is encoded into binary 
-representations using the specified index codecs. The byte size of the index is 
-determined by the number of inner chunks in the shard ``n``, i.e. the product of 
-chunks per shard, and the choice of index codecs.
+The index is either placed at the end of the file, at the beginning of the file,
+or defined directly within the codec configuration, as configured by the
+``index_location`` parameter.
+
+When ``index_location`` is ``start`` or ``end``, the index is encoded into a
+binary representation using the specified index codecs, which must include one
+``array -> bytes`` codec.
+
+When ``index_location`` is ``configuration``, the index is provided via the
+``predefined_index`` parameter.
+If ``predefined_index`` is a BASE64 encoded string, its content is the binary
+representation produced by applying the full ``index_codecs`` chain (including
+an ``array -> bytes`` codec) to the index array.
+If ``predefined_index`` is a JSON array, it represents the index *after* any
+``array -> array`` codecs in the ``index_codecs`` chain have been applied. In
+this case, the ``index_codecs`` chain MUST NOT contain an ``array -> bytes``
+codec. The byte size of the index is determined by the number of inner chunks
+in the shard ``n``, i.e. the product of chunks per shard.
 
 For an example, consider a shard shape of ``[64, 64]``, an inner chunk shape of 
 ``[32, 32]`` and an index codec combination of a little-endian codec followed by 
@@ -250,12 +293,13 @@ common optimizations.
 * **Decoding**: A simple implementation to decode inner chunks in a shard would (a) 
   read the entire value from the store into a byte buffer, (b) parse the shard
   index as specified above from the beginning or end (according to the 
-  ``index_location``) of the buffer and (c) cut out the relevant bytes that belong 
-  to the requested chunk. The relevant bytes are determined by the 
-  ``offset,nbytes`` pair in the shard index. This bytestream then needs to be 
-  decoded with the inner codecs as specified in the sharding configuration applying 
-  the :ref:`decoding_procedure`. This is similar to how an implementation would 
-  access a sub-slice of a chunk.
+  ``index_location``) of the buffer, or retrieve it directly from the
+  ``predefined_index`` parameter when ``index_location`` is ``configuration``,
+  and (c) cut out the relevant bytes that belong to the requested chunk. The relevant bytes are
+  determined by the ``offset,nbytes`` pair in the shard index. This bytestream
+  then needs to be decoded with the inner codecs as specified in the sharding
+  configuration applying the :ref:`decoding_procedure`. This is similar to how
+  an implementation would access a sub-slice of a chunk.
 
   The size of the index can be determined by applying ``c.compute_encoded_size``
   for each index codec recursively. The initial size is the byte size of the index 
@@ -265,36 +309,54 @@ common optimizations.
   read the entire shard once into a byte buffer and then cut out and decode all 
   inner chunks from that buffer in one pass.
 
-  If the underlying store supports partial reads, the decoding of single inner
-  chunks can be optimized. In that case, the shard index can be read from the
-  store by requesting the ``n`` first or last bytes (according to the 
-  ``index_location``), where ``n`` is the size of the index as determined by 
-  the number of inner chunks in the shard and choice of index codecs. After 
-  parsing the shard index, single inner chunks can be requested from the store 
-  by specifying the byte range. The bytestream, then, needs to be decoded as above. 
+  If the underlying store supports partial reads and ``index_location`` is
+  ``start`` or ``end``, the decoding of single inner chunks can be optimized.
+  In that case, the shard index can be read from the store by requesting the
+  ``n`` first or last bytes (according to the ``index_location``), where ``n``
+  is the size of the index as determined by the number of inner chunks in the
+  shard and choice of index codecs. After parsing the shard index, single
+  inner chunks can be requested from the store by specifying the byte range.
+  If ``index_location`` is ``configuration``, the index is directly available
+  from the codec configuration and no partial read is needed for the index itself.
+  The bytestream, then, needs to be decoded as above.
 
 * **Encoding**: A simple implementation to encode a chunk in a shard would (a)
   encode the new chunk per :ref:`encoding_procedure` in a byte buffer using the 
   shard's inner codecs, (b) read an existing shard from the store, (c) create a 
   new bytestream with all encoded inner chunks of that shard including the overwritten 
-  chunk, (d) generate a new shard index that is prepended or appended (according 
-  to the ``index_location``) to the chunk bytestream and (e) writes the shard to 
-  the store. If there was no existing shard, an empty shard is assumed. When 
-  writing entire inner chunks, reading the existing shard first may be skipped.
+  chunk, (d) generate a new shard index that is prepended or appended
+  (according to the ``index_location``) to the chunk
+  bytestream and (e) writes the shard to the store. If there was no existing
+  shard, an empty shard is assumed. When writing entire inner chunks, reading
+  the existing shard first may be skipped.
+
+  Due to the difficulty of updating an index stored in the array metadata,
+  implementations MAY consider any array using ``"index_location": "configuration"``
+  (at any level of nesting) to be read-only. Writing to such an array may
+  produce an error or lead to a corrupted state if the written data would
+  require a change to the predefined index.
 
   When working with inner chunks that have a fixed byte size (e.g., uncompressed) and 
   a store that supports partial writes, a optimization would be to replace the
   new chunk by writing to the store at the specified byte range.
 
   On stores with random-write capabilities, it may be useful to (a) place the shard 
-  index at the beginning of the file, (b) write out inner chunks in 
-  application-specific order, and (c) update the shard index accordingly. 
+  index at the beginning of the file or in a separate file, (b) write out inner
+  chunks in application-specific order, and (c) update the shard index accordingly.
   Synchronization of parallelly written inner chunks needs to be handled by the
   application.
 
   Other use case-specific optimizations may be available, e.g., for append-only
   workloads.
 
+* **Nesting**: The ``sharding_indexed`` codec MAY be used as part of a codec
+  chain of another ``sharding_indexed`` codec. This means that an inner chunk
+  MAY itself be a shard nested within an outer chunk, creating a hierarchical
+  index and multiple levels of partitioning. While the number of nested levels
+  of shards is not restricted, some implementations MAY support a limited
+  number of nested shards or MAY NOT support nesting. Both primary and nested
+  shards MAY have an ``index_location`` value of ``start``, ``end``, or
+  ``configuration``.
 
 References
 ==========
@@ -305,6 +367,8 @@ References
 
 Change log
 ==========
+
+* Add ``configuration`` as a parameter value for ``index_location`` to Version 1.1 and clarified nesting. `PR ABC <https://github.com/zarr-developers/zarr-specs/pull/368>`_
 
 * Adds ``index_location`` parameter. `PR 280 <https://github.com/zarr-developers/zarr-specs/pull/280>`_
 
