@@ -1760,7 +1760,7 @@ by time.
   supported; implementations SHOULD support all core data types.
 - The raw bits data type is now identified by the object
   ``{"name": "raw_bits", "configuration": {"length_bits": <int>}}``. The
-  previous string form ``"r<N>"`` is retained as a legacy synonym that
+  previous string form ``"r<N>"`` is a deprecated alias that
   implementations MUST accept when reading. See :ref:`raw_bits <dtype-raw>`.
 - The fill value of the raw bits data type may now also be encoded as a
   base64 string, in addition to an array of byte values.
