@@ -5,7 +5,7 @@ Sharding codec
 ==============
 
 Version:
-    1.0
+    1.1-draft
 Specification URI:
     https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/
 Editors:
@@ -131,11 +131,21 @@ Sharding can be configured per array in the :ref:`array-metadata` as follows::
     An array of integers specifying the shape of the inner chunks in a shard
     along each dimension of the outer array. The length of the ``chunk_shape``
     array must match the number of dimensions of the shard shape to which this
-    sharding codec is applied, and the inner chunk shape along each dimension must
-    evenly divide the size of the shard shape. For example, an inner chunk
-    shape of ``[32, 2]`` with an shard shape ``[64, 64]`` indicates that
-    64 inner chunks are combined in one shard, 2 along the first dimension, and for
-    each of those 32 along the second dimension.
+    sharding codec is applied. Inner chunks are clipped by the shard shape.
+    For example:
+
+    * An inner chunk shape of ``[32, 2]`` with a shard shape ``[64, 64]``
+      indicates that 64 inner chunks are combined in one shard, 2 along the first
+      dimension, and for each of those 32 along the second dimension.
+
+    * An inner chunk shape of ``[12]`` with a shard shape of ``[5]`` indicates that 3
+      inner chunks are combined in one shard with shapes ``[5]``, ``[5]``, and ``[2]``.
+      The last inner chunk is clipped to the shard shape.
+
+    .. note:: Version 1.0 of the ``sharding_indexed`` specification required the
+       ``chunk_shape`` to evenly divide the shard shape.
+       Version 1.0 implementations MUST reject a ``chunk_shape`` that does not evenly 
+       divide the shard shape, otherwise they are non-conformant.
 
 ``codecs``
 
@@ -168,10 +178,10 @@ Definitions
 * **Inner chunk** is a chunk within the shard.
 * **Shard shape** is the chunk shape of the outer array.
 * **Inner chunk shape** is defined by the ``chunk_shape`` configuration of the codec.
-  The inner chunk shape needs to have the same number of dimensions as the shard shape and the
-  inner chunk shape along each dimension must evenly divide the size of the shard shape.
-* **Chunks per shard** is the element-wise division of the shard shape by the 
-  inner chunk shape.
+  The inner chunk shape needs to have the same number of dimensions as the shard shape.
+  Inner chunks are clipped by the shard shape.
+* **Chunks per shard** is the element-wise division of the shard shape by the
+  inner chunk shape, rounded up to the nearest integer.
 
 
 Binary shard format
@@ -306,6 +316,14 @@ References
 Change log
 ==========
 
-* Adds ``index_location`` parameter. `PR 280 <https://github.com/zarr-developers/zarr-specs/pull/280>`_
+* 1.1 (draft)
 
-* ZEP0002 was accepted. `Issue 254 <https://github.com/zarr-developers/zarr-specs/pull/254>`_
+  * Lifts constraint requiring ``chunk_shape`` to evenly divide the shard shape.
+    This addreses a common hurdle in practical usage, particularly with
+    irregularly gridded arrays (e.g. ``rectilinear``).
+
+* 1.0
+
+  * Adds ``index_location`` parameter. `PR 280 <https://github.com/zarr-developers/zarr-specs/pull/280>`_
+
+  * ZEP0002 was accepted. `Issue 254 <https://github.com/zarr-developers/zarr-specs/pull/254>`_
