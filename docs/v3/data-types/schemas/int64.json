@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "int64",
+  "description": "Signed 64-bit integer data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the int64 data type.",
+      "const": "int64"
+    },
+    "element": {
+      "description": "An integer in [-9223372036854775808, 9223372036854775807].",
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807
+    }
+  }
+}

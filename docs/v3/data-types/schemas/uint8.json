@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "uint8",
+  "description": "Unsigned 8-bit integer data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the uint8 data type.",
+      "const": "uint8"
+    },
+    "element": {
+      "description": "An integer in [0, 255].",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    }
+  }
+}

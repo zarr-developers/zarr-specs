@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "float32",
+  "description": "IEEE 754 32-bit floating point data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the float32 data type.",
+      "const": "float32"
+    },
+    "element": {
+      "description": "A 32-bit IEEE 754 floating point number.",
+      "oneOf": [
+        {
+          "type": "number",
+          "description": "Rounded to the nearest representable value using round half to even."
+        },
+        {
+          "type": "string",
+          "enum": [
+            "Infinity",
+            "-Infinity",
+            "NaN"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{8}$",
+          "description": "The bit pattern of the value as 8 hexadecimal digits."
+        }
+      ]
+    }
+  }
+}
