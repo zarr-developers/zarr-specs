@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "raw_bits",
+  "description": "Fixed-length raw bytes data type.",
+  "type": "object",
+  "properties": {
+    "data_type": {
+      "$ref": "#/$defs/identifier"
+    },
+    "fill_value": {
+      "$ref": "#/$defs/element"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "The identifier of the raw_bits data type: an object, or the legacy string form \"r<N>\".",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "const": "raw_bits"
+            },
+            "configuration": {
+              "type": "object",
+              "properties": {
+                "length_bits": {
+                  "type": "integer",
+                  "minimum": 8,
+                  "multipleOf": 8,
+                  "description": "The size of each element in bits."
+                }
+              },
+              "required": [
+                "length_bits"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "name",
+            "configuration"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^r[1-9][0-9]*$",
+          "description": "Legacy form. The integer after \"r\" is length_bits and must be a positive multiple of 8; this constraint cannot be expressed in the pattern."
+        }
+      ]
+    },
+    "element": {
+      "description": "A byte sequence of length length_bits / 8. The length constraint cannot be expressed here because it depends on the identifier.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "description": "One integer per byte, in order."
+        },
+        {
+          "type": "string",
+          "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+          "description": "The bytes encoded as base64 (RFC 4648 section 4, with padding)."
+        }
+      ]
+    }
+  }
+}
